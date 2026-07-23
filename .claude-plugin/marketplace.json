@@ -1,0 +1,15 @@
+{
+  "name": "gx-design",
+  "description": "GX 디자인 멀티에이전트 팀 마켓플레이스 — BX·그래픽·UX/UI·영상 공용 디자인 워크플로 플러그인 제공",
+  "owner": {
+    "name": "구본승",
+    "email": "bonseung@sqisoft.com"
+  },
+  "plugins": [
+    {
+      "name": "gx-design",
+      "source": "./",
+      "description": "디자인 멀티에이전트 팀 플러그인 (design-team 오케스트레이터 + 전문 에이전트 3종 + 스킬 5종)"
+    }
+  ]
+}
