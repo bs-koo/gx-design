@@ -234,3 +234,12 @@ UI 프로토타입이 필요하면 frontend-design 스킬을, .pen 시안이 필
 - **구조 검증**: JSON 매니페스트 2건 유효, frontmatter 8건 유효, name 중복 없음, `skills:` 참조 4건 전부 대응 SKILL.md 존재, tools 전부 유효, memory 값 유효, design-team 참조 파일 3건 존재 — ALL PASS.
 - **테스트 깊이 한계(잔여 부채)**: RED/GREEN 각 1회 실행. writing-skills가 권장하는 5회+ 반복과 압박 시나리오(시간 압박·매몰 비용 결합)는 미실시 — 실제 프로젝트 첫 실행이 REFACTOR 입력이 된다.
 - **설치 후 확인 필요**: 재시작 후 에이전트·스킬 등록 여부, 플러그인 컨텍스트에서 `skills:` 사전 로드가 접두사 없이 해석되는지(대비책으로 에이전트 본문에 Skill 도구 로드 가드 1줄 포함).
+
+---
+
+## 5. v0.2 확장 — 커맨드 개편 + gx-redesign (2026-07-23)
+
+- **커맨드 체계**: design-team → `gx-design`(신규 제작, 5단계), 신설 `gx-redesign`(기존 개선, 진단 선행 6단계: 자산 인벤토리+개선 브리프 → 진단 Audit → 갭 리서치(조건부) → 개선 강도 전략 3안(최소 개입/리프레시/리뉴얼) → before/after 제작 → 3축 검수). 방법론 스킬 4종은 oh-my-gx:gx-research와의 이름 충돌을 피해 이름 유지.
+- **gx-redesign TDD**: RED(스킬 없음)에서 4개 실패 관찰 — 진단 부재, 상류 질문 누락("요즘 느낌"→레퍼런스 취향 직행), 게이트 없음, before/after 부재 → GREEN(스킬 로드)에서 4개 전부 해소 확인 — 자산 인벤토리 표 + before 기준선 태깅, "요즘 느낌" 상류 분해(계기/성공 기준/범위/낡음의 정체), 라운드 구조 예고, 승인 전 제안 금지 선언.
+- **자산 파악 보강(v0.2.1)**: 자산 유형별 파악 방법(문서 Read / .pen pencil / 코드 실행 / 이미지 시각 분석 / 배포 화면 브라우저 캡처) 명시 + 자산 부재 시 첫 라운드에서 자료 요청(스크린샷/URL/파일 경로/Figma 링크) 규칙 추가.
+- **배포**: GitHub github.com/bs-koo/gx-design (main). 원격 설치: `/plugin marketplace add bs-koo/gx-design` → `/plugin install gx-design@gx-design`.
