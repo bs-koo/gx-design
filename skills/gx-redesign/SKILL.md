@@ -20,7 +20,8 @@ argument-hint: "[개선 대상 한 줄 설명]"
 
 ## 단계 1 — 진단 (Audit)
 
-기존 디자인에 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축 독립 검수를 그대로 적용한다.
+기존 디자인에 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축 독립 검수를 적용한다.
+단, 진단에서는 축 A의 입력을 조정한다 — 이전 브리프·전략 문서가 있으면 그것과의 일치를, 없으면 개선 브리프에 기록된 현행 목표 대비 적합성을 검수한다.
 "낡았다"는 인상을 구체적 문제 목록(Critical/Major/Minor + 근거)으로 번역하는 단계다.
 
 완료 기준: outputs/research/에 진단 리포트가 저장되었고, 사용자에게 진단 요약을 보고했다.

@@ -9,7 +9,7 @@
     {
       "name": "gx-design",
       "source": "./",
-      "description": "디자인 멀티에이전트 팀 플러그인 (design-team 오케스트레이터 + 전문 에이전트 3종 + 스킬 5종)"
+      "description": "디자인 멀티에이전트 팀 플러그인 (gx-design·gx-redesign 오케스트레이터 + 전문 에이전트 3종 + 방법론 스킬 4종)"
     }
   ]
 }

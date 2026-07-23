@@ -1,7 +1,7 @@
 {
   "name": "gx-design",
   "description": "디자인 멀티에이전트 팀 — 브리프 인터뷰 게이트와 Research → Strategy → Production → Review 파이프라인으로 BX·그래픽·UX/UI·영상 산출물을 제작",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "구본승",
     "email": "bonseung@sqisoft.com"
