@@ -9,7 +9,7 @@
     {
       "name": "gx-design",
       "source": "./",
-      "description": "디자인 멀티에이전트 팀 플러그인 (gx-design·gx-redesign 오케스트레이터 + 전문 에이전트 3종 + 방법론 스킬 4종, 전체/핵심 모드 지원)"
+      "description": "디자인 멀티에이전트 팀 플러그인 (gx-design·gx-redesign 오케스트레이터 + 전문 에이전트 3종 + 방법론 스킬 4종, 전체/핵심 모드·디자인 톤 기준(DESIGN.md) 지원)"
     }
   ]
 }

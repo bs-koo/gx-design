@@ -57,6 +57,7 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 - **C안 — 리뉴얼**: 불가침 자산만 남기고 전면 재설계
 
 각 안은 진단 문제 중 무엇을 해결하는지 명시해야 한다. 비교표(해결 범위 / 리스크 / 작업량) + 소신 추천 1안을 제시한 뒤 AskUserQuestion으로 선택받는다(추천안이 첫 번째, "(추천)" 표기, preview에 요약).
+개선 브리프에 디자인 톤 기준이 있으면 세 안 모두 그 팔레트·타이포·톤·형태를 제약으로 삼는다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 선택 게이트에서 승인받는다.
 
 **핵심 모드**: design-strategist 1개가 개선 강도 1안(브리프의 개선 강도 허용치 기준으로 선택) + 반대 강도 미니 대안(10줄 요약)을 작성한다. 선택 게이트는 유지한다.
 
@@ -68,6 +69,7 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 
 **모든 변경 항목은 before → after → 근거(진단 문제 또는 브리프 목표와 연결)의 3열로 기록하게 한다.**
 유지 자산으로 지정된 요소는 변경하지 않는다.
+디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 
 **핵심 모드**: 위임 프롬프트에 분량 상한 200줄을 명시한다. before/after 매핑 의무는 모드와 무관하게 유지된다.
 
@@ -78,6 +80,8 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축에 세 번째 축을 추가해 3축 병렬 검수한다:
 
 - **축 C — 개선 목표 달성**: 진단된 Critical/Major가 해소되었는가, 유지 자산이 보존되었는가, 브리프의 성공 기준을 충족하는가.
+
+디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 
 **핵심 모드**: 검수 서브에이전트 1개가 축 A→B→C를 순차 점검한다(보고는 축별 분리, Critical만 수정 루프).
 
