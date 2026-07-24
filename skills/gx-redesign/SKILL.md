@@ -70,6 +70,7 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 **모든 변경 항목은 before → after → 근거(진단 문제 또는 브리프 목표와 연결)의 3열로 기록하게 한다.**
 유지 자산으로 지정된 요소는 변경하지 않는다.
 디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
+UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션).
 
 **핵심 모드**: 위임 프롬프트에 분량 상한 200줄을 명시한다. before/after 매핑 의무는 모드와 무관하게 유지된다.
 

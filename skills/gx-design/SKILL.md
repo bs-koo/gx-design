@@ -52,7 +52,7 @@ argument-hint: "[프로젝트 한 줄 설명]"
 ## 단계 3 — Production
 
 선택된 전략을 creative-producer 서브에이전트에게 위임한다.
-UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도구를 사용하게 한다(사용 가능한 경우). 렌더·화면 실물이 나오는 제작은 위임 프롬프트에 VISUAL-QUALITY.md 경로를 포함해 시각 품질 루프를 수행하게 한다.
+UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도구를 사용하게 한다(사용 가능한 경우). 렌더·화면 실물이 나오는 제작은 위임 프롬프트에 VISUAL-QUALITY.md 경로를 포함해 시각 품질 루프를 수행하게 한다. UI·그래픽·UX/UI 산출물은 VISUAL-CRAFT.md 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션 — 렌더 없이 명세만 만드는 잡도 서브에이전트가 규칙 원문에 닿도록).
 디자인 톤 기준이 있으면 위임 프롬프트에 그 원본 파일 경로를 전달하고, hex·폰트·spacing·radius를 그 파일에서 그대로 인용하게 한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4 — 즉흥 팔레트 금지). Gemini 경로가 병행되면 그 팔레트를 PROMPT-PLAYBOOK 공통 스타일 블록에 주입한다.
 
 **핵심 모드**: 위임 프롬프트에 분량 상한 200줄과 매체별 필수 섹션(creative-production 스킬 기준)을 명시한다.
