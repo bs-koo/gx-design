@@ -34,6 +34,7 @@
 같은 프로젝트의 여러 컷은 공통 문단 하나를 모든 프롬프트 끝에 반복한다:
 
 - 팔레트(hex 포함), 조명 톤, 카메라·필름 룩, 무드 키워드를 한 문단으로 고정
+- **디자인 톤 기준([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md))이 있으면** 그 파일의 팔레트 hex·폰트·톤 키워드를 이 블록의 정본 소스로 쓴다 — 임의 색 지정 금지.
 - 마지막 문장: "All images in this series should share this consistent look."
 - 생성 도구는 프롬프트 간 맥락을 유지하지 않는다 — 반복 포함이 유일한 일관성 장치다(같은 대화의 후속 수정은 예외).
 

@@ -84,9 +84,10 @@
 - 적용 범위: gx-design·gx-redesign 둘 다.
 - 버전: 0.5.0(additive minor).
 
-## 별도 기록(이번 범위 아님)
+## 실행 이력 메모
 
-gx-design SKILL.md 단계 4 핵심 모드가 "REVIEW-AXES.md의 핵심 모드 조항을 따른다"고 참조하나 REVIEW-AXES.md에 해당 조항이 없다(v0.4 누락 추정, dangling reference). 이번 작업과 섞지 않고 사용자에게 별도 보고 후 결정.
+- 최초 브랜치를 낡은 로컬 main(v0.3.0) 위에서 떠 작업을 시작했으나, 원격 origin/main이 v0.4.0(+ A/B 원칙)까지 머지된 최신본임을 확인하고 로컬 main을 origin/main으로 정렬한 뒤 브랜치를 v0.4 베이스로 리베이스했다.
+- 초기 조사에서 "REVIEW-AXES.md에 핵심 모드 조항이 없다(dangling reference)"고 본 것은 v0.3.0판을 읽은 착오였다 — v0.4판에는 조항이 존재하며 gx-design SKILL 단계 4의 참조는 정상이다.
 
 ## 실행 방식 판단
 
