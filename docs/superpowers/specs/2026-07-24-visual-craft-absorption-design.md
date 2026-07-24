@@ -48,9 +48,10 @@ taste의 다이얼은 "vibe에서 자동으로 디자인을 밀어붙이는" 성
 3. `skills/creative-production/SKILL.md` — 제작 원칙에 VISUAL-CRAFT(다이얼 기록·크래프트 규칙)
 4. `skills/creative-review/SKILL.md` — 시각 완성도/렌더 절에 안티-슬롭·일관성·모션 QA
 5. `agents/creative-producer.md` — VISUAL-CRAFT 준수 원칙
-6. `README.md` — 참조 목록 + 버전
-7. `.claude-plugin/plugin.json` — 0.5.0 → 0.6.0
-8. `.claude-plugin/marketplace.json` — 소개 반영
+6. `skills/gx-design/SKILL.md` · `skills/gx-redesign/SKILL.md` — 단계 3/4 위임 프롬프트에 VISUAL-CRAFT.md 경로 배달(검수 반영: 렌더 없이 명세만 만드는 잡도 서브에이전트가 규칙 원문에 닿도록)
+7. `README.md` — 참조 목록 + 버전
+8. `.claude-plugin/plugin.json` — 0.5.0 → 0.6.0
+9. `.claude-plugin/marketplace.json` — 소개 반영
 
 ## 비목표(YAGNI)
 

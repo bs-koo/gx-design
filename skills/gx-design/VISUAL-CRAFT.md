@@ -3,7 +3,7 @@
 시각 산출물(UI·그래픽·코드 렌더)의 제작·검수·시각 품질 루프가 공통 참조하는 크래프트 규칙.
 근거: Anthropic frontend-design 공식 스킬 원칙 + 커뮤니티 taste·animate 스킬의 구체 규칙을 우리 규격으로 **흡수**한 것이다(외부 스킬 런타임 의존 없음).
 
-적용 범위는 UI·그래픽·코드 렌더 산출물이다. Gemini 이미지·영상 프롬프트 패키지는 [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md)를 따른다(§2 다이얼 중 팔레트·무드는 참고 가능하나 CSS·모션 규칙은 무관).
+적용 범위는 UI·그래픽·코드 렌더 산출물이다. Gemini 이미지·영상 프롬프트 패키지는 [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md)를 따른다(§1 안티-슬롭과 §2 다이얼 중 VARIANCE·DENSITY는 생성 이미지에도 참고 가능하나, §3 radius·§4 모션 등 CSS 규칙은 무관).
 
 **상위 규칙**: 디자인 톤 기준([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md))이 있으면 그것이 상위다 — 아래 다이얼·일관성·팔레트는 톤 기준 안에서 정한다. VISUAL-CRAFT는 톤 기준을 대체하지 않는다.
 
