@@ -1,7 +1,7 @@
 {
   "name": "gx-design",
   "description": "디자인 멀티에이전트 팀 — 브리프 인터뷰 게이트와 Research → Strategy → Production → Review → 실물 제작(코드 렌더링·Gemini 프롬프트) 파이프라인으로 BX·그래픽·UX/UI·영상 산출물을 제작. DESIGN.md 등 디자인 톤 기준 첨부 시 팔레트·타이포·톤을 전 단계에 반영",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": {
     "name": "구본승",
     "email": "bonseung@sqisoft.com"
