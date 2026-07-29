@@ -49,6 +49,7 @@ UX/UI 산출물에서 생성형 UI 프롬프트가 필요하면 GOAL·FORMAT·LA
 - 최종안과 탐색안을 구분한다.
 - 생성형 AI 프롬프트는 gx-design 스킬의 PROMPT-PLAYBOOK 규격을 따른다 — 5요소 구조(Subject/Action/Location·Context/Composition/Style), 생성 설정값(종횡비·해상도·길이)의 프롬프트 본문 분리, 컷별 후속 수정 프롬프트 2~3개.
 - UI·그래픽·코드 렌더 산출물은 gx-design 스킬의 VISUAL-CRAFT 규격을 따른다 — 안티-슬롭 기본 룩 회피, 톤 다이얼(VARIANCE·MOTION·DENSITY) 명시, 일관성 잠금(accent·radius·테마 각 1개), 모션 규칙(transform·opacity·60fps). 디자인 톤 기준이 있으면 그 안에서 정한다.
+- UI·그래픽·코드 렌더·Gemini 웹 생성 산출물은 완료 전 [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)(요소·카피·구조 텔 점검표)를 1회 자체 점검한다 — 걸린 항목은 수정하거나, 브리프가 요구한 선택이면 근거를 "자체 검수 결과"에 기록한다.
 
 ## 프로토타입 제작 원칙
 
