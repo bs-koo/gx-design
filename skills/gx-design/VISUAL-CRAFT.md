@@ -18,6 +18,10 @@ AI 생성 디자인이 몰리는 3대 기본 룩 — 브리프가 명시하지 �
 - **브리프가 방향을 지정하면 그대로 따른다 — 브리프의 말이 항상 우선**(위 룩을 요청한 경우 포함).
 - 자유로운 축은 위 기본값이 아니라 "이 브리프·주제만의 선택"으로 채운다. 같은 프롬프트로 다른 디자이너가 도달할 결과라면 다시 고른다.
 
+**명명된 룩 슬롭 워치리스트** — 위 3대 룩 외에도, 커뮤니티가 "기본으로 예쁜 것"으로 수렴시키는 룩이 새 디폴트 슬롭이 된다: dark-glass-clean, mesh-gradient-dark-blue, clean-minimal-beige, editorial-tech, solar-duotone, high-contrast-skeuomorphic. 이름에 *clean·glass·dark·tech* 가 반복되면 경계 신호다 — 브리프가 지정하지 않는 한 자유 축을 이 룩으로 채우지 않는다.
+
+**부정 정의로 룩 못박기 ("not X, not Y")** — 의도한 룩을 서술할 때 가장 가까운 흔한 클리셰 2개와 대비해 정의한다: "frosted depth가 있는 glass — pastel glassmorphism도 sci-fi 패널도 아님." 이 한 줄이 슬롭 회피를 프롬프트·명세에 고정한다.
+
 ## 2. 톤 다이얼 (VARIANCE / MOTION / DENSITY)
 
 UI·그래픽 산출물은 세 다이얼을 브리프의 vibe·타깃에서 도출해 명세에 **명시**한다:
@@ -25,6 +29,7 @@ UI·그래픽 산출물은 세 다이얼을 브리프의 vibe·타깃에서 도�
 - **VARIANCE** — 레이아웃 비대칭/파격 정도(낮음: 정렬된 그리드 / 높음: 비대칭·의외 구성)
 - **MOTION** — 모션 강도(낮음: hover 미세 인터랙션 / 높음: 스크롤·마그네틱 연출)
 - **DENSITY** — 뷰포트당 정보 밀도(낮음: 여백 중심 / 높음: 대시보드 밀집)
+- 특정 룩을 택하면 그 룩 전용 다이얼(예: glass intensity, mesh visibility, frame visibility, accent restraint)을 위 3다이얼에 덧붙여 명세에 함께 적는다.
 
 다이얼은 **승인된 전략에 종속된 실행 보조**다 — vibe만으로 전략을 밀어붙이지 않는다. 디자인 톤 기준이 있으면 그 안에서 정한다.
 
