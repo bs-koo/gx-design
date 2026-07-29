@@ -37,6 +37,7 @@
 - **디자인 톤 기준([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md))이 있으면** 그 파일의 팔레트 hex·폰트·톤 키워드를 이 블록의 정본 소스로 쓴다 — 임의 색 지정 금지.
 - 마지막 문장: "All images in this series should share this consistent look."
 - 생성 도구는 프롬프트 간 맥락을 유지하지 않는다 — 반복 포함이 유일한 일관성 장치다(같은 대화의 후속 수정은 예외).
+- FONT·STYLE·MODE(라이트/다크)는 형용사가 아니라 **명시값**으로 못박는다(constraints 카드): "Font: geometric sans, heavy weight. Style: matte 3D clay render. Mode: dark." 값이 고정돼야 컷 간 일관성이 유지된다.
 
 ### 2.4 네거티브 처리
 
@@ -47,6 +48,7 @@
 
 - 참조를 쓰면 역할을 문장으로 고정한다: "Use Image A for the character's pose, Image B for the art style, Image C for the background environment."
 - 캐릭터·심볼 일관성이 필요하면 유지 대상 특징을 명시한다: "maintain the exact same facial features — same eyes, nose shape, jawline".
+- 레퍼런스를 아트디렉션 입력으로 본격 활용하는 생성(스타일 트랜스퍼·1레퍼런스→N브랜드)은 [REFERENCE-DRIVEN.md](REFERENCE-DRIVEN.md)의 근접도 다이얼·visual DNA·저작권 가드레일을 함께 따른다.
 
 ### 2.6 후속 수정 프롬프트 (컷마다 2~3개 필수)
 
@@ -55,6 +57,11 @@ Nano Banana 계열의 최대 강점은 같은 대화에서의 부분 수정이�
 - **델타 지시**: 바꿀 것 하나만 말한다 — "Change the amber glow to appear in only one place."
 - **유지 잠금**: "Keep everything else exactly the same, especially the composition and the palette."
 - 전형 용도: 색·조명 보정 / 요소 제거·개수 교정 / 여백 확보(오버레이 자리) / 텍스트 철자 교정
+
+### 2.7 변형 > 재롤 (반복 규율)
+
+- 시스템(레이아웃·정보 위계·확정 카피)을 1회 고정한 뒤, 개선은 **한 번에 변수 하나만** 바꾼다 — 각도, 크롭, 액센트 색, 배경 톤 중 하나씩. 여러 변수를 동시에 바꾸면 무엇이 좋아졌는지 알 수 없다.
+- 부분 개선은 후속 수정 프롬프트(§2.6)로, 전체 재생성(reroll)은 §1의 즉시 탈락 기준을 어겼을 때만 한다.
 
 ## 3. 영상 프롬프트 규격 (Omni·Veo 계열)
 
@@ -93,6 +100,7 @@ Nano Banana 계열의 최대 강점은 같은 대화에서의 부분 수정이�
 
 - 텍스트가 이미지의 주체(포스터 헤드라인 등)면 **2단계**로 간다: ① 카피 문구 확정 → ② 그 문구의 정확한 렌더를 요구하는 프롬프트 작성.
 - 텍스트를 넣지 않는 컷은 §2.4 원칙대로 긍정 서술로 잠근다: "no readable text" 대신 "all detail abstract and soft, nothing reads as text".
+- **2-pass 타이포**: 텍스트가 주체가 아닌 컷은 1차로 텍스트 없이(오버레이 안전영역을 비워) 생성하고, 로고·긴 카피는 코드 렌더·편집 도구로 2차 합성한다 — 생성 모델의 취약한 타이포에 정본 텍스트를 맡기지 않는다.
 
 ## 5. 타 도구 변형
 
