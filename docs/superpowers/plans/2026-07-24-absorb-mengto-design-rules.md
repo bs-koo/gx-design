@@ -78,7 +78,7 @@
 
 - [ ] **Step 2: 검증 — 파일·섹션·분량**
 
-Run: `grep -nE '^## [0-9]' skills/gx-design/REFERENCE-DRIVEN.md && wc -l skips 있으면 무시 && wc -l < skills/gx-design/REFERENCE-DRIVEN.md`
+Run: `grep -nE '^## [0-9]' skills/gx-design/REFERENCE-DRIVEN.md && wc -l < skills/gx-design/REFERENCE-DRIVEN.md`
 Expected: §1~§6 여섯 섹션이 모두 출력되고, 줄 수가 40~55 범위. `§4 저작권 안전 가드레일`·`§6 검수 연계` 존재. 원문 영어 문장 복붙 없음(한국어 재서술).
 
 - [ ] **Step 3: 커밋**
