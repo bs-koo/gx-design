@@ -69,6 +69,7 @@ description: BX, 그래픽, UX/UI, 영상 결과물을 목표 적합성, 전략 
 - 필수 규격이 포함되어 있는가?
 - 파일 및 결과물 구조가 명확한가?
 - 추가 결정이 필요한 부분이 표시되어 있는가?
+- 명세의 수용 체크(Acceptance Checks) 조건을 실제로 충족하는가? (creative-production 수용 체크 항목 대조 — 미충족은 Critical/Major로 분류)
 
 ## 검수 결과 형식
 
