@@ -64,6 +64,7 @@ UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도�
 
 [REVIEW-AXES.md](REVIEW-AXES.md)를 읽고 그 절차를 그대로 수행한다.
 디자인 톤 기준이 있으면 축 A 검수에 톤 준수 점검을 포함한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4).
+레퍼런스 입력을 쓴 제작이면 축 A 검수에 REFERENCE-DRIVEN.md 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 
 **핵심 모드**: REVIEW-AXES.md의 핵심 모드 조항을 따른다 — 검수 서브에이전트 1개가 축 A→축 B를 순차 점검하되 보고는 축별 분리를 유지하고, Critical만 수정 루프를 돈다.
 
