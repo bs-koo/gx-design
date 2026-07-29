@@ -84,6 +84,7 @@ UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VI
 - **축 C — 개선 목표 달성**: 진단된 Critical/Major가 해소되었는가, 유지 자산이 보존되었는가, 브리프의 성공 기준을 충족하는가.
 
 디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
+레퍼런스 입력을 쓴 제작이면 축 A 검수에 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 
 **핵심 모드**: 검수 서브에이전트 1개가 축 A→B→C를 순차 점검한다(보고는 축별 분리, Critical만 수정 루프).
 
