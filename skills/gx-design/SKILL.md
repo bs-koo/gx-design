@@ -53,7 +53,7 @@ argument-hint: "[프로젝트 한 줄 설명]"
 
 선택된 전략을 creative-producer 서브에이전트에게 위임한다.
 UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도구를 사용하게 한다(사용 가능한 경우). 렌더·화면 실물이 나오는 제작은 위임 프롬프트에 VISUAL-QUALITY.md 경로를 포함해 시각 품질 루프를 수행하게 한다. UI·그래픽·UX/UI 산출물은 VISUAL-CRAFT.md 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션 — 렌더 없이 명세만 만드는 잡도 서브에이전트가 규칙 원문에 닿도록).
-같은 산출물에는 ANTI-TELL-CHECKLIST.md 경로도 함께 배달한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
+UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 ANTI-TELL-CHECKLIST.md 경로도 함께 배달한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작(스타일 트랜스퍼·1레퍼런스→N브랜드)이면 위임 프롬프트에 REFERENCE-DRIVEN.md 경로도 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
 디자인 톤 기준이 있으면 위임 프롬프트에 그 원본 파일 경로를 전달하고, hex·폰트·spacing·radius를 그 파일에서 그대로 인용하게 한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4 — 즉흥 팔레트 금지). Gemini 경로가 병행되면 그 팔레트를 PROMPT-PLAYBOOK 공통 스타일 블록에 주입한다.
 
@@ -66,6 +66,7 @@ UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도�
 [REVIEW-AXES.md](REVIEW-AXES.md)를 읽고 그 절차를 그대로 수행한다.
 디자인 톤 기준이 있으면 축 A 검수에 톤 준수 점검을 포함한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 REFERENCE-DRIVEN.md 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
+UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 ANTI-TELL-CHECKLIST.md 경로를 전달한다(요소·카피 텔 점검).
 
 **핵심 모드**: REVIEW-AXES.md의 핵심 모드 조항을 따른다 — 검수 서브에이전트 1개가 축 A→축 B를 순차 점검하되 보고는 축별 분리를 유지하고, Critical만 수정 루프를 돈다.
 
