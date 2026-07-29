@@ -25,11 +25,17 @@ description: 승인된 전략을 BX, 그래픽, UX/UI, 영상 결과물과 구�
 
 아래 섹션이 하나라도 없으면 그 명세는 미완성이다. 자체 검수에서 확인한다.
 
-- 공통: 제작 목표 / 적용 전략 / 제작 명세 / 자체 검수 결과 / 미확정 사항
+- 공통: 제작 목표 / 적용 전략 / 제작 명세 / 자체 검수 결과 / 미확정 사항 / 수용 체크
 - BX: 컬러 시스템(hex) / 타이포그래피 / 로고 또는 그래픽 모티프 / 브랜드 애플리케이션 최소 1종
 - 그래픽: 레이아웃·그리드 / 색상 / 타이포그래피 / 매체별 사이즈 / (생성형 사용 시) 이미지 생성 프롬프트
 - UX/UI: IA 또는 화면 목록 / 화면별 레이아웃 구조 / 컴포넌트·상태 / 디자인 토큰 / 톤 다이얼(VARIANCE·MOTION·DENSITY — VISUAL-CRAFT §2)
 - 영상: 러닝타임·규격 / 씬별 구성(시간 배분 검산 포함) / 자막·카피 전문 / 편집 가이드
+
+### 수용 체크 (Acceptance Checks)
+
+명세 말미에 "이 산출물이 맞다고 볼 조건"을 체크리스트로 명시한다 — vibe가 아니라 확인 가능한 조건으로. 최소 포함: 반응형 범위(해당 시), 접근성(키보드 포커스·텍스트 대비·reduced-motion, 해당 시), 성능(모션은 transform·opacity), 시각 위계(시선 순서), 그리고 레퍼런스를 썼다면 저작권 가드([REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) §4) 위반 0건. 검수(creative-review)는 이 체크를 판정 기준으로 쓴다.
+
+UX/UI 산출물에서 생성형 UI 프롬프트가 필요하면 GOAL·FORMAT·LAYOUT(말로 쓴 와이어프레임)·TYPE·COLOR+MATERIAL·IMAGERY·COPY(정확히 렌더)·CONSTRAINTS·NEGATIVE 9블록으로 스켈레톤화하고, 변형은 한 번에 1변수만 바꾼다(PROMPT-PLAYBOOK §2.7).
 
 위임 프롬프트에 분량 상한이 명시되면 필수 섹션을 우선 채우고 상한을 지킨다. 상한 안에서는 수치·규칙의 구체성이 산문 설명보다 우선한다.
 
@@ -43,6 +49,7 @@ description: 승인된 전략을 BX, 그래픽, UX/UI, 영상 결과물과 구�
 - 최종안과 탐색안을 구분한다.
 - 생성형 AI 프롬프트는 gx-design 스킬의 PROMPT-PLAYBOOK 규격을 따른다 — 5요소 구조(Subject/Action/Location·Context/Composition/Style), 생성 설정값(종횡비·해상도·길이)의 프롬프트 본문 분리, 컷별 후속 수정 프롬프트 2~3개.
 - UI·그래픽·코드 렌더 산출물은 gx-design 스킬의 VISUAL-CRAFT 규격을 따른다 — 안티-슬롭 기본 룩 회피, 톤 다이얼(VARIANCE·MOTION·DENSITY) 명시, 일관성 잠금(accent·radius·테마 각 1개), 모션 규칙(transform·opacity·60fps). 디자인 톤 기준이 있으면 그 안에서 정한다.
+- UI·그래픽·코드 렌더·Gemini 웹 생성 산출물은 완료 전 [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)(요소·카피·구조 텔 점검표)를 1회 자체 점검한다 — 걸린 항목은 수정하거나, 브리프가 요구한 선택이면 근거를 "자체 검수 결과"에 기록한다.
 
 ## 프로토타입 제작 원칙
 
