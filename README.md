@@ -7,7 +7,7 @@
 AI 크리에이티브 디렉터가 결정 트리가 빌 때까지 인터뷰하고,
 리서치 → 전략 → 제작 → 검수 → 실물 제작 파이프라인을 전문 에이전트 팀으로 지휘합니다.
 
-**[소개 페이지 →](https://bs-koo.github.io/gx-design/)**
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-%EC%86%8C%EA%B0%9C%20%ED%8E%98%EC%9D%B4%EC%A7%80-533afd?style=for-the-badge&logo=github&logoColor=white)](https://bs-koo.github.io/gx-design/)
 
 [빠른 시작](#빠른-시작) • [왜 gx-design인가?](#왜-gx-design인가) • [어떻게 작동하나?](#어떻게-작동하나) • [구성](#구성) • [FAQ](#faq)
 
@@ -71,6 +71,12 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
  → 5. 검수                          2축 + 개선 목표 달성 축 = 3축 병렬
  → 6. 실물 제작(선택)                신규 제작과 동일한 게이트 — after 실물까지
 ```
+
+**실제 적용 사례** — 인증 진행현황 조회 화면을 gx-redesign으로 개선한 결과입니다. 단순 목록 조회가 상태 요약과 점검 알럿이 있는 대시보드로 바뀌었습니다.
+
+| Before | After |
+|---|---|
+| ![개편 전 — 필터 4개와 단순 목록 테이블](site/assets/redesign-before.png) | ![개편 후 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드](site/assets/redesign-after.png) |
 
 ### 진행 모드
 
