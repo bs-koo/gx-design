@@ -76,7 +76,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 
 | Before | After |
 |---|---|
-| ![개편 전 — 필터 4개와 단순 목록 테이블](site/assets/redesign-before.png) | ![개편 후 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드](site/assets/redesign-after.png) |
+| ![개편 후 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드](site/assets/redesign-after.png) | ![개편 전 — 필터 4개와 단순 목록 테이블](site/assets/redesign-before.png) |
 
 ### 진행 모드
 
