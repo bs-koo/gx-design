@@ -246,7 +246,7 @@
   .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
   /* 8회차: 신규/개선 파이프라인 토글 — 세그먼트 컨트롤. 인디고 채움을 쓰지 않아 밴드당 단일 CTA 규칙과 색으로 충돌하지 않는다 */
   .pipeline-toggle{display:inline-flex;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-pill);padding:4px;gap:2px;margin-bottom:var(--sp-xl);}
-  .pipeline-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);}
+  .pipeline-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;font-family:var(--font-mono);font-size:.9375rem;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);} /* 라벨이 스킬 명령어라 코드블록·스텝 노드와 같은 등폭 계열로 맞춤 */
   @media(max-width:767px){ .pipeline-toggle-btn{padding:14px 16px;} }
   .pipeline-toggle-btn[aria-pressed="true"]{background:var(--canvas-soft);color:var(--ink);}
   .pipeline-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-xl);padding:var(--sp-xl);box-shadow:var(--shadow-2);}
@@ -430,13 +430,13 @@
 
       <!-- 8회차: role="tablist" 중첩 방지 — 토글은 버튼 2개 + aria-pressed(별도 패턴), 스텝바의 tablist와 역할이 겹치지 않는다 -->
       <div class="pipeline-toggle reveal" role="group" aria-label="파이프라인 종류">
-        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="new" aria-pressed="true">신규 제작</button>
-        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="redesign" aria-pressed="false">기존 개선</button>
+        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="new" aria-pressed="true">gx-design</button>
+        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="redesign" aria-pressed="false">gx-redesign</button>
       </div>
 
       <div class="pipeline-card reveal">
         <div class="pipeline-set" data-pipeline-set="new">
-          <div class="stepbar" role="tablist" aria-label="신규 제작 파이프라인 6단계">
+          <div class="stepbar" role="tablist" aria-label="gx-design 파이프라인 6단계">
             <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-new" id="step-tab-new-0" tabindex="0" data-step="0">
               <span class="step-node">0</span><span class="step-label t-caption">브리프</span>
             </button>
@@ -472,7 +472,7 @@
         </div>
 
         <div class="pipeline-set" data-pipeline-set="redesign" hidden>
-          <div class="stepbar" role="tablist" aria-label="기존 개선 파이프라인 7단계">
+          <div class="stepbar" role="tablist" aria-label="gx-redesign 파이프라인 7단계">
             <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-redesign" id="step-tab-redesign-0" tabindex="0" data-step="0">
               <span class="step-node">0</span><span class="step-label t-caption">자산 인벤토리</span>
             </button>
@@ -518,20 +518,20 @@
     <div class="container">
       <div class="section-head reveal">
         <h2 id="redesign-case-heading" class="t-display-lg">기존 화면은 이렇게 바뀝니다.</h2>
-        <p class="t-body-lg">gx-redesign 실제 사례 — 단순 목록 조회가 상태 요약과 점검 알럿이 있는 대시보드로 바뀌었습니다.</p>
+        <p class="t-body-lg">gx-redesign 실제 사례 — 인증 진행현황 통합조회 화면을 개선한 결과입니다.</p>
       </div>
 
       <div class="ba-grid reveal">
         <figure class="ba-item">
           <figcaption class="ba-label t-micro-cap">BEFORE</figcaption>
           <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 필터 4개와 단순 목록 테이블">
+            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 상태 요약 카드와 점검 알럿이 있는 다크 대시보드">
           </div>
         </figure>
         <figure class="ba-item">
           <figcaption class="ba-label t-micro-cap">AFTER</figcaption>
           <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드">
+            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 필터와 목록 테이블로 정리된 조회 화면">
           </div>
         </figure>
       </div>
