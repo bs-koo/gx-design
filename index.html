@@ -207,24 +207,21 @@
     margin-top:var(--sp-xxl);background:var(--canvas);border-radius:var(--radius-lg);
     box-shadow:var(--shadow-2);padding:var(--sp-xl);max-width:560px;
   }
-  .mockup-topline{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-lg);}
+  .mockup-topline{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-lg);padding-bottom:var(--sp-md);border-bottom:1px solid var(--hairline);}
   .mockup-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex:0 0 auto;}
   .mockup-label{font-family:var(--font-mono);letter-spacing:.1em;color:var(--ink-mute);}
   .mockup-caption{margin-left:auto;color:var(--ink-mute);}
   .mockup-row{display:flex;align-items:flex-start;gap:var(--sp-sm);}
-  .mockup-input{color:var(--ink);margin-bottom:var(--sp-lg);}
+  .mockup-input{color:var(--ink);margin-bottom:var(--sp-xl);}
   .prompt-icon{color:var(--primary);font-family:var(--font-mono);flex:0 0 auto;}
-  .mockup-response{flex-direction:column;gap:var(--sp-sm);margin-bottom:var(--sp-xl);}
-  .mockup-response-label{color:var(--ink-mute);}
   .chip-row{display:flex;flex-wrap:wrap;gap:var(--sp-sm);}
-  .mini-steps{display:flex;align-items:center;gap:0;}
-  .mini-node{
-    width:22px;height:22px;border-radius:50%;border:1px solid var(--hairline);
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-mono);font-size:.6875rem;color:var(--ink-mute);flex:0 0 auto;background:var(--canvas);
-  }
-  .mini-line{flex:1 1 auto;height:1px;background:var(--hairline);min-width:8px;}
-  .mini-steps-caption{margin-top:var(--sp-sm);color:var(--ink-mute);}
+  /* 8회차: 대화 흐름형 재설계 — 사용자 발화(prompt-icon)와 gx-design 발화(dot+label)를 아이콘으로만 구분(테두리·배경 없이 절제) */
+  .mockup-turn{margin-top:var(--sp-xl);}
+  .mockup-turn:first-of-type{margin-top:0;}
+  .mockup-speaker{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-xs);}
+  .mockup-turn-text{color:var(--ink);}
+  .mockup-question{margin-top:var(--sp-lg);}
+  .mockup-q-text{color:var(--ink);margin-bottom:var(--sp-sm);}
 
   .install{margin-top:var(--sp-xxl);max-width:560px;min-width:0;} /* CTA 섹션의 grid item으로 쓰일 때 min-width:auto가 코드 줄 폭만큼 트랙을 밀어 넓히는 현상(grid blowout) 방지 — 렌더 품질 로그 2회차 C3 */
   .cta-grid > .install{min-width:0;}
@@ -247,6 +244,11 @@
 
   /* ---------- 파이프라인 ---------- */
   .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
+  /* 8회차: 신규/개선 파이프라인 토글 — 세그먼트 컨트롤. 인디고 채움을 쓰지 않아 밴드당 단일 CTA 규칙과 색으로 충돌하지 않는다 */
+  .pipeline-toggle{display:inline-flex;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-pill);padding:4px;gap:2px;margin-bottom:var(--sp-xl);}
+  .pipeline-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);}
+  @media(max-width:767px){ .pipeline-toggle-btn{padding:14px 16px;} }
+  .pipeline-toggle-btn[aria-pressed="true"]{background:var(--canvas-soft);color:var(--ink);}
   .pipeline-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-xl);padding:var(--sp-xl);box-shadow:var(--shadow-2);}
   @media(min-width:768px){ .pipeline-card{padding:var(--sp-huge);} } /* M2: 시그니처 구간 — 카드 존재감을 위아래 섹션보다 크게 */
   .stepbar{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:var(--sp-xs);gap:0;}
@@ -278,10 +280,16 @@
   .step-panel-index{display:block;font-family:var(--font-mono);color:var(--primary);margin-bottom:var(--sp-sm);}
   .step-panel-desc{color:var(--ink);}
   .step-panel-detail{color:var(--ink-secondary);margin-top:var(--sp-sm);}
-  /* M-d: 카드 밖으로 이동 + 캡션급 타입 + ink-secondary(soft 배경 위 대비 확보) — 패널 내용으로 오독되지 않도록 시각 분리 */
-  .pipeline-note{margin-top:var(--sp-xl);color:var(--ink-secondary);}
-  .pipeline-note a{color:var(--primary);}
-  .pipeline-note a:hover{text-decoration:underline;}
+  /* ---------- gx-redesign 실사례(before/after, 9회차) ---------- */
+  /* 나란히 2열(≥860px) 채택 — "시연" 원칙상 즉시 대비가 보이는 편이 낫고, 파이프라인 토글 직후 두 번째 토글형 인터랙션을
+     또 넣으면 시그니처가 분산된다(§9 9회차). 텍스트 완전 가독보다 다크/라이트·구조 대비 자체가 메시지라 축소에도 무리 없음. */
+  .ba-grid{display:grid;gap:var(--sp-xxl);align-items:start;}
+  @media(min-width:860px){ .ba-grid{grid-template-columns:1fr 1fr;} }
+  .ba-item{display:flex;flex-direction:column;gap:var(--sp-sm);}
+  .ba-label{color:var(--ink-mute);font-size:.6875rem;} /* micro-cap(10px)은 기능 라벨 하한 미달 — micro(11px) 실재 토큰으로 상향, 기존 pill-tag와 동일 패턴(§5.3 승인 이탈 2) */
+  /* card-dashboard-mockup 컴포넌트 그대로 적용: canvas 배경·padding 24px·radius-lg·Level 2 shadow(DESIGN.md 토큰표 §5.2) */
+  .ba-frame{background:var(--canvas);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);padding:var(--sp-xl);}
+  .ba-img{width:100%;height:auto;display:block;border-radius:var(--radius-md);border:1px solid var(--hairline);}
 
   /* ---------- 구성 (릴레이) ---------- */
   .relay{display:flex;align-items:stretch;gap:var(--sp-lg);}
@@ -379,30 +387,33 @@
       <div class="mockup-card reveal">
         <div class="mockup-topline">
           <span class="mockup-dot" aria-hidden="true"></span>
-          <span class="mockup-label t-micro-cap">SESSION</span>
-          <span class="mockup-caption t-caption">예시 · 실제 세션 캡처 아님</span>
+          <span class="mockup-label t-micro-cap">gx-design</span>
+          <span class="mockup-caption t-caption">예시</span>
         </div>
         <div class="mockup-row mockup-input t-body-lg">
           <span class="prompt-icon" aria-hidden="true">›</span>
-          <span>대학생 캠퍼스 중고거래 서비스 UX/UI</span>
+          <span>공공기관 에너지 감축 캠페인 사이트 UX/UI</span>
         </div>
-        <div class="mockup-row mockup-response">
-          <span class="mockup-response-label t-caption">되묻는 질문</span>
+
+        <div class="mockup-turn">
+          <p class="mockup-turn-text t-body-md">만들기 전에 몇 가지 여쭙겠습니다</p>
+        </div>
+
+        <div class="mockup-question">
+          <p class="mockup-q-text t-body-md">Q. 핵심 사용자는 누구인가요?</p>
           <div class="chip-row">
-            <span class="pill-tag t-micro-cap">타깃: 학과 전체 · 특정 단대</span>
-            <span class="pill-tag t-micro-cap">핵심 기능: 채팅 · 위치 인증 · 결제</span>
+            <span class="pill-tag t-micro-cap">기관 담당자</span>
+            <span class="pill-tag t-micro-cap">일반 시민</span>
           </div>
         </div>
-        <div class="mockup-steps" aria-hidden="true">
-          <div class="mini-steps">
-            <span class="mini-node">0</span><span class="mini-line"></span>
-            <span class="mini-node">1</span><span class="mini-line"></span>
-            <span class="mini-node">2</span><span class="mini-line"></span>
-            <span class="mini-node">3</span><span class="mini-line"></span>
-            <span class="mini-node">4</span><span class="mini-line"></span>
-            <span class="mini-node">5</span>
+
+        <div class="mockup-question">
+          <p class="mockup-q-text t-body-md">Q. 무엇을 먼저 보여줄까요?</p>
+          <div class="chip-row">
+            <span class="pill-tag t-micro-cap">감축 실적</span>
+            <span class="pill-tag t-micro-cap">참여 신청</span>
+            <span class="pill-tag t-micro-cap">가이드</span>
           </div>
-          <p class="mini-steps-caption t-caption">브리프 · 리서치 · 전략 · 제작 · 검수 · 실물 제작</p>
         </div>
       </div>
      </div>
@@ -414,51 +425,121 @@
     <div class="container">
       <div class="section-head reveal">
         <p class="pipeline-pain t-body-lg">질문 없이 나온 디자인엔, 근거가 없습니다.</p>
-        <h2 id="pipeline-heading" class="t-display-lg">한 줄의 요청이, 여섯 단계를 거칩니다.</h2>
+        <h2 id="pipeline-heading" class="t-display-lg">한 줄의 요청이, <span id="pipeline-heading-count">여섯</span> 단계를 거칩니다.</h2>
+      </div>
+
+      <!-- 8회차: role="tablist" 중첩 방지 — 토글은 버튼 2개 + aria-pressed(별도 패턴), 스텝바의 tablist와 역할이 겹치지 않는다 -->
+      <div class="pipeline-toggle reveal" role="group" aria-label="파이프라인 종류">
+        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="new" aria-pressed="true">신규 제작</button>
+        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="redesign" aria-pressed="false">기존 개선</button>
       </div>
 
       <div class="pipeline-card reveal">
-        <div class="stepbar" role="tablist" aria-label="파이프라인 6단계">
-          <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel" id="step-tab-0" tabindex="0" data-step="0">
-            <span class="step-node">0</span><span class="step-label t-caption">브리프</span>
-          </button>
-          <span class="step-connector" aria-hidden="true"></span>
-          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-1" tabindex="-1" data-step="1">
-            <span class="step-node">1</span><span class="step-label t-caption">리서치</span>
-          </button>
-          <span class="step-connector" aria-hidden="true"></span>
-          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-2" tabindex="-1" data-step="2">
-            <span class="step-node">2</span><span class="step-label t-caption">전략</span>
-          </button>
-          <span class="step-connector" aria-hidden="true"></span>
-          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-3" tabindex="-1" data-step="3">
-            <span class="step-node">3</span><span class="step-label t-caption">제작</span>
-          </button>
-          <span class="step-connector" aria-hidden="true"></span>
-          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-4" tabindex="-1" data-step="4">
-            <span class="step-node">4</span><span class="step-label t-caption">검수</span>
-          </button>
-          <span class="step-connector" aria-hidden="true"></span>
-          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-5" tabindex="-1" data-step="5">
-            <span class="step-node">5</span><span class="step-label t-caption">실물 제작</span>
-          </button>
+        <div class="pipeline-set" data-pipeline-set="new">
+          <div class="stepbar" role="tablist" aria-label="신규 제작 파이프라인 6단계">
+            <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-new" id="step-tab-new-0" tabindex="0" data-step="0">
+              <span class="step-node">0</span><span class="step-label t-caption">브리프</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-1" tabindex="-1" data-step="1">
+              <span class="step-node">1</span><span class="step-label t-caption">리서치</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-2" tabindex="-1" data-step="2">
+              <span class="step-node">2</span><span class="step-label t-caption">전략</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-3" tabindex="-1" data-step="3">
+              <span class="step-node">3</span><span class="step-label t-caption">제작</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-4" tabindex="-1" data-step="4">
+              <span class="step-node">4</span><span class="step-label t-caption">검수</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-5" tabindex="-1" data-step="5">
+              <span class="step-node">5</span><span class="step-label t-caption">실물 제작</span>
+            </button>
+          </div>
+
+          <div class="step-panel" id="step-panel-new" role="tabpanel" aria-labelledby="step-tab-new-0">
+            <div class="step-panel-inner">
+              <span class="step-panel-index t-caption">0 · 브리프</span>
+              <p class="step-panel-desc t-display-md">결정 트리로 질문</p>
+              <p class="step-panel-detail t-body-md">승인 전에는 어떤 산출물도 만들지 않습니다.</p>
+            </div>
+          </div>
         </div>
 
-        <div class="step-panel" id="step-panel" role="tabpanel" aria-labelledby="step-tab-0">
-          <div class="step-panel-inner">
-            <span class="step-panel-index t-caption">0 · 브리프</span>
-            <p class="step-panel-desc t-display-md">결정 트리로 질문</p>
-            <p class="step-panel-detail t-body-md">승인 전에는 어떤 산출물도 만들지 않습니다.</p>
+        <div class="pipeline-set" data-pipeline-set="redesign" hidden>
+          <div class="stepbar" role="tablist" aria-label="기존 개선 파이프라인 7단계">
+            <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-redesign" id="step-tab-redesign-0" tabindex="0" data-step="0">
+              <span class="step-node">0</span><span class="step-label t-caption">자산 인벤토리</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-1" tabindex="-1" data-step="1">
+              <span class="step-node">1</span><span class="step-label t-caption">진단</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-2" tabindex="-1" data-step="2">
+              <span class="step-node">2</span><span class="step-label t-caption">갭 리서치</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-3" tabindex="-1" data-step="3">
+              <span class="step-node">3</span><span class="step-label t-caption">개선 강도 3안</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-4" tabindex="-1" data-step="4">
+              <span class="step-node">4</span><span class="step-label t-caption">제작</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-5" tabindex="-1" data-step="5">
+              <span class="step-node">5</span><span class="step-label t-caption">검수</span>
+            </button>
+            <span class="step-connector" aria-hidden="true"></span>
+            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-6" tabindex="-1" data-step="6">
+              <span class="step-node">6</span><span class="step-label t-caption">실물 제작</span>
+            </button>
+          </div>
+
+          <div class="step-panel" id="step-panel-redesign" role="tabpanel" aria-labelledby="step-tab-redesign-0">
+            <div class="step-panel-inner">
+              <span class="step-panel-index t-caption">0 · 자산 인벤토리</span>
+              <p class="step-panel-desc t-display-md">기존 문서·코드·배포 화면 전수 파악 후 인터뷰</p>
+            </div>
           </div>
         </div>
       </div>
-
-      <p class="pipeline-note t-caption">기존 화면을 고치는 작업은 7단계 <code style="font-family:var(--font-mono);">gx-redesign</code> 파이프라인을 따로 씁니다 — <a href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">README에서 보기</a></p>
     </div>
   </section>
 
-  <!-- ============ 3. 구성 (3 에이전트) ============ -->
-  <section id="composition" class="section" aria-labelledby="composition-heading">
+  <!-- ============ 3. gx-redesign 실사례 (9회차 추가) ============ -->
+  <section id="redesign-case" class="section" aria-labelledby="redesign-case-heading">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2 id="redesign-case-heading" class="t-display-lg">기존 화면은 이렇게 바뀝니다.</h2>
+        <p class="t-body-lg">gx-redesign 실제 사례 — 단순 목록 조회가 상태 요약과 점검 알럿이 있는 대시보드로 바뀌었습니다.</p>
+      </div>
+
+      <div class="ba-grid reveal">
+        <figure class="ba-item">
+          <figcaption class="ba-label t-micro-cap">BEFORE</figcaption>
+          <div class="ba-frame">
+            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 필터 4개와 단순 목록 테이블">
+          </div>
+        </figure>
+        <figure class="ba-item">
+          <figcaption class="ba-label t-micro-cap">AFTER</figcaption>
+          <div class="ba-frame">
+            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. 구성 (3 에이전트) ============ -->
+  <section id="composition" class="section section--soft" aria-labelledby="composition-heading">
     <div class="container">
       <div class="section-head reveal">
         <h2 id="composition-heading" class="t-display-lg">세 역할이 이어받습니다.</h2>
@@ -497,8 +578,8 @@
     </div>
   </section>
 
-  <!-- ============ 4. 설치 CTA (반복) ============ -->
-  <section id="cta" class="section section--soft cta-section" aria-labelledby="cta-heading">
+  <!-- ============ 5. 설치 CTA (반복) ============ -->
+  <section id="cta" class="section cta-section" aria-labelledby="cta-heading">
     <div class="container">
       <div class="cta-grid">
         <div class="section-head reveal" style="margin-bottom:0;">
@@ -527,7 +608,7 @@
 
 </main>
 
-<!-- ============ 5. 푸터 ============ -->
+<!-- ============ 6. 푸터 ============ -->
 <footer class="site-footer">
   <div class="container footer-inner">
     <div>
@@ -589,11 +670,17 @@
     });
   });
 
-  /* ---------- 2) 파이프라인 자동 전환 탭리스트 ---------- */
-  /* 7회차: 사용자 직접 요청("클릭 방식 말고 2초 간격 자동 전환")으로 클릭 전용 → 자동 재생 기본 동작으로 변경.
-     전략 §5.4 원문("클릭 또는 스크롤 트리거 아코디언")과 다른 사양 — 오케스트레이터가 전략 문서를 별도 갱신한다. */
-  /* detail: README 사실 기반 2번째 줄(§9 렌더 품질 로그 3회차 M-a 근거 참조) */
-  var steps = [
+  /* ---------- 2) 파이프라인 자동 전환 탭리스트(신규 제작 / 기존 개선 토글) ---------- */
+  /* 7회차: 클릭 전용 → 2초 자동 전환(사용자 요청). 8회차: gx-redesign 7단계를 토글로 추가.
+     전략 §5.4 원문과 다른 사양 — 오케스트레이터가 전략 문서를 별도 갱신한다. */
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var AUTOPLAY_MS = 2000;
+  var FADE_OUT_MS = 120; /* CSS .step-panel.is-swapping의 dur-out(120ms)과 동기화 */
+  var pipelineCardEl = document.querySelector('.pipeline-card');
+  var sharedSectionInView = false; /* 정지 조건 3 — 두 파이프라인이 같은 카드 안에 있어 IO 하나를 공유 */
+
+  /* detail: README 사실 기반 2번째 줄(신규 제작만 — §9 3회차 M-a). 개선은 README 원문이 이미 한 줄이라 detail 없음(§9 8회차) */
+  var newSteps = [
     {label:'브리프', desc:'결정 트리로 질문', detail:'승인 전에는 어떤 산출물도 만들지 않습니다.'},
     {label:'리서치', desc:'시장·사용자 병렬 조사', detail:'경쟁사·트렌드까지 네 갈래로 동시에 조사합니다.'},
     {label:'전략', desc:'철학 다른 3안', detail:'본질 우선·차별화 우선·시스템 우선 중 하나를 고릅니다.'},
@@ -601,105 +688,161 @@
     {label:'검수', desc:'전략·완성도 2축', detail:'두 보고서는 서로 합치지 않습니다.'},
     {label:'실물 제작', desc:'코드·Gemini·편집 핸드오프 중 선택', detail:'검수를 통과해야 열리는 단계입니다.'}
   ];
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('.step-trigger'));
-  var stepbarEl = document.querySelector('.stepbar');
-  var panel = document.getElementById('step-panel');
-  var pipelineCardEl = document.querySelector('.pipeline-card');
-  var panelIndex = panel ? panel.querySelector('.step-panel-index') : null;
-  var panelDesc = panel ? panel.querySelector('.step-panel-desc') : null;
-  var panelDetail = panel ? panel.querySelector('.step-panel-detail') : null;
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var redesignSteps = [
+    {label:'자산 인벤토리', desc:'기존 문서·코드·배포 화면 전수 파악 후 인터뷰'},
+    {label:'진단', desc:"낡았다는 인상을 Critical/Major/Minor로 번역"},
+    {label:'갭 리서치', desc:'경쟁·트렌드 대비 격차 분석'},
+    {label:'개선 강도 3안', desc:'최소 개입·리프레시·리뉴얼 중 선택'},
+    {label:'제작', desc:'모든 변경을 before→after→근거 3열로 기록'},
+    {label:'검수', desc:'2축 + 개선 목표 달성 축 = 3축 병렬'},
+    {label:'실물 제작', desc:'신규 제작과 동일한 게이트, after 실물까지'}
+  ];
 
-  var currentStep = 0;
-  var autoplayStopped = reduceMotion; /* 정지 조건 2: reduced-motion이면 애초에 시작하지 않음(재개 없음) */
-  var sectionInView = false;          /* 정지 조건 3 */
-  var stepbarFocused = false;         /* 정지 조건 5 */
-  var autoplayTimer = null;
-  var AUTOPLAY_MS = 2000;
-  var FADE_OUT_MS = 120; /* CSS .step-panel.is-swapping의 dur-out(120ms)과 동기화 — 페이드아웃이 끝나는 시점에 정확히 텍스트를 교체 */
-
-  function activateStep(i, moveFocus){
-    currentStep = i;
-    tabs.forEach(function(tab, idx){
-      var on = idx === i;
-      tab.setAttribute('aria-selected', on ? 'true' : 'false');
-      tab.tabIndex = on ? 0 : -1;
-      tab.classList.toggle('is-active', on);
-    });
-    if(panel){ panel.setAttribute('aria-labelledby', tabs[i].id); }
-
-    function swap(){
-      if(panelIndex){ panelIndex.textContent = i + ' · ' + steps[i].label; }
-      if(panelDesc){ panelDesc.textContent = steps[i].desc; }
-      if(panelDetail){ panelDetail.textContent = steps[i].detail; }
-    }
-    if(reduceMotion || !panel){
-      swap();
-    } else {
-      panel.classList.add('is-swapping');
-      window.setTimeout(function(){
-        swap();
-        panel.classList.remove('is-swapping');
-      }, FADE_OUT_MS);
-    }
-    if(moveFocus){ tabs[i].focus(); } /* 자동 전환 tick은 항상 moveFocus=false로 호출 — 포커스 강탈 금지 */
+  function makeStepRefs(setEl, panelId){
+    var panel = document.getElementById(panelId);
+    return {
+      tabs: Array.prototype.slice.call(setEl.querySelectorAll('.step-trigger')),
+      stepbarEl: setEl.querySelector('.stepbar'),
+      panel: panel,
+      panelIndex: panel ? panel.querySelector('.step-panel-index') : null,
+      panelDesc: panel ? panel.querySelector('.step-panel-desc') : null,
+      panelDetail: panel ? panel.querySelector('.step-panel-detail') : null
+    };
   }
 
-  function canAutoplay(){
-    return !reduceMotion && !autoplayStopped && sectionInView && !document.hidden && !stepbarFocused;
-  }
-  function stopAutoplayTimer(){
-    if(autoplayTimer){ window.clearInterval(autoplayTimer); autoplayTimer = null; }
-  }
-  function refreshAutoplayTimer(){
-    if(canAutoplay()){
-      if(!autoplayTimer){
-        autoplayTimer = window.setInterval(function(){
-          activateStep((currentStep + 1) % tabs.length, false);
-        }, AUTOPLAY_MS);
+  function makePipelineController(refs, steps){
+    var tabs = refs.tabs, stepbarEl = refs.stepbarEl, panel = refs.panel;
+    var panelIndex = refs.panelIndex, panelDesc = refs.panelDesc, panelDetail = refs.panelDetail;
+    var currentStep = 0;
+    var autoplayStopped = reduceMotion; /* 정지 조건 2 */
+    var stepbarFocused = false;         /* 정지 조건 5 */
+    var autoplayTimer = null;
+    var isActiveSet = false; /* 토글로 현재 화면에 보이는 파이프라인인지 — canAutoplay의 일부 */
+
+    function activateStep(i, moveFocus){
+      currentStep = i;
+      tabs.forEach(function(tab, idx){
+        var on = idx === i;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        tab.tabIndex = on ? 0 : -1;
+        tab.classList.toggle('is-active', on);
+      });
+      if(panel){ panel.setAttribute('aria-labelledby', tabs[i].id); }
+
+      function swap(){
+        if(panelIndex){ panelIndex.textContent = i + ' · ' + steps[i].label; }
+        if(panelDesc){ panelDesc.textContent = steps[i].desc; }
+        if(panelDetail){ panelDetail.textContent = steps[i].detail || ''; }
       }
-    } else {
+      if(reduceMotion || !panel){
+        swap();
+      } else {
+        panel.classList.add('is-swapping');
+        window.setTimeout(function(){
+          swap();
+          panel.classList.remove('is-swapping');
+        }, FADE_OUT_MS);
+      }
+      if(moveFocus){ tabs[i].focus(); } /* 자동 전환 tick은 항상 moveFocus=false — 포커스 강탈 금지 */
+    }
+
+    function canAutoplay(){
+      return !reduceMotion && !autoplayStopped && isActiveSet && sharedSectionInView && !document.hidden && !stepbarFocused;
+    }
+    function stopAutoplayTimer(){
+      if(autoplayTimer){ window.clearInterval(autoplayTimer); autoplayTimer = null; }
+    }
+    function refreshAutoplayTimer(){
+      if(canAutoplay()){
+        if(!autoplayTimer){
+          autoplayTimer = window.setInterval(function(){
+            activateStep((currentStep + 1) % tabs.length, false);
+          }, AUTOPLAY_MS);
+        }
+      } else {
+        stopAutoplayTimer();
+      }
+    }
+    function disableAutoplayPermanently(){ /* 정지 조건 1 — 토글 전환에는 적용하지 않음(setActive가 별도로 리셋) */
+      autoplayStopped = true;
       stopAutoplayTimer();
     }
-  }
-  function disableAutoplayPermanently(){ /* 정지 조건 1: 사용자 조작 후 영구 정지 — 재개하지 않음 */
-    autoplayStopped = true;
-    stopAutoplayTimer();
+
+    tabs.forEach(function(tab, i){
+      tab.addEventListener('click', function(){ disableAutoplayPermanently(); activateStep(i, false); });
+      tab.addEventListener('keydown', function(e){
+        var target = null;
+        if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ target = (i + 1) % tabs.length; }
+        else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ target = (i - 1 + tabs.length) % tabs.length; }
+        else if(e.key === 'Home'){ target = 0; }
+        else if(e.key === 'End'){ target = tabs.length - 1; }
+        if(target !== null){ e.preventDefault(); disableAutoplayPermanently(); activateStep(target, true); }
+      });
+    });
+
+    if(stepbarEl){
+      stepbarEl.addEventListener('focusin', function(){ stepbarFocused = true; refreshAutoplayTimer(); });
+      stepbarEl.addEventListener('focusout', function(e){
+        if(!stepbarEl.contains(e.relatedTarget)){ stepbarFocused = false; refreshAutoplayTimer(); }
+      });
+    }
+
+    function setActive(active){ /* 8회차: 토글 전환 — 자동 재생은 멈추지 않고 새 파이프라인 0단계부터 다시 시작(스텝 클릭과는 다른 경로) */
+      isActiveSet = active;
+      if(active){
+        currentStep = 0;
+        autoplayStopped = reduceMotion;
+        activateStep(0, false);
+        refreshAutoplayTimer();
+      } else {
+        stopAutoplayTimer();
+      }
+    }
+
+    return { activateStep: activateStep, refreshAutoplayTimer: refreshAutoplayTimer, setActive: setActive };
   }
 
-  tabs.forEach(function(tab, i){
-    tab.addEventListener('click', function(){ disableAutoplayPermanently(); activateStep(i, false); });
-    tab.addEventListener('keydown', function(e){
-      var target = null;
-      if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ target = (i + 1) % tabs.length; }
-      else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ target = (i - 1 + tabs.length) % tabs.length; }
-      else if(e.key === 'Home'){ target = 0; }
-      else if(e.key === 'End'){ target = tabs.length - 1; }
-      if(target !== null){ e.preventDefault(); disableAutoplayPermanently(); activateStep(target, true); }
+  var newSetEl = document.querySelector('[data-pipeline-set="new"]');
+  var redesignSetEl = document.querySelector('[data-pipeline-set="redesign"]');
+  var newController = makePipelineController(makeStepRefs(newSetEl, 'step-panel-new'), newSteps);
+  var redesignController = makePipelineController(makeStepRefs(redesignSetEl, 'step-panel-redesign'), redesignSteps);
+
+  var pipelineHeadingCount = document.getElementById('pipeline-heading-count');
+  var toggleButtons = Array.prototype.slice.call(document.querySelectorAll('.pipeline-toggle-btn'));
+  toggleButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var showNew = btn.getAttribute('data-pipeline') === 'new';
+      toggleButtons.forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      newSetEl.hidden = !showNew;
+      redesignSetEl.hidden = showNew;
+      if(pipelineHeadingCount){ pipelineHeadingCount.textContent = showNew ? '여섯' : '일곱'; }
+      newController.setActive(showNew);
+      redesignController.setActive(!showNew);
     });
   });
 
-  /* 정지 조건 5: 스텝바 내부에 포커스가 있는 동안 일시정지(영구 정지 아님 — 포커스가 빠져나가면 다른 조건이 허용하는 한 재개) */
-  if(stepbarEl){
-    stepbarEl.addEventListener('focusin', function(){ stepbarFocused = true; refreshAutoplayTimer(); });
-    stepbarEl.addEventListener('focusout', function(e){
-      if(!stepbarEl.contains(e.relatedTarget)){ stepbarFocused = false; refreshAutoplayTimer(); }
-    });
-  }
+  newController.setActive(true);   /* 초기: 신규 제작 표시 — 실제 자동 재생 시작은 아래 IO가 뷰포트 진입을 감지한 뒤 */
+  redesignController.setActive(false);
 
-  /* 정지 조건 4: 탭이 백그라운드(document.hidden)면 정지, 복귀 시 다른 조건이 허용하면 재개 */
-  document.addEventListener('visibilitychange', function(){ refreshAutoplayTimer(); });
+  /* 정지 조건 4: 탭이 백그라운드면 정지, 복귀 시 재개(활성 파이프라인만) */
+  document.addEventListener('visibilitychange', function(){
+    newController.refreshAutoplayTimer();
+    redesignController.refreshAutoplayTimer();
+  });
 
-  /* B-M1: 인쇄는 공유 패널 구조상 6단계를 동시에 지면에 낼 수 없다(패널 텍스트가 DOM에 1벌만 존재, 나머지는 JS 데이터로만 존재) —
-     대신 인쇄 시점에 항상 0단계로 되돌려 "타이머가 우연히 멈춘 단계"가 아닌 결정적인 첫 단계가 찍히게 한다. 정지·재생 상태는 건드리지 않는다. */
-  window.addEventListener('beforeprint', function(){ activateStep(0, false); });
+  /* B-M1: 공유 패널 구조상 각 파이프라인의 나머지 단계는 DOM에 없어 인쇄 시 0단계로 고정 — 8회차: 두 컨트롤러 모두 리셋 */
+  window.addEventListener('beforeprint', function(){
+    newController.activateStep(0, false);
+    redesignController.activateStep(0, false);
+  });
 
-  /* 정지 조건 3: 파이프라인 카드가 뷰포트 밖이면 일시정지, 다시 들어오면 재개(단 조건 1로 영구 정지된 상태면 재개 안 함) */
+  /* 정지 조건 3: 카드가 뷰포트 밖이면 일시정지, 재진입 시 재개(조건 1로 정지된 경우 제외) — 두 컨트롤러가 공유 */
   if(pipelineCardEl && !reduceMotion && 'IntersectionObserver' in window){
     var pipelineIO = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
-        sectionInView = entry.isIntersecting;
-        refreshAutoplayTimer();
+        sharedSectionInView = entry.isIntersecting;
+        newController.refreshAutoplayTimer();
+        redesignController.refreshAutoplayTimer();
       });
     }, { threshold: 0.3 });
     pipelineIO.observe(pipelineCardEl);
