@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#533afd">
+<title>gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.</title>
+<meta name="description" content="Claude Code용 디자인 멀티에이전트 팀 gx-design. 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
+<meta property="og:title" content="gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.">
+<meta property="og:description" content="한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23533afd'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css">
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
+<style>
+  /* ============ 토큰 (출처: outputs/brief/2026-07-30_gx-landing_DESIGN.md — hard) ============ */
+  :root{
+    color-scheme: light;
+    --primary:#533afd;
+    --primary-deep:#4434d4;
+    --primary-press:#2e2b8c;
+    --primary-soft:#665efd;
+    --primary-subdued:#b9b9f9;
+    --brand-dark-900:#1c1e54;
+    --ink:#0d253d;
+    --ink-secondary:#273951;
+    --ink-mute:#64748d;
+    --on-primary:#ffffff;
+    --canvas:#ffffff;
+    --canvas-soft:#f6f9fc;
+    --canvas-cream:#f5e9d4;
+    --hairline:#e3e8ee;
+    --hairline-input:#a8c3de;
+    --ruby:#ea2261;
+    --magenta:#f96bee;
+    --lemon:#9b6829;
+
+    --radius-xs:4px; --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-pill:9999px;
+
+    --sp-xxs:2px; --sp-xs:4px; --sp-sm:8px; --sp-md:12px; --sp-lg:16px; --sp-xl:24px; --sp-xxl:32px; --sp-huge:64px;
+
+    --font-kr:'Pretendard','Inter',-apple-system,'Malgun Gothic',system-ui,sans-serif;
+    --font-mono:ui-monospace,'SFMono-Regular','SF Mono',Consolas,'Liberation Mono',Menlo,monospace;
+
+    --shadow-1: 0 1px 3px rgba(0,55,112,.08);
+    --shadow-2: 0 8px 24px rgba(0,55,112,.08), 0 2px 6px rgba(0,55,112,.04);
+
+    --ease: cubic-bezier(.22,.7,.32,1);
+    --dur-in: 480ms;
+    --dur-fast: 180ms;
+    --dur-out: 120ms;
+
+    --container: 1200px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:var(--font-kr);
+    font-weight:400; /* 승인된 이탈: 한글 본문 400 (18px 미만) — 근거: 리서치 §4 */
+    font-feature-settings:"ss01";
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    word-break:keep-all; /* 한글 어절 중간 줄바꿈 방지 — 코드 블록은 .code-lines code에서 예외 처리 */
+    overflow-wrap:break-word;
+  }
+  h1,h2,h3,p,ul,ol,dl,dd,figure,table{margin:0;}
+  ul,ol{padding:0;list-style:none;}
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;max-width:100%;}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+  table{border-collapse:collapse;width:100%;}
+
+  /* ---------- 접근성 ---------- */
+  .skip-link{
+    position:absolute;left:var(--sp-md);top:-56px;z-index:100;
+    background:var(--ink);color:var(--canvas);
+    padding:var(--sp-sm) var(--sp-lg);border-radius:var(--radius-sm);
+    transition:top var(--dur-fast) var(--ease);
+  }
+  .skip-link:focus{top:var(--sp-md);}
+  /* 5회차: 이중 링(흰색 2px + 인디고 2px) — 단일 outline:primary는 다크 코드블록(#1c1e54) 위에서 2.49:1로 WCAG 1.4.11(3:1) 미달.
+     흰 안쪽 링은 다크 표면에서 15.41:1, 인디고 바깥 링은 라이트 표면(canvas/canvas-soft)에서 6.19:1 — 두 표면 모두 3:1 이상 확보(계산 근거 §9 5회차).
+     6회차 R-2: outline:2px solid transparent를 병기 — Windows 고대비(forced-colors) 모드는 box-shadow를 렌더하지 않고
+     outline은 transparent를 시스템 강조색으로 강제 치환하므로, 그 모드에서도 포커스 표시가 남는다(WCAG 2.4.7). */
+  :focus-visible{outline:2px solid transparent;outline-offset:2px;box-shadow:0 0 0 2px var(--canvas), 0 0 0 4px var(--primary);border-radius:var(--radius-xs);}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+
+  /* ---------- 타이포 역할 (DESIGN.md 토큰) ---------- */
+  /* letter-spacing은 DESIGN.md 각 토큰의 px/font-size 비율(예: -1.4px/56px=-0.025em)을 em으로 환산 —
+     56px 렌더 시 정확히 -1.4px와 동일하되, clamp()로 줄어드는 렌더 크기에도 비례 유지(반응형 대응, 값은 이탈 아님) */
+  /* 히어로 h1 전용 최소 크기 하향(1.5rem=24px) — 확정 카피 2행 중 긴 행("디자인 팀처럼 진행합니다.")이
+     375px에서 keep-all 적용 후에도 한 줄에 들어가도록 여유를 둔 값. DESIGN.md 참고치(모바일 36px)보다 작지만
+     고정 <br> 2행 요구를 지키기 위한 근거 있는 조정(렌더 품질 로그 2회차 C2 참조) */
+  .t-display-xxl{font-weight:300;line-height:1.1;letter-spacing:-0.025em;font-size:clamp(1.5rem,.8rem + 3vw,3.5rem);}
+  .t-display-xl{font-weight:300;line-height:1.15;letter-spacing:-0.02em;font-size:clamp(1.75rem,1.2rem + 2.2vw,3rem);}
+  /* 5회차 M-4: 375px 실측 h1 24.06px = h2 24.00px(위계 소멸). h1(§ line99, 2행 확정 카피 유지 필요·이미 실측 통과)은 무변경하고
+     h2 쪽 하한을 20px로 낮춰 분리(24 vs 20, 20px는 DESIGN.md heading-md 실재 토큰) — desktop 상한 32px는 그대로 */
+  .t-display-lg{font-weight:300;line-height:1.16;letter-spacing:-0.02em;font-size:clamp(1.25rem,.985rem + 1.13vw,2rem);}
+  .t-display-md{font-weight:300;line-height:1.2;letter-spacing:-0.01em;font-size:clamp(1.25rem,1.05rem + .8vw,1.625rem);}
+  .t-heading-sm{font-weight:300;line-height:1.4;font-size:clamp(1rem,.9rem + .4vw,1.125rem);}
+  /* A-M2: t-heading-sm의 clamp 전개식(.9rem+.4vw)이 18px(승인 이탈의 헤드라인급 기준)에 도달하는 지점은 뷰포트 900px —
+     그 아래에서는 렌더 크기가 18px 미만인데 weight가 300으로 남아 있어 승인 이탈("18px 미만 한글 본문 400")을 자기 위반했다.
+     900px 미만에서만 400으로 전환 — 900px 이상(18px 렌더)은 헤드라인급이라 300 유지 */
+  @media(max-width:899px){ .t-heading-sm{font-weight:400;} }
+  .t-body-lg{font-weight:400;line-height:1.55;font-size:1rem;}
+  .t-body-md{font-weight:400;line-height:1.55;font-size:.9375rem;}
+  .t-caption{font-weight:400;line-height:1.4;letter-spacing:-0.39px;font-size:.8125rem;color:var(--ink-mute);}
+  .t-micro-cap{font-weight:400;line-height:1.15;letter-spacing:.1px;font-size:.625rem;text-transform:uppercase;}
+  .t-button{font-weight:400;line-height:1;font-size:1rem;}
+
+  /* ---------- 레이아웃 ---------- */
+  .container{max-width:var(--container);margin:0 auto;padding:0 var(--sp-xl);}
+  @media(max-width:767px){ .container{padding:0 var(--sp-lg);} }
+  .section{padding-top:64px;padding-bottom:64px;position:relative;}
+  @media(min-width:1024px){ .section{padding-top:96px;padding-bottom:96px;} }
+  .section--soft{background:var(--canvas-soft);}
+  .section-head{max-width:640px;margin-bottom:var(--sp-xxl);}
+  .section-head h2{color:var(--ink);}
+  .section-head p{margin-top:var(--sp-md);color:var(--ink-secondary);max-width:56ch;}
+
+  /* ---------- 스크롤 리빌 ---------- */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity var(--dur-in) var(--ease),transform var(--dur-in) var(--ease);}
+  .reveal.is-visible{opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1!important;transform:none!important;transition:none!important;}
+  }
+  /* B-M1: opacity:0이 인쇄 시에도 상속돼 히어로 아래가 백지로 나옴 — noscript 폴백과 같은 이유의 다른 경로 */
+  @media print{
+    .reveal{opacity:1!important;transform:none!important;transition:none!important;}
+  }
+
+  /* ---------- 버튼 ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-sm);
+    border-radius:var(--radius-pill);padding:8px 16px;border:1px solid transparent; /* 6회차 R-4: 테두리를 .btn 기저로 이동 — .btn-secondary 존재 여부에 암묵 결합되지 않도록, 항상 1px 박스 높이를 예약 */
+    font-family:var(--font-kr);font-weight:400;font-size:1rem;line-height:1;
+    transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
+    white-space:nowrap;
+  }
+  @media(max-width:767px){ .btn{padding:14px 16px;} } /* 터치 타깃 44px 확보 — 세로 패딩만 확대 */
+  .btn-primary{background:var(--primary);color:var(--on-primary);}
+  .btn-primary:hover{background:var(--primary-deep);}
+  .btn-primary:active{background:var(--primary-press);transform:translateY(1px);}
+  .btn-primary.is-copied{background:var(--primary-press);} /* 5회차: 복사 완료 상태 — 같은 인디고 계열, 신규 색상 아님 */
+  .btn-primary svg{width:14px;height:14px;flex:0 0 auto;}
+  .btn-secondary{background:var(--canvas);color:var(--primary);border:1px solid var(--primary);}
+  .btn-secondary:hover{background:var(--canvas-soft);}
+  .btn-row{display:flex;flex-wrap:wrap;gap:var(--sp-md);align-items:center;}
+
+  /* ---------- pill 태그 (pill-tag-soft) ---------- */
+  /* 접근성 조정: DESIGN.md 원안 text=primary-deep(대비 4.23:1, AA 미달) → primary-press(6.19:1)로 교체. 색상군은 동일(인디고), 신규 색상 아님 */
+  .pill-tag{
+    display:inline-flex;align-items:center;background:var(--primary-subdued);color:var(--primary-press);
+    border-radius:var(--radius-pill);padding:4px 8px;
+    font-size:.6875rem; /* 11px = DESIGN.md micro 토큰. micro-cap(10px)은 기능 라벨 가독성 하한 미달이라 상향 — 접근성 이탈 2 */
+  }
+
+  /* ---------- 상단 크롬(단일 줄) ---------- */
+  .chrome{position:relative;z-index:2;padding-top:var(--sp-xl);}
+  .chrome-inner{display:flex;align-items:center;justify-content:space-between;}
+  .brand-word{font-family:var(--font-kr);font-weight:400;font-size:1rem;color:var(--ink);}
+  .chrome-link{color:var(--primary);font-size:.9375rem;}
+  .chrome-link:hover{text-decoration:underline;}
+
+  /* ---------- 히어로 ---------- */
+  .hero{position:relative;overflow:hidden;padding-top:var(--sp-xxl);padding-bottom:var(--sp-huge);}
+  .hero-mesh{
+    position:absolute;top:0;left:0;width:100%;height:clamp(360px,52vw,620px);
+    z-index:0;pointer-events:none;
+    -webkit-mask-image:linear-gradient(to bottom, black 0%, black 52%, transparent 94%);
+    mask-image:linear-gradient(to bottom, black 0%, black 52%, transparent 94%);
+  }
+  .hero-mesh svg{width:100%;height:100%;}
+  .blob-cream{fill:var(--canvas-cream);opacity:.95;}
+  .blob-lemon{fill:var(--lemon);opacity:.28;}
+  .blob-lavender{fill:var(--primary-subdued);opacity:.55;}
+  .blob-indigo{fill:var(--primary);opacity:.42;}
+  .blob-ruby{fill:var(--ruby);opacity:.32;}
+  .blob-magenta{fill:var(--magenta);opacity:.22;}
+
+  .hero-content{position:relative;z-index:1;padding-top:var(--sp-huge);}
+  .hero h1{color:var(--ink);} /* max-width 제거 — ch단위가 한글 실폭을 절반가량 과소평가해 강제 개행 유발(렌더 품질 로그 2회차 C2) */
+  .hero .sub{color:var(--ink-secondary);margin-top:var(--sp-lg);}
+  .hero-grid{display:grid;gap:var(--sp-xxl);}
+  @media(min-width:1024px){
+    .hero-grid{
+      grid-template-columns:1.1fr .9fr;
+      grid-template-areas:"headline mockup" "sub mockup" "install mockup";
+      align-items:start;column-gap:var(--sp-huge);
+    }
+    #hero-heading{grid-area:headline;align-self:end;}
+    .hero .sub{grid-area:sub;}
+    .hero .mockup-card{grid-area:mockup;margin-top:0;align-self:start;}
+    .hero .install{grid-area:install;margin-top:0;}
+  }
+
+  .mockup-card{
+    margin-top:var(--sp-xxl);background:var(--canvas);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-2);padding:var(--sp-xl);max-width:560px;
+  }
+  .mockup-topline{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-lg);}
+  .mockup-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex:0 0 auto;}
+  .mockup-label{font-family:var(--font-mono);letter-spacing:.1em;color:var(--ink-mute);}
+  .mockup-caption{margin-left:auto;color:var(--ink-mute);}
+  .mockup-row{display:flex;align-items:flex-start;gap:var(--sp-sm);}
+  .mockup-input{color:var(--ink);margin-bottom:var(--sp-lg);}
+  .prompt-icon{color:var(--primary);font-family:var(--font-mono);flex:0 0 auto;}
+  .mockup-response{flex-direction:column;gap:var(--sp-sm);margin-bottom:var(--sp-xl);}
+  .mockup-response-label{color:var(--ink-mute);}
+  .chip-row{display:flex;flex-wrap:wrap;gap:var(--sp-sm);}
+  .mini-steps{display:flex;align-items:center;gap:0;}
+  .mini-node{
+    width:22px;height:22px;border-radius:50%;border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:.6875rem;color:var(--ink-mute);flex:0 0 auto;background:var(--canvas);
+  }
+  .mini-line{flex:1 1 auto;height:1px;background:var(--hairline);min-width:8px;}
+  .mini-steps-caption{margin-top:var(--sp-sm);color:var(--ink-mute);}
+
+  .install{margin-top:var(--sp-xxl);max-width:560px;min-width:0;} /* CTA 섹션의 grid item으로 쓰일 때 min-width:auto가 코드 줄 폭만큼 트랙을 밀어 넓히는 현상(grid blowout) 방지 — 렌더 품질 로그 2회차 C3 */
+  .cta-grid > .install{min-width:0;}
+  /* 5회차 C-1: 복사 버튼을 다크 코드블록 밖(.btn-row, 라이트 배경)으로 이동 — 채워진 인디고 CTA가
+     다크 표면 위에서 3:1 미달(2.49:1)이 되는 함정을 배치 자체로 제거하고, DESIGN.md "밴드당 채워진 버튼 1개"를 충족 */
+  .code-block{background:var(--brand-dark-900);border-radius:var(--radius-lg);padding:var(--sp-xl);}
+  .code-head{margin-bottom:var(--sp-md);}
+  .code-label{font-family:var(--font-mono);letter-spacing:.1em;color:rgba(255,255,255,.55);}
+  .code-lines{margin:0;overflow-x:auto;}
+  .code-lines code{
+    font-family:var(--font-mono);font-size:.9375rem;line-height:1.7;color:var(--on-primary);
+    white-space:pre;display:block;word-break:normal;overflow-wrap:normal; /* 전역 keep-all 예외 */
+  }
+  @media(max-width:767px){
+    .code-block{padding:var(--sp-lg);}
+    .code-lines code{font-size:.75rem;} /* 375px 가로 오버플로 방지 — 코드 줄이 뷰포트 안에 들어오도록 축소 */
+  }
+  .code-lines code .op{color:var(--primary-soft);}
+  .install .btn-row{margin-top:var(--sp-lg);}
+
+  /* ---------- 파이프라인 ---------- */
+  .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
+  .pipeline-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-xl);padding:var(--sp-xl);box-shadow:var(--shadow-2);}
+  @media(min-width:768px){ .pipeline-card{padding:var(--sp-huge);} } /* M2: 시그니처 구간 — 카드 존재감을 위아래 섹션보다 크게 */
+  .stepbar{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:var(--sp-xs);gap:0;}
+  .step-trigger{display:flex;flex-direction:column;align-items:center;gap:var(--sp-sm);padding:var(--sp-xs);flex:0 0 auto;min-width:64px;border-radius:var(--radius-md);}
+  .step-node{
+    width:44px;height:44px;border-radius:50%;border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:.8125rem;color:var(--ink-mute);background:var(--canvas);
+    transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease);
+  }
+  .step-label{color:var(--ink-mute);font-size:.8125rem;white-space:nowrap;transition:color var(--dur-fast) var(--ease);}
+  .step-trigger.is-active .step-node{border-color:var(--primary);color:var(--on-primary);background:var(--primary);} /* M2: 인디고 채움으로 활성 단계 강조 */
+  .step-trigger.is-active .step-label{color:var(--ink);}
+  .step-connector{flex:1 1 32px;height:1px;background:var(--hairline);margin-top:22px;min-width:20px;}
+  /* 4회차: 767px 이하 세로 스텝바(전략 §5.4 "모바일: 스텝바가 세로선으로 전환" 준수) —
+     가로 스크롤로 4/6단계만 보이던 문제 해소, 6개 전부 한 화면 흐름에 들어오게 함. 데스크톱(≥768px)은 무변경. */
+  @media(max-width:767px){
+    .stepbar{flex-direction:column;align-items:stretch;overflow-x:visible;gap:0;padding-bottom:0;}
+    .step-trigger{flex-direction:row;align-items:center;justify-content:flex-start;gap:var(--sp-md);width:100%;min-width:0;padding:var(--sp-sm) var(--sp-xs);}
+    .step-node{flex:0 0 auto;}
+    .step-label{white-space:normal;font-size:.9375rem;}
+    .step-connector{flex:0 0 auto;width:1px;height:14px;min-width:0;margin:0 0 0 25px;} /* 44px 노드(4px 패딩 포함) 중심축과 정렬 */
+  }
+  /* 6회차 R-3: max-width가 border-top까지 잘라 구분선이 카드 폭의 49%만 그려지던 버그 —
+     구분선(.step-panel, 카드 폭 100%)과 텍스트 폭 제한(.step-panel-inner)을 분리 */
+  .step-panel{margin-top:var(--sp-xl);padding-top:var(--sp-xl);border-top:1px solid var(--hairline);opacity:1;transition:opacity var(--dur-fast) var(--ease);} /* 들어오는 페이드 180ms(dur-fast) */
+  .step-panel-inner{max-width:520px;} /* 5회차 M-5 의도 유지 — 텍스트만 캡, 우측 여백은 넓은 카드에서 짧은 텍스트가 왼쪽 정렬로 숨쉬는 의도된 여백(§9 6회차) */
+  .step-panel.is-swapping{opacity:0;transition:opacity var(--dur-out) var(--ease);} /* 7회차: 나가는 페이드 120ms(dur-out) — VISUAL-CRAFT §4 "나가는 모션 < 들어오는 모션" */
+  .step-panel-index{display:block;font-family:var(--font-mono);color:var(--primary);margin-bottom:var(--sp-sm);}
+  .step-panel-desc{color:var(--ink);}
+  .step-panel-detail{color:var(--ink-secondary);margin-top:var(--sp-sm);}
+  /* M-d: 카드 밖으로 이동 + 캡션급 타입 + ink-secondary(soft 배경 위 대비 확보) — 패널 내용으로 오독되지 않도록 시각 분리 */
+  .pipeline-note{margin-top:var(--sp-xl);color:var(--ink-secondary);}
+  .pipeline-note a{color:var(--primary);}
+  .pipeline-note a:hover{text-decoration:underline;}
+
+  /* ---------- 구성 (릴레이) ---------- */
+  .relay{display:flex;align-items:stretch;gap:var(--sp-lg);}
+  .relay-item{flex:1 1 0;display:flex;flex-direction:column;align-items:flex-start;}
+  .relay-node{
+    width:28px;height:28px;border-radius:50%;background:var(--canvas);border:1px solid var(--primary-subdued);
+    color:var(--primary-deep);display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:.6875rem;margin-bottom:var(--sp-md);
+  }
+  .relay-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:var(--sp-xl);box-shadow:var(--shadow-1);width:100%;flex:1 0 auto;display:flex;flex-direction:column;} /* M-b: relay-item(stretch)의 남는 세로 공간을 카드가 직접 채워 하단선 정렬 */
+  .relay-card .model-tag{margin-bottom:var(--sp-md);align-self:flex-start;} /* 카드가 column flex라 span 배지가 blockify되어 폭을 꽉 채우던 회귀 수정 — pill-tag-soft는 내용 폭 칩이다 */
+  .relay-card h3{color:var(--ink);margin-bottom:var(--sp-sm);}
+  .relay-card p{color:var(--ink-secondary);}
+  .relay-connector{flex:0 0 auto;width:24px;align-self:flex-start;height:1px;background:var(--hairline);margin-top:14px;} /* M-b: relay-node(28px) 배지의 세로 중심(14px)과 같은 축에 고정 — 카드 중간에 걸리지 않도록 */
+  .composition-note{margin-top:var(--sp-xl);color:var(--ink-secondary);max-width:60ch;}
+
+  @media(max-width:767px){
+    .relay{flex-direction:column;}
+    .relay-connector{width:1px;height:24px;align-self:flex-start;margin:0 0 0 13px;}
+  }
+
+  /* ---------- 마감 CTA ---------- */
+  .cta-section .section-head{max-width:none;}
+  .cta-grid{display:grid;gap:var(--sp-xxl);align-items:start;}
+  .cta-sub{color:var(--ink-secondary);margin-top:var(--sp-md);} /* M-c: 좌측 하단 공백 해소 — README "빠른 시작" 다음 행동 안내를 그대로 인용 */
+  @media(min-width:860px){ .cta-grid{grid-template-columns:1fr 1fr;} }
+
+  /* ---------- 푸터 ---------- */
+  .site-footer{background:var(--canvas);border-top:1px solid var(--hairline);padding:var(--sp-huge) 0;}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--sp-xl);align-items:flex-start;}
+  .footer-tagline{margin-top:var(--sp-sm);color:var(--ink-mute);max-width:42ch;}
+
+  /* ---------- 헤어라인 구분(섹션 사이) ---------- */
+  .hr-line{border-top:1px solid var(--hairline);}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">본문으로 건너뛰기</a>
+<div id="copy-announce" class="visually-hidden" role="status" aria-live="polite"></div>
+
+<div class="chrome container">
+  <div class="chrome-inner">
+    <span class="brand-word">gx-design</span>
+    <a class="chrome-link t-body-md" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============ 1. 히어로 ============ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-mesh" aria-hidden="true">
+      <svg viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="meshBlur" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="68"/>
+          </filter>
+        </defs>
+        <!-- M1: 블롭을 0~1440 전 구간에 고르게 겹치도록 재배치(좌우 가장자리로 bleed) — 상단 1/3 가로 워시(DESIGN.md) -->
+        <g filter="url(#meshBlur)">
+          <path class="blob-cream" d="M60,50 C180,-10 400,10 500,90 C600,170 580,270 470,310 C350,355 160,330 70,260 C-20,190 -40,110 60,50 Z"/>
+          <path class="blob-lemon" d="M340,130 C460,70 640,90 700,180 C760,270 690,350 570,360 C450,370 320,340 300,250 C282,180 240,175 340,130 Z"/>
+          <path class="blob-lavender" d="M600,70 C750,20 930,50 980,140 C1030,230 960,310 840,330 C720,350 590,300 570,210 C552,140 480,105 600,70 Z"/>
+          <path class="blob-indigo" d="M860,110 C1010,50 1200,80 1260,180 C1320,275 1230,360 1100,370 C970,380 830,330 810,240 C792,170 730,150 860,110 Z"/>
+          <path class="blob-ruby" d="M1120,80 C1260,40 1420,80 1450,170 C1480,255 1400,320 1290,320 C1190,320 1100,270 1090,190 C1082,130 1020,110 1120,80 Z"/>
+          <path class="blob-magenta" d="M1240,140 C1320,110 1400,140 1410,200 C1420,255 1360,290 1300,285 C1250,280 1200,240 1210,190 C1215,158 1180,158 1240,140 Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="container hero-content">
+     <div class="hero-grid">
+      <h1 id="hero-heading" class="t-display-xxl">디자인 팀처럼 묻고,<br>디자인 팀처럼 진행합니다.</h1>
+      <p class="sub t-heading-sm">한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.</p>
+
+      <!-- 6회차 R-1: 모바일(<1024px)은 DOM 순서가 곧 시각 순서라 install(코드+CTA)을 mockup-card보다 앞에 둔다.
+           ≥1024px는 grid-template-areas가 DOM 순서와 무관하게 배치하므로 데스크톱 2열은 그대로 유지된다. -->
+      <div class="install reveal">
+        <div class="code-block">
+          <div class="code-head">
+            <span class="code-label t-micro-cap">INSTALL</span>
+          </div>
+          <pre class="code-lines"><code>/plugin marketplace add bs-koo/gx-design
+/plugin install gx-design@gx-design</code></pre>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary t-button" type="button" data-copy>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 10.5V3a1 1 0 0 1 1-1h7.5" stroke="currentColor" stroke-width="1.3"/></svg>
+            <span class="copy-btn-label" data-default="명령어 복사">명령어 복사</span>
+          </button>
+          <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
+        </div>
+      </div>
+
+      <div class="mockup-card reveal">
+        <div class="mockup-topline">
+          <span class="mockup-dot" aria-hidden="true"></span>
+          <span class="mockup-label t-micro-cap">SESSION</span>
+          <span class="mockup-caption t-caption">예시 · 실제 세션 캡처 아님</span>
+        </div>
+        <div class="mockup-row mockup-input t-body-lg">
+          <span class="prompt-icon" aria-hidden="true">›</span>
+          <span>대학생 캠퍼스 중고거래 서비스 UX/UI</span>
+        </div>
+        <div class="mockup-row mockup-response">
+          <span class="mockup-response-label t-caption">되묻는 질문</span>
+          <div class="chip-row">
+            <span class="pill-tag t-micro-cap">타깃: 학과 전체 · 특정 단대</span>
+            <span class="pill-tag t-micro-cap">핵심 기능: 채팅 · 위치 인증 · 결제</span>
+          </div>
+        </div>
+        <div class="mockup-steps" aria-hidden="true">
+          <div class="mini-steps">
+            <span class="mini-node">0</span><span class="mini-line"></span>
+            <span class="mini-node">1</span><span class="mini-line"></span>
+            <span class="mini-node">2</span><span class="mini-line"></span>
+            <span class="mini-node">3</span><span class="mini-line"></span>
+            <span class="mini-node">4</span><span class="mini-line"></span>
+            <span class="mini-node">5</span>
+          </div>
+          <p class="mini-steps-caption t-caption">브리프 · 리서치 · 전략 · 제작 · 검수 · 실물 제작</p>
+        </div>
+      </div>
+     </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. 파이프라인 6단계 (문제 제기 리드 이설) ============ -->
+  <section id="pipeline" class="section section--soft" aria-labelledby="pipeline-heading">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="pipeline-pain t-body-lg">질문 없이 나온 디자인엔, 근거가 없습니다.</p>
+        <h2 id="pipeline-heading" class="t-display-lg">한 줄의 요청이, 여섯 단계를 거칩니다.</h2>
+      </div>
+
+      <div class="pipeline-card reveal">
+        <div class="stepbar" role="tablist" aria-label="파이프라인 6단계">
+          <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel" id="step-tab-0" tabindex="0" data-step="0">
+            <span class="step-node">0</span><span class="step-label t-caption">브리프</span>
+          </button>
+          <span class="step-connector" aria-hidden="true"></span>
+          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-1" tabindex="-1" data-step="1">
+            <span class="step-node">1</span><span class="step-label t-caption">리서치</span>
+          </button>
+          <span class="step-connector" aria-hidden="true"></span>
+          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-2" tabindex="-1" data-step="2">
+            <span class="step-node">2</span><span class="step-label t-caption">전략</span>
+          </button>
+          <span class="step-connector" aria-hidden="true"></span>
+          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-3" tabindex="-1" data-step="3">
+            <span class="step-node">3</span><span class="step-label t-caption">제작</span>
+          </button>
+          <span class="step-connector" aria-hidden="true"></span>
+          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-4" tabindex="-1" data-step="4">
+            <span class="step-node">4</span><span class="step-label t-caption">검수</span>
+          </button>
+          <span class="step-connector" aria-hidden="true"></span>
+          <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel" id="step-tab-5" tabindex="-1" data-step="5">
+            <span class="step-node">5</span><span class="step-label t-caption">실물 제작</span>
+          </button>
+        </div>
+
+        <div class="step-panel" id="step-panel" role="tabpanel" aria-labelledby="step-tab-0">
+          <div class="step-panel-inner">
+            <span class="step-panel-index t-caption">0 · 브리프</span>
+            <p class="step-panel-desc t-display-md">결정 트리로 질문</p>
+            <p class="step-panel-detail t-body-md">승인 전에는 어떤 산출물도 만들지 않습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="pipeline-note t-caption">기존 화면을 고치는 작업은 7단계 <code style="font-family:var(--font-mono);">gx-redesign</code> 파이프라인을 따로 씁니다 — <a href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">README에서 보기</a></p>
+    </div>
+  </section>
+
+  <!-- ============ 3. 구성 (3 에이전트) ============ -->
+  <section id="composition" class="section" aria-labelledby="composition-heading">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2 id="composition-heading" class="t-display-lg">세 역할이 이어받습니다.</h2>
+      </div>
+
+      <div class="relay reveal" role="list">
+        <div class="relay-item" role="listitem">
+          <span class="relay-node" aria-hidden="true">01</span>
+          <div class="relay-card">
+            <span class="pill-tag model-tag t-micro-cap">HAIKU</span>
+            <h3 class="t-display-md">리서처</h3>
+            <p class="t-body-md">시장·경쟁사·사용자·트렌드를 병렬로 조사합니다.</p>
+          </div>
+        </div>
+        <span class="relay-connector" aria-hidden="true"></span>
+        <div class="relay-item" role="listitem">
+          <span class="relay-node" aria-hidden="true">02</span>
+          <div class="relay-card">
+            <span class="pill-tag model-tag t-micro-cap">SONNET</span>
+            <h3 class="t-display-md">전략가</h3>
+            <p class="t-body-md">철학이 다른 전략 3안을 세우고, 하나를 함께 고릅니다.</p>
+          </div>
+        </div>
+        <span class="relay-connector" aria-hidden="true"></span>
+        <div class="relay-item" role="listitem">
+          <span class="relay-node" aria-hidden="true">03</span>
+          <div class="relay-card">
+            <span class="pill-tag model-tag t-micro-cap">SONNET</span>
+            <h3 class="t-display-md">프로듀서</h3>
+            <p class="t-body-md">명세·카피·생성형 프롬프트·프로토타입까지 만듭니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="composition-note t-body-md reveal">이 세 역할에 스킬 6종이 매체가 아니라 업무 단계로 연결됩니다.</p>
+    </div>
+  </section>
+
+  <!-- ============ 4. 설치 CTA (반복) ============ -->
+  <section id="cta" class="section section--soft cta-section" aria-labelledby="cta-heading">
+    <div class="container">
+      <div class="cta-grid">
+        <div class="section-head reveal" style="margin-bottom:0;">
+          <h2 id="cta-heading" class="t-display-lg">지금, 터미널 두 줄이면 됩니다.</h2>
+          <p class="cta-sub t-body-lg">Claude Code를 재시작한 뒤, 만들고 싶은 것을 한 줄로 말하면 됩니다.</p>
+        </div>
+        <div class="install reveal" style="margin-top:0;">
+          <div class="code-block">
+            <div class="code-head">
+              <span class="code-label t-micro-cap">INSTALL</span>
+            </div>
+            <pre class="code-lines"><code>/plugin marketplace add bs-koo/gx-design
+/plugin install gx-design@gx-design</code></pre>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary t-button" type="button" data-copy>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 10.5V3a1 1 0 0 1 1-1h7.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <span class="copy-btn-label" data-default="명령어 복사">명령어 복사</span>
+            </button>
+            <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 5. 푸터 ============ -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="brand-word">gx-design</span>
+      <p class="footer-tagline t-body-md">BX · 그래픽 · UX/UI · 영상 — 한 줄로 요청하세요. 디자인 팀이 움직입니다.</p>
+    </div>
+    <a class="chrome-link t-body-md" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub 레포지토리</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 1) 설치 명령 복사 ---------- */
+  function fallbackCopy(text, cb){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly','');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.left = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      cb(ok);
+    }catch(e){ cb(false); }
+  }
+
+  var announce = document.getElementById('copy-announce');
+  var copyButtons = document.querySelectorAll('[data-copy]');
+  copyButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var block = btn.closest('.install'); /* 5회차: 복사 버튼이 .code-block 밖(형제 .btn-row)으로 이동해 조회 범위를 상위 컨테이너로 확장 */
+      var codeEl = block ? block.querySelector('.code-block code') : null;
+      var text = codeEl ? codeEl.innerText.trim() : '';
+      var label = btn.querySelector('.copy-btn-label');
+      var original = label.getAttribute('data-default');
+
+      function done(ok){
+        btn.classList.toggle('is-copied', ok);
+        label.textContent = ok ? '복사됨' : original;
+        if(announce){ announce.textContent = ok ? '설치 명령이 복사되었습니다.' : '복사에 실패했습니다. 직접 선택해 복사해 주세요.'; }
+        window.clearTimeout(btn._copyTimer);
+        btn._copyTimer = window.setTimeout(function(){
+          btn.classList.remove('is-copied');
+          label.textContent = original;
+        }, 1800);
+      }
+
+      if(navigator.clipboard && window.isSecureContext){
+        navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(function(){ fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
+    });
+  });
+
+  /* ---------- 2) 파이프라인 자동 전환 탭리스트 ---------- */
+  /* 7회차: 사용자 직접 요청("클릭 방식 말고 2초 간격 자동 전환")으로 클릭 전용 → 자동 재생 기본 동작으로 변경.
+     전략 §5.4 원문("클릭 또는 스크롤 트리거 아코디언")과 다른 사양 — 오케스트레이터가 전략 문서를 별도 갱신한다. */
+  /* detail: README 사실 기반 2번째 줄(§9 렌더 품질 로그 3회차 M-a 근거 참조) */
+  var steps = [
+    {label:'브리프', desc:'결정 트리로 질문', detail:'승인 전에는 어떤 산출물도 만들지 않습니다.'},
+    {label:'리서치', desc:'시장·사용자 병렬 조사', detail:'경쟁사·트렌드까지 네 갈래로 동시에 조사합니다.'},
+    {label:'전략', desc:'철학 다른 3안', detail:'본질 우선·차별화 우선·시스템 우선 중 하나를 고릅니다.'},
+    {label:'제작', desc:'명세·카피·프롬프트', detail:'프로토타입까지 실제로 만듭니다.'},
+    {label:'검수', desc:'전략·완성도 2축', detail:'두 보고서는 서로 합치지 않습니다.'},
+    {label:'실물 제작', desc:'코드·Gemini·편집 핸드오프 중 선택', detail:'검수를 통과해야 열리는 단계입니다.'}
+  ];
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.step-trigger'));
+  var stepbarEl = document.querySelector('.stepbar');
+  var panel = document.getElementById('step-panel');
+  var pipelineCardEl = document.querySelector('.pipeline-card');
+  var panelIndex = panel ? panel.querySelector('.step-panel-index') : null;
+  var panelDesc = panel ? panel.querySelector('.step-panel-desc') : null;
+  var panelDetail = panel ? panel.querySelector('.step-panel-detail') : null;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var currentStep = 0;
+  var autoplayStopped = reduceMotion; /* 정지 조건 2: reduced-motion이면 애초에 시작하지 않음(재개 없음) */
+  var sectionInView = false;          /* 정지 조건 3 */
+  var stepbarFocused = false;         /* 정지 조건 5 */
+  var autoplayTimer = null;
+  var AUTOPLAY_MS = 2000;
+  var FADE_OUT_MS = 120; /* CSS .step-panel.is-swapping의 dur-out(120ms)과 동기화 — 페이드아웃이 끝나는 시점에 정확히 텍스트를 교체 */
+
+  function activateStep(i, moveFocus){
+    currentStep = i;
+    tabs.forEach(function(tab, idx){
+      var on = idx === i;
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      tab.tabIndex = on ? 0 : -1;
+      tab.classList.toggle('is-active', on);
+    });
+    if(panel){ panel.setAttribute('aria-labelledby', tabs[i].id); }
+
+    function swap(){
+      if(panelIndex){ panelIndex.textContent = i + ' · ' + steps[i].label; }
+      if(panelDesc){ panelDesc.textContent = steps[i].desc; }
+      if(panelDetail){ panelDetail.textContent = steps[i].detail; }
+    }
+    if(reduceMotion || !panel){
+      swap();
+    } else {
+      panel.classList.add('is-swapping');
+      window.setTimeout(function(){
+        swap();
+        panel.classList.remove('is-swapping');
+      }, FADE_OUT_MS);
+    }
+    if(moveFocus){ tabs[i].focus(); } /* 자동 전환 tick은 항상 moveFocus=false로 호출 — 포커스 강탈 금지 */
+  }
+
+  function canAutoplay(){
+    return !reduceMotion && !autoplayStopped && sectionInView && !document.hidden && !stepbarFocused;
+  }
+  function stopAutoplayTimer(){
+    if(autoplayTimer){ window.clearInterval(autoplayTimer); autoplayTimer = null; }
+  }
+  function refreshAutoplayTimer(){
+    if(canAutoplay()){
+      if(!autoplayTimer){
+        autoplayTimer = window.setInterval(function(){
+          activateStep((currentStep + 1) % tabs.length, false);
+        }, AUTOPLAY_MS);
+      }
+    } else {
+      stopAutoplayTimer();
+    }
+  }
+  function disableAutoplayPermanently(){ /* 정지 조건 1: 사용자 조작 후 영구 정지 — 재개하지 않음 */
+    autoplayStopped = true;
+    stopAutoplayTimer();
+  }
+
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){ disableAutoplayPermanently(); activateStep(i, false); });
+    tab.addEventListener('keydown', function(e){
+      var target = null;
+      if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ target = (i + 1) % tabs.length; }
+      else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ target = (i - 1 + tabs.length) % tabs.length; }
+      else if(e.key === 'Home'){ target = 0; }
+      else if(e.key === 'End'){ target = tabs.length - 1; }
+      if(target !== null){ e.preventDefault(); disableAutoplayPermanently(); activateStep(target, true); }
+    });
+  });
+
+  /* 정지 조건 5: 스텝바 내부에 포커스가 있는 동안 일시정지(영구 정지 아님 — 포커스가 빠져나가면 다른 조건이 허용하는 한 재개) */
+  if(stepbarEl){
+    stepbarEl.addEventListener('focusin', function(){ stepbarFocused = true; refreshAutoplayTimer(); });
+    stepbarEl.addEventListener('focusout', function(e){
+      if(!stepbarEl.contains(e.relatedTarget)){ stepbarFocused = false; refreshAutoplayTimer(); }
+    });
+  }
+
+  /* 정지 조건 4: 탭이 백그라운드(document.hidden)면 정지, 복귀 시 다른 조건이 허용하면 재개 */
+  document.addEventListener('visibilitychange', function(){ refreshAutoplayTimer(); });
+
+  /* B-M1: 인쇄는 공유 패널 구조상 6단계를 동시에 지면에 낼 수 없다(패널 텍스트가 DOM에 1벌만 존재, 나머지는 JS 데이터로만 존재) —
+     대신 인쇄 시점에 항상 0단계로 되돌려 "타이머가 우연히 멈춘 단계"가 아닌 결정적인 첫 단계가 찍히게 한다. 정지·재생 상태는 건드리지 않는다. */
+  window.addEventListener('beforeprint', function(){ activateStep(0, false); });
+
+  /* 정지 조건 3: 파이프라인 카드가 뷰포트 밖이면 일시정지, 다시 들어오면 재개(단 조건 1로 영구 정지된 상태면 재개 안 함) */
+  if(pipelineCardEl && !reduceMotion && 'IntersectionObserver' in window){
+    var pipelineIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        sectionInView = entry.isIntersecting;
+        refreshAutoplayTimer();
+      });
+    }, { threshold: 0.3 });
+    pipelineIO.observe(pipelineCardEl);
+  }
+
+  /* ---------- 3) 스크롤 진입 애니메이션 ---------- */
+  var reveals = document.querySelectorAll('.reveal');
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    reveals.forEach(function(el){ el.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(function(el){ io.observe(el); });
+  }
+})();
+</script>
+</body>
+</html>
