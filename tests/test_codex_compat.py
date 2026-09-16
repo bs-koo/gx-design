@@ -103,6 +103,35 @@ class InstallBlockParser(HTMLParser):
             self.code_host = None
 
 
+class RedesignComparisonParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.cards = []
+        self.current = None
+        self.reading_label = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        classes = attrs.get("class", "").split()
+        if tag == "figure" and "ba-item" in classes:
+            self.current = {"label": "", "image": None}
+            self.cards.append(self.current)
+        elif self.current is not None and tag == "figcaption" and "ba-label" in classes:
+            self.reading_label = True
+        elif self.current is not None and tag == "img" and "ba-img" in classes:
+            self.current["image"] = attrs
+
+    def handle_data(self, data):
+        if self.current is not None and self.reading_label:
+            self.current["label"] += data
+
+    def handle_endtag(self, tag):
+        if tag == "figcaption":
+            self.reading_label = False
+        elif tag == "figure":
+            self.current = None
+
+
 class CodexCompatibilityTests(unittest.TestCase):
     def test_skill_frontmatter_has_matching_identity_and_description(self):
         skill_paths = sorted((ROOT / "skills").glob("*/SKILL.md"))
@@ -158,6 +187,23 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("Claude Code와 Codex", text)
         self.assertIn("[data-install-host]", text)
         self.assertIn("[data-host]", text)
+
+    def test_site_redesign_comparison_matches_labels_to_images(self):
+        text = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        parser = RedesignComparisonParser()
+        parser.feed(text)
+        cards = {card["label"].strip(): card["image"] for card in parser.cards}
+
+        self.assertEqual(set(cards), {"BEFORE", "AFTER"})
+        self.assertEqual(cards["BEFORE"]["src"], "assets/redesign-before.png")
+        self.assertIn("개편 전", cards["BEFORE"]["alt"])
+        self.assertIn("필터", cards["BEFORE"]["alt"])
+        self.assertIn("목록 테이블", cards["BEFORE"]["alt"])
+        self.assertEqual(cards["AFTER"]["src"], "assets/redesign-after.png")
+        self.assertIn("개편 후", cards["AFTER"]["alt"])
+        self.assertIn("상태 요약 카드", cards["AFTER"]["alt"])
+        self.assertIn("점검", cards["AFTER"]["alt"])
+        self.assertIn("다크 대시보드", cards["AFTER"]["alt"])
 
     def test_codex_manifest_matches_claude_identity(self):
         claude = json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
