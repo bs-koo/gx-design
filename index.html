@@ -6,9 +6,9 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#533afd">
 <title>gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.</title>
-<meta name="description" content="Claude Code용 디자인 멀티에이전트 팀 gx-design. 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
+<meta name="description" content="Claude Code와 Codex에서 쓰는 gx-design 디자인 워크플로. 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
 <meta property="og:title" content="gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.">
-<meta property="og:description" content="한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
+<meta property="og:description" content="Claude Code와 Codex에서 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23533afd'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,6 +229,11 @@
      다크 표면 위에서 3:1 미달(2.49:1)이 되는 함정을 배치 자체로 제거하고, DESIGN.md "밴드당 채워진 버튼 1개"를 충족 */
   .code-block{background:var(--brand-dark-900);border-radius:var(--radius-lg);padding:var(--sp-xl);}
   .code-head{margin-bottom:var(--sp-md);}
+  .install-hosts{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--sp-sm);}
+  .install-host-btn{min-height:44px;padding:9px 14px;border:1px solid rgba(255,255,255,.45);border-radius:var(--radius-pill);color:var(--on-primary);font-family:var(--font-mono);font-size:.875rem;}
+  .install-host-btn[aria-pressed="true"]{background:var(--on-primary);color:var(--brand-dark-900);border-color:var(--on-primary);}
+  .install-host-btn:focus-visible{outline:3px solid var(--primary-soft);outline-offset:3px;}
+  .code-lines[hidden]{display:none;}
   .code-label{font-family:var(--font-mono);letter-spacing:.1em;color:rgba(255,255,255,.55);}
   .code-lines{margin:0;overflow-x:auto;}
   .code-lines code{
@@ -241,6 +246,8 @@
   }
   .code-lines code .op{color:var(--primary-soft);}
   .install .btn-row{margin-top:var(--sp-lg);}
+  .install-help{margin-top:var(--sp-md);color:var(--ink-secondary);}
+  .install-help a{color:var(--primary);text-decoration:underline;text-underline-offset:3px;}
 
   /* ---------- 파이프라인 ---------- */
   .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
@@ -363,17 +370,23 @@
     <div class="container hero-content">
      <div class="hero-grid">
       <h1 id="hero-heading" class="t-display-xxl">디자인 팀처럼 묻고,<br>디자인 팀처럼 진행합니다.</h1>
-      <p class="sub t-heading-sm">한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.</p>
+      <p class="sub t-heading-sm">Claude Code와 Codex에서 한 줄로 요청하세요. 리서치·전략·제작·검수를 역할별 절차로 진행합니다.</p>
 
       <!-- 6회차 R-1: 모바일(<1024px)은 DOM 순서가 곧 시각 순서라 install(코드+CTA)을 mockup-card보다 앞에 둔다.
            ≥1024px는 grid-template-areas가 DOM 순서와 무관하게 배치하므로 데스크톱 2열은 그대로 유지된다. -->
       <div class="install reveal">
         <div class="code-block">
           <div class="code-head">
-            <span class="code-label t-micro-cap">INSTALL</span>
+            <span class="code-label t-micro-cap">INSTALL · 호스트 선택</span>
+            <div class="install-hosts" role="group" aria-label="설치할 호스트 선택">
+              <button class="install-host-btn" type="button" data-install-host="claude" aria-pressed="true">Claude Code</button>
+              <button class="install-host-btn" type="button" data-install-host="codex" aria-pressed="false">Codex</button>
+            </div>
           </div>
-          <pre class="code-lines"><code>/plugin marketplace add bs-koo/gx-design
+          <pre class="code-lines"><code data-host="claude">/plugin marketplace add bs-koo/gx-design
 /plugin install gx-design@gx-design</code></pre>
+          <pre class="code-lines" hidden><code data-host="codex">codex plugin marketplace add bs-koo/gx-design
+codex plugin add gx-design@gx-design</code></pre>
         </div>
         <div class="btn-row">
           <button class="btn btn-primary t-button" type="button" data-copy>
@@ -382,6 +395,7 @@
           </button>
           <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
         </div>
+        <p class="install-help t-body-md"><a href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">두 호스트의 설치·스킬 유지보수 안내</a></p>
       </div>
 
       <div class="mockup-card reveal">
@@ -525,40 +539,41 @@
         <figure class="ba-item">
           <figcaption class="ba-label t-micro-cap">BEFORE</figcaption>
           <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 상태 요약 카드와 점검 알럿이 있는 다크 대시보드">
+            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 필터와 목록 테이블로 구성된 밝은 화면">
           </div>
         </figure>
         <figure class="ba-item">
           <figcaption class="ba-label t-micro-cap">AFTER</figcaption>
           <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 필터와 목록 테이블로 정리된 조회 화면">
+            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 상태 요약 카드와 점검 알럿이 있는 다크 대시보드">
           </div>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ============ 4. 구성 (3 에이전트) ============ -->
+  <!-- ============ 4. 구성 (3 역할) ============ -->
   <section id="composition" class="section section--soft" aria-labelledby="composition-heading">
     <div class="container">
       <div class="section-head reveal">
         <h2 id="composition-heading" class="t-display-lg">세 역할이 이어받습니다.</h2>
+        <p class="t-body-lg">Claude Code의 전용 에이전트나 Codex의 사용 가능한 작업자가 역할을 맡을 수 있습니다. 위임할 수 없으면 주 에이전트가 같은 스킬 절차를 수행합니다.</p>
       </div>
 
       <div class="relay reveal" role="list">
         <div class="relay-item" role="listitem">
           <span class="relay-node" aria-hidden="true">01</span>
           <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">HAIKU</span>
+            <span class="pill-tag model-tag t-micro-cap">RESEARCH</span>
             <h3 class="t-display-md">리서처</h3>
-            <p class="t-body-md">시장·경쟁사·사용자·트렌드를 병렬로 조사합니다.</p>
+            <p class="t-body-md">시장·경쟁사·사용자·트렌드를 조사합니다.</p>
           </div>
         </div>
         <span class="relay-connector" aria-hidden="true"></span>
         <div class="relay-item" role="listitem">
           <span class="relay-node" aria-hidden="true">02</span>
           <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">SONNET</span>
+            <span class="pill-tag model-tag t-micro-cap">STRATEGY</span>
             <h3 class="t-display-md">전략가</h3>
             <p class="t-body-md">철학이 다른 전략 3안을 세우고, 하나를 함께 고릅니다.</p>
           </div>
@@ -567,7 +582,7 @@
         <div class="relay-item" role="listitem">
           <span class="relay-node" aria-hidden="true">03</span>
           <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">SONNET</span>
+            <span class="pill-tag model-tag t-micro-cap">PRODUCTION</span>
             <h3 class="t-display-md">프로듀서</h3>
             <p class="t-body-md">명세·카피·생성형 프롬프트·프로토타입까지 만듭니다.</p>
           </div>
@@ -583,16 +598,22 @@
     <div class="container">
       <div class="cta-grid">
         <div class="section-head reveal" style="margin-bottom:0;">
-          <h2 id="cta-heading" class="t-display-lg">지금, 터미널 두 줄이면 됩니다.</h2>
-          <p class="cta-sub t-body-lg">Claude Code를 재시작한 뒤, 만들고 싶은 것을 한 줄로 말하면 됩니다.</p>
+          <h2 id="cta-heading" class="t-display-lg">지금, 설치 명령 두 줄이면 됩니다.</h2>
+          <p class="cta-sub t-body-lg">Claude Code 또는 Codex를 선택해 설치하고, 새 대화에서 만들고 싶은 것을 한 줄로 말하세요.</p>
         </div>
         <div class="install reveal" style="margin-top:0;">
           <div class="code-block">
             <div class="code-head">
-              <span class="code-label t-micro-cap">INSTALL</span>
+              <span class="code-label t-micro-cap">INSTALL · 호스트 선택</span>
+              <div class="install-hosts" role="group" aria-label="설치할 호스트 선택">
+                <button class="install-host-btn" type="button" data-install-host="claude" aria-pressed="true">Claude Code</button>
+                <button class="install-host-btn" type="button" data-install-host="codex" aria-pressed="false">Codex</button>
+              </div>
             </div>
-            <pre class="code-lines"><code>/plugin marketplace add bs-koo/gx-design
+            <pre class="code-lines"><code data-host="claude">/plugin marketplace add bs-koo/gx-design
 /plugin install gx-design@gx-design</code></pre>
+            <pre class="code-lines" hidden><code data-host="codex">codex plugin marketplace add bs-koo/gx-design
+codex plugin add gx-design@gx-design</code></pre>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary t-button" type="button" data-copy>
@@ -601,6 +622,7 @@
             </button>
             <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
           </div>
+          <p class="install-help t-body-md"><a href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">두 호스트의 설치·스킬 유지보수 안내</a></p>
         </div>
       </div>
     </div>
@@ -642,11 +664,24 @@
   }
 
   var announce = document.getElementById('copy-announce');
+  document.querySelectorAll('.install').forEach(function(block){
+    block.querySelectorAll('[data-install-host]').forEach(function(choice){
+      choice.addEventListener('click', function(){
+        var host = choice.getAttribute('data-install-host');
+        block.querySelectorAll('[data-install-host]').forEach(function(button){
+          button.setAttribute('aria-pressed', button === choice ? 'true' : 'false');
+        });
+        block.querySelectorAll('[data-host]').forEach(function(code){
+          code.closest('.code-lines').hidden = code.getAttribute('data-host') !== host;
+        });
+      });
+    });
+  });
   var copyButtons = document.querySelectorAll('[data-copy]');
   copyButtons.forEach(function(btn){
     btn.addEventListener('click', function(){
       var block = btn.closest('.install'); /* 5회차: 복사 버튼이 .code-block 밖(형제 .btn-row)으로 이동해 조회 범위를 상위 컨테이너로 확장 */
-      var codeEl = block ? block.querySelector('.code-block code') : null;
+      var codeEl = block ? block.querySelector('.code-lines:not([hidden]) code[data-host]') : null;
       var text = codeEl ? codeEl.innerText.trim() : '';
       var label = btn.querySelector('.copy-btn-label');
       var original = label.getAttribute('data-default');
@@ -682,7 +717,7 @@
   /* detail: README 사실 기반 2번째 줄(신규 제작만 — §9 3회차 M-a). 개선은 README 원문이 이미 한 줄이라 detail 없음(§9 8회차) */
   var newSteps = [
     {label:'브리프', desc:'결정 트리로 질문', detail:'승인 전에는 어떤 산출물도 만들지 않습니다.'},
-    {label:'리서치', desc:'시장·사용자 병렬 조사', detail:'경쟁사·트렌드까지 네 갈래로 동시에 조사합니다.'},
+    {label:'리서치', desc:'시장·사용자 조사', detail:'경쟁사·트렌드까지 네 갈래로 조사합니다.'},
     {label:'전략', desc:'철학 다른 3안', detail:'본질 우선·차별화 우선·시스템 우선 중 하나를 고릅니다.'},
     {label:'제작', desc:'명세·카피·프롬프트', detail:'프로토타입까지 실제로 만듭니다.'},
     {label:'검수', desc:'전략·완성도 2축', detail:'두 보고서는 서로 합치지 않습니다.'},
@@ -694,7 +729,7 @@
     {label:'갭 리서치', desc:'경쟁·트렌드 대비 격차 분석'},
     {label:'개선 강도 3안', desc:'최소 개입·리프레시·리뉴얼 중 선택'},
     {label:'제작', desc:'모든 변경을 before→after→근거 3열로 기록'},
-    {label:'검수', desc:'2축 + 개선 목표 달성 축 = 3축 병렬'},
+    {label:'검수', desc:'2축 + 개선 목표 달성 축 = 3축 독립 검수'},
     {label:'실물 제작', desc:'신규 제작과 동일한 게이트, after 실물까지'}
   ];
 
