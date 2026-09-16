@@ -1,5 +1,7 @@
 import json
+import re
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 
@@ -8,9 +10,74 @@ SKILL_NAMES = {
     "gx-design", "gx-redesign", "design-research",
     "design-strategy", "creative-production", "creative-review",
 }
+CLAUDE_COMMANDS = "/plugin marketplace add bs-koo/gx-design\n/plugin install gx-design@gx-design"
+CODEX_COMMANDS = "codex plugin marketplace add bs-koo/gx-design\ncodex plugin add gx-design@gx-design"
+
+
+class InstallBlockParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.blocks = []
+        self.current = None
+        self.code_host = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        classes = attrs.get("class", "").split()
+        if tag == "div" and "install" in classes:
+            self.current = {"codes": {}, "buttons": []}
+            self.blocks.append(self.current)
+        if self.current is None:
+            return
+        if tag == "code" and "data-host" in attrs:
+            self.code_host = attrs["data-host"]
+            self.current["codes"][self.code_host] = ""
+        if tag == "button" and "data-install-host" in attrs:
+            self.current["buttons"].append(attrs)
+
+    def handle_data(self, data):
+        if self.current is not None and self.code_host:
+            self.current["codes"][self.code_host] += data
+
+    def handle_endtag(self, tag):
+        if tag == "code":
+            self.code_host = None
 
 
 class CodexCompatibilityTests(unittest.TestCase):
+    def test_local_skill_links_resolve(self):
+        for path in (ROOT / "skills").rglob("*.md"):
+            content = path.read_text(encoding="utf-8")
+            for target in re.findall(r"\]\(([^)]+)\)", content):
+                target = target.split("#", 1)[0]
+                if not target or "://" in target or target.startswith("mailto:"):
+                    continue
+                with self.subTest(source=path.relative_to(ROOT), target=target):
+                    self.assertTrue((path.parent / target).exists())
+
+    def test_readme_explains_both_install_paths(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn(CLAUDE_COMMANDS, text)
+        self.assertIn(CODEX_COMMANDS, text)
+        self.assertIn("docs/codex-skill-maintenance.md", text)
+        self.assertTrue((ROOT / "docs/codex-skill-maintenance.md").exists())
+
+    def test_site_has_two_accessible_host_install_blocks(self):
+        text = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        parser = InstallBlockParser()
+        parser.feed(text)
+        self.assertEqual(len(parser.blocks), 2)
+        for block in parser.blocks:
+            with self.subTest(block=block):
+                self.assertEqual(block["codes"].get("claude", "").strip(), CLAUDE_COMMANDS)
+                self.assertEqual(block["codes"].get("codex", "").strip(), CODEX_COMMANDS)
+                self.assertEqual({button.get("data-install-host") for button in block["buttons"]}, {"claude", "codex"})
+                self.assertEqual([button.get("aria-pressed") for button in block["buttons"]], ["true", "false"])
+        self.assertIn("docs/codex-skill-maintenance.md", text)
+        self.assertIn("Claude Code와 Codex", text)
+        self.assertIn("[data-install-host]", text)
+        self.assertIn("[data-host]", text)
+
     def test_codex_manifest_matches_claude_identity(self):
         claude = json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
         codex_manifest = ROOT / ".codex-plugin/plugin.json"
