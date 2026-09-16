@@ -15,33 +15,48 @@
 저장소 루트에서 다음을 실행합니다. 검증기는 설치된 plugin-creator 스킬의 경로를 사용합니다.
 
 ```powershell
+$repo = (Get-Location).Path
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.codex' }
+$pluginCreator = Join-Path $codexHome 'skills/.system/plugin-creator/scripts'
 python -m unittest discover -s tests -v
-python C:/Users/SQI/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py D:/SQ/design-plugin
+python (Join-Path $pluginCreator 'validate_plugin.py') $repo
 rg -n 'AskUserQuestion|multiSelect|preview|WebSearch|WebFetch|Read로|model: haiku|model: sonnet' skills
 git diff --check
 ```
+
+위 명령은 현재 위치가 gx-design 저장소 루트라고 가정합니다. `CODEX_HOME`이 설정되어 있으면 그 위치를, 없으면 사용자 프로필 아래의 `.codex`를 사용합니다.
 
 `rg` 결과는 문맥을 읽어 두 호스트의 필수 호출인지 판별합니다. 활성 스킬과 참조 파일의 로컬 Markdown 링크는 `tests/test_codex_compat.py`가 실제 파일 존재 여부를 검사합니다. 정적 검사는 사용자의 실제 선택이나 디자인 품질까지 증명하지 않습니다.
 
 ## 로컬 설치와 캐시 갱신
 
-기존 사용자 설치와 분리하려면 `CODEX_HOME`을 `D:/Temp` 아래의 새 경로로 지정합니다. 로컬 체크아웃 경로는 자신의 저장소 위치로 바꿉니다. 이 확인은 네트워크를 필요로 하지 않습니다.
+기존 사용자 설치와 분리하려면 운영체제의 임시 디렉터리 아래에 별도 `CODEX_HOME`을 만듭니다. 다음 명령은 gx-design 저장소 루트에서 실행하며 네트워크를 필요로 하지 않습니다.
 
 ```powershell
-$env:CODEX_HOME = 'D:/Temp/gx-design-codex-smoke'
-codex plugin marketplace add D:/SQ/design-plugin --json
+$repo = (Get-Location).Path
+$originalCodexHome = $env:CODEX_HOME
+$smokeHome = Join-Path ([System.IO.Path]::GetTempPath()) 'gx-design-codex-smoke'
+New-Item -ItemType Directory -Path $smokeHome -Force | Out-Null
+$env:CODEX_HOME = $smokeHome
+codex plugin marketplace add $repo --json
 codex plugin add gx-design@gx-design --json
 codex plugin list
+$env:CODEX_HOME = $originalCodexHome
 ```
 
 실사용 환경에서 같은 기본 버전의 변경을 다시 설치할 때는 마켓플레이스 이름을 확인하고 Codex 매니페스트의 cachebuster를 갱신한 다음 기본 버전 동기화를 테스트합니다.
 
 ```powershell
-python C:/Users/SQI/.codex/skills/.system/plugin-creator/scripts/read_marketplace_name.py --marketplace-path D:/SQ/design-plugin/.claude-plugin/marketplace.json
-python C:/Users/SQI/.codex/skills/.system/plugin-creator/scripts/update_plugin_cachebuster.py D:/SQ/design-plugin
+$repo = (Get-Location).Path
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.codex' }
+$pluginCreator = Join-Path $codexHome 'skills/.system/plugin-creator/scripts'
+python (Join-Path $pluginCreator 'read_marketplace_name.py') --marketplace-path (Join-Path $repo '.claude-plugin/marketplace.json')
+python (Join-Path $pluginCreator 'update_plugin_cachebuster.py') $repo
 python -m unittest discover -s tests -v
 codex plugin add gx-design@gx-design
 ```
+
+캐시 갱신 블록은 평소 사용하는 Codex 환경에서 실행합니다. 격리 설치 블록은 마지막에 기존 `CODEX_HOME` 값을 복원합니다.
 
 Claude Code에서는 기존 `/plugin marketplace add bs-koo/gx-design`와 `/plugin install gx-design@gx-design` 경로를 확인합니다. 변경 반영은 Claude 매니페스트 버전과 `claude plugin marketplace update gx-design`, `claude plugin update gx-design@gx-design` 절차를 따릅니다.
 

@@ -180,17 +180,18 @@ UI·그래픽·코드 렌더 산출물에는 **VISUAL-CRAFT 규칙**이 제작·
 
 두 호스트 모두 설치본이 캐시될 수 있으므로, 파일을 수정한 뒤에는 매니페스트·테스트·재설치를 점검합니다. 자세한 절차는 [두 호스트 유지보수 안내](docs/codex-skill-maintenance.md)에 있습니다.
 
-Claude Code 로컬 개발 설치:
+Claude Code 로컬 개발 설치 (`<repo-path>`를 현재 체크아웃의 절대 경로로 바꿉니다):
 
 ```
-/plugin marketplace add D:\SQ\design-plugin
+/plugin marketplace add <repo-path>
 /plugin install gx-design@gx-design
 ```
 
-Codex 로컬 개발 설치 (저장소 경로를 실제 체크아웃 위치로 바꿉니다):
+Codex 로컬 개발 설치 (저장소 루트에서 실행합니다):
 
 ```powershell
-codex plugin marketplace add D:/SQ/design-plugin
+$repo = (Get-Location).Path
+codex plugin marketplace add $repo
 codex plugin add gx-design@gx-design
 codex plugin list
 ```

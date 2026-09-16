@@ -62,6 +62,17 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("docs/codex-skill-maintenance.md", text)
         self.assertTrue((ROOT / "docs/codex-skill-maintenance.md").exists())
 
+    def test_public_maintenance_commands_do_not_use_machine_specific_paths(self):
+        paths = (ROOT / "README.md", ROOT / "docs/codex-skill-maintenance.md")
+        for path in paths:
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertNotIn("C:/Users/SQI", text)
+                self.assertNotIn("D:/SQ/design-plugin", text)
+        maintenance = paths[1].read_text(encoding="utf-8")
+        self.assertIn("$repo = (Get-Location).Path", maintenance)
+        self.assertIn("$env:CODEX_HOME", maintenance)
+
     def test_site_has_two_accessible_host_install_blocks(self):
         text = (ROOT / "site/index.html").read_text(encoding="utf-8")
         parser = InstallBlockParser()
