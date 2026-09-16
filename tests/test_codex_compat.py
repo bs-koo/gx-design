@@ -78,6 +78,27 @@ class CodexCompatibilityTests(unittest.TestCase):
                     self.assertNotIn(agent, text)
                 self.assertNotIn("병렬 스폰한다", text)
 
+    def test_strategy_variants_have_main_agent_fallback(self):
+        text = (ROOT / "skills/gx-design/DESIGN-IT-TWICE.md").read_text(encoding="utf-8")
+        self.assertIn("HOST-COMPAT.md", text)
+        self.assertIn("design-strategy", text)
+        self.assertIn("위임할 수 없으면", text)
+        self.assertIn("주 에이전트", text)
+        self.assertIn("순서대로", text)
+        self.assertNotIn("design-strategist 서브에이전트", text)
+        for variant in ("A안", "B안", "C안"):
+            self.assertIn(variant, text)
+
+    def test_production_handoff_has_main_agent_gemini_fallback(self):
+        text = (ROOT / "skills/gx-design/PRODUCTION-HANDOFF.md").read_text(encoding="utf-8")
+        self.assertIn("HOST-COMPAT.md", text)
+        self.assertIn("creative-production", text)
+        self.assertIn("위임할 수 없으면", text)
+        self.assertIn("주 에이전트", text)
+        self.assertIn("PROMPT-PLAYBOOK.md", text)
+        self.assertNotIn("creative-producer에게 위임한다", text)
+        self.assertIn("outputs/final/YYYY-MM-DD_<project>_gemini-prompts.md", text)
+
 
 if __name__ == "__main__":
     unittest.main()
