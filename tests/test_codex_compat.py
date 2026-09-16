@@ -12,6 +12,65 @@ SKILL_NAMES = {
 }
 CLAUDE_COMMANDS = "/plugin marketplace add bs-koo/gx-design\n/plugin install gx-design@gx-design"
 CODEX_COMMANDS = "codex plugin marketplace add bs-koo/gx-design\ncodex plugin add gx-design@gx-design"
+NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
+
+
+def parse_frontmatter(path):
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    try:
+        closing = next(index for index, line in enumerate(lines[1:], 1) if line.strip() == "---")
+    except StopIteration:
+        return None
+
+    fields = {}
+    for line in lines[1:closing]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        key, separator, value = line.partition(":")
+        if separator and key.strip():
+            fields[key.strip()] = value.strip().strip("\"'")
+    return fields
+
+
+def runtime_dependency_violations(text):
+    violations = []
+    forbidden_patterns = {
+        "Claude-only model": r"(?im)^\s*model\s*:\s*(?:haiku|sonnet)\s*$",
+        "automatic skills injection": r"(?im)^\s*skills\s*:",
+        "named Claude agent": rf"(?i)\b(?:{'|'.join(NAMED_CLAUDE_AGENTS)})\b",
+        "mandatory delegation": (
+            r"(?i)(?:\b(?:must|always)\b.{0,120}\b(?:delegate|spawn|sub-?agents?)\b|"
+            r"\b(?:delegate|spawn)\b.{0,120}\b(?:must|always)\b|"
+            r"(?:반드시|무조건|항상).{0,120}(?:위임|서브에이전트|하위 작업자))"
+        ),
+    }
+    for label, pattern in forbidden_patterns.items():
+        if re.search(pattern, text):
+            violations.append(label)
+
+    fixed_delegation = re.compile(
+        r"(?i)(?:(?:서브에이전트|하위 작업자|sub-?agents?).{0,120}"
+        r"(?:위임한다|호출한다|생성한다|실행한다|\b(?:delegate|spawn)\b)|"
+        r"에이전트(?:\s*\d+개)?(?:를|을)?\s*(?:병렬로\s*)?(?:호출|생성|스폰|실행)한다|"
+        r"\bspawn\b.{0,40}\bagents?\b)"
+    )
+    for line in text.splitlines():
+        if not fixed_delegation.search(line):
+            continue
+        has_capability_guard = any(
+            phrase in line
+            for phrase in ("도구가 있으면", "도구를 사용할 수 있으면", "위임이 허용되고", "위임할 수 있으면")
+        )
+        has_local_fallback = any(
+            phrase in line
+            for phrase in ("도구가 없으면", "위임할 수 없으면", "주 에이전트", "주 작업자")
+        )
+        if not (has_capability_guard and has_local_fallback):
+            violations.append("fixed delegation")
+            break
+    return violations
 
 
 class InstallBlockParser(HTMLParser):
@@ -45,6 +104,17 @@ class InstallBlockParser(HTMLParser):
 
 
 class CodexCompatibilityTests(unittest.TestCase):
+    def test_skill_frontmatter_has_matching_identity_and_description(self):
+        skill_paths = sorted((ROOT / "skills").glob("*/SKILL.md"))
+        self.assertTrue(skill_paths, "at least one runtime skill must exist")
+        for path in skill_paths:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = parse_frontmatter(path)
+                self.assertIsNotNone(frontmatter, "SKILL.md must start with closed frontmatter")
+                self.assertTrue(frontmatter.get("name", "").strip(), "frontmatter name must be nonempty")
+                self.assertTrue(frontmatter.get("description", "").strip(), "frontmatter description must be nonempty")
+                self.assertEqual(frontmatter["name"], path.parent.name)
+
     def test_local_skill_links_resolve(self):
         for path in (ROOT / "skills").rglob("*.md"):
             content = path.read_text(encoding="utf-8")
@@ -144,17 +214,41 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("위임할 수 없으면", redesign)
 
     def test_orchestrators_do_not_require_fixed_claude_agents(self):
-        paths = (
-            ROOT / "skills/gx-design/SKILL.md",
-            ROOT / "skills/gx-redesign/SKILL.md",
-            ROOT / "skills/gx-design/REVIEW-AXES.md",
-        )
-        for path in paths:
+        for path in sorted((ROOT / "skills").rglob("*.md")):
             with self.subTest(path=path.relative_to(ROOT)):
                 text = path.read_text(encoding="utf-8")
-                for agent in ("design-researcher", "design-strategist", "creative-producer"):
-                    self.assertNotIn(agent, text)
-                self.assertNotIn("병렬 스폰한다", text)
+                self.assertEqual(runtime_dependency_violations(text), [])
+
+    def test_runtime_dependency_detector_rejects_equivalent_hard_dependencies(self):
+        hard_dependencies = (
+            "model: haiku",
+            "skills:\n  - frontend-design",
+            "design-strategist 에이전트에게 맡긴다.",
+            "서브에이전트를 호출한다.",
+            "에이전트 3개를 병렬로 생성한다.",
+            "Always delegate this stage to sub-agents.",
+        )
+        for content in hard_dependencies:
+            with self.subTest(content=content):
+                self.assertTrue(runtime_dependency_violations(content))
+
+    def test_question_headers_follow_the_active_host_capability(self):
+        brief_lines = (ROOT / "skills/gx-design/BRIEF-INTERVIEW.md").read_text(encoding="utf-8").splitlines()
+        header_rule = next(line for line in brief_lines if "현재 호스트" in line and "header" in line)
+        mode_rule = next(line for line in brief_lines if "첫 문항" in line and "진행 모드" in line)
+        for line in (header_rule, mode_rule):
+            with self.subTest(path="skills/gx-design/BRIEF-INTERVIEW.md", line=line):
+                self.assertIn("구조화 입력 도구", line)
+                self.assertIn("실제 도구 상한", line)
+                self.assertIn("일반 대화 라벨", line)
+
+        for relative_path in ("skills/gx-design/SKILL.md", "skills/gx-redesign/SKILL.md"):
+            lines = (ROOT / relative_path).read_text(encoding="utf-8").splitlines()
+            mode_rule = next(line for line in lines if "첫 문항" in line and "진행 모드" in line)
+            with self.subTest(path=relative_path):
+                self.assertIn("구조화 입력 도구", mode_rule)
+                self.assertIn("실제 도구 상한", mode_rule)
+                self.assertIn("일반 대화 라벨", mode_rule)
 
     def test_strategy_variants_have_main_agent_fallback(self):
         text = (ROOT / "skills/gx-design/DESIGN-IT-TWICE.md").read_text(encoding="utf-8")
@@ -174,7 +268,7 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("위임할 수 없으면", text)
         self.assertIn("주 에이전트", text)
         self.assertIn("PROMPT-PLAYBOOK.md", text)
-        self.assertNotIn("creative-producer에게 위임한다", text)
+        self.assertEqual(runtime_dependency_violations(text), [])
         self.assertIn("outputs/final/YYYY-MM-DD_<project>_gemini-prompts.md", text)
 
 
