@@ -1,13 +1,13 @@
 # PRODUCTION-HANDOFF — 실물 제작 게이트
 
 검수 통과본(outputs/final/)은 명세 문서다. 문서는 실물이 아니다 — 영상 명세는 MP4가 아니고, 이미지 명세는 PNG가 아니다.
-검수 결과 보고 직후 이 게이트를 연다: **실물 제작 여부와 방식을 AskUserQuestion으로 묻는다.**
+검수 결과 보고 직후 이 게이트를 연다: **실물 제작 여부와 방식을 [HOST-COMPAT.md](HOST-COMPAT.md)의 질문·선택으로 묻는다.**
 묻지 않고 명세만 남긴 채 종료하지 않는다. 묻지 않고 실물 제작을 시작하지도 않는다.
 결과물이 문서 자체(브랜드 가이드·전략 문서·카피 등)인 프로젝트는 이 게이트를 생략하고 생략 사실을 보고한다.
 
 ## 1. 질문 구성
 
-1문항, header "실물 제작", multiSelect: true(경로 병행 가능), preview는 쓰지 않는다(다중 선택과 호환되지 않음).
+경로 병행이 가능하면 그 사실을 명시하고, 추천 경로와 근거를 선택지보다 먼저 제시한다.
 결과물 유형별 옵션:
 
 | 결과물 유형 | 옵션 4개 |
@@ -33,13 +33,13 @@ BX처럼 산출물이 혼합(시각 자산 + 가이드 문서)인 프로젝트�
 
 - 명세의 프레임·픽셀·색상 값을 그대로 코드로 옮긴다. 환경 제약으로 바꾼 값(폰트 폴백 등)은 [가정] 표기 후 보고한다.
 - 렌더 전후 [VISUAL-QUALITY.md](VISUAL-QUALITY.md)의 시각 품질 루프를 수행한다 — 대표 컷 2~3장을 먼저 렌더해 직접 열어 보고 비평·수정하며(최소 1회·최대 3회), 통과 후 전체 렌더로 간다.
-- 제작을 creative-producer에게 위임하는 경우 위임 프롬프트에 [VISUAL-QUALITY.md](VISUAL-QUALITY.md) 경로를 포함한다.
+- 제작을 위임하는 경우 제작 역할에 [VISUAL-QUALITY.md](VISUAL-QUALITY.md) 경로를 전달한다. 위임할 수 없으면 주 에이전트가 그 문서를 읽고 같은 시각 품질 루프를 수행한다.
 - 실물은 outputs/final/에 저장하고, 렌더 프로젝트는 outputs/video/ 같은 별도 폴더에 남겨 재렌더 가능하게 한다.
 - 의존성 설치·렌더 환경 구성은 오케스트레이터가 직접 수행해도 된다(위임 예외).
 
 ## 3. 경로 B — Gemini 프롬프트 패키지
 
-creative-producer에게 위임한다. 위임 프롬프트에 final 명세 경로와 [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md) 경로를 함께 전달하고, 패키지 구조·프롬프트 규격·텍스트 정책은 그 문서를 정본으로 따르게 한다.
+실행 전 [HOST-COMPAT.md](HOST-COMPAT.md)의 위임 규칙과 [creative-production 스킬](../creative-production/SKILL.md)의 역할·산출물 계약을 읽는다. 위임이 허용되고 서브에이전트 도구가 있으면 제작 역할에 final 명세 경로, [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md) 경로, 위임 11항목을 전달한다. 위임할 수 없으면 주 에이전트가 creative-production 역할·산출물 계약에 따라 final 명세와 PROMPT-PLAYBOOK.md를 읽고 Gemini 프롬프트 패키지를 제작한다. 어느 경로든 패키지 구조·프롬프트 규격·텍스트 정책은 PROMPT-PLAYBOOK.md를 정본으로 따른다.
 저장: `outputs/final/YYYY-MM-DD_<project>_gemini-prompts.md`
 
 핵심 원칙 요약(상세와 예외는 PROMPT-PLAYBOOK):
