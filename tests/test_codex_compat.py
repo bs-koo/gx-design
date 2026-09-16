@@ -23,6 +23,22 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertTrue(codex["description"].strip())
         self.assertEqual(set(p.parent.name for p in (ROOT / "skills").glob("*/SKILL.md")), SKILL_NAMES)
 
+    def test_active_skills_do_not_require_claude_question_tool(self):
+        for path in (ROOT / "skills").rglob("*.md"):
+            with self.subTest(path=path.relative_to(ROOT)):
+                content = path.read_text(encoding="utf-8")
+                self.assertNotIn("AskUserQuestion", content)
+                self.assertNotIn("multiSelect", content)
+                self.assertNotIn("preview를 쓴다", content)
+                self.assertNotIn("WebSearch", content)
+                self.assertNotIn("WebFetch", content)
+                self.assertNotIn("Read로", content)
+
+    def test_host_contract_is_present(self):
+        host = (ROOT / "skills/gx-design/HOST-COMPAT.md").read_text(encoding="utf-8")
+        for section in ("질문·선택", "답변 게이트", "위임", "도구 가용성"):
+            self.assertIn(section, host)
+
 
 if __name__ == "__main__":
     unittest.main()
