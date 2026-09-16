@@ -161,6 +161,23 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("docs/codex-skill-maintenance.md", text)
         self.assertTrue((ROOT / "docs/codex-skill-maintenance.md").exists())
 
+    def test_readme_redesign_comparison_matches_before_after_columns(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        table = re.search(
+            r"\| Before \| After \|\s*\n\|---\|---\|\s*\n"
+            r"\| (?P<before>.*?) \| (?P<after>.*?) \|",
+            text,
+        )
+        self.assertIsNotNone(table, "README must contain the Before/After comparison table")
+        before = table.group("before")
+        after = table.group("after")
+        self.assertIn("개편 전", before)
+        self.assertIn("단순 목록 테이블", before)
+        self.assertIn("site/assets/redesign-before.png", before)
+        self.assertIn("개편 후", after)
+        self.assertIn("상태 요약 카드", after)
+        self.assertIn("site/assets/redesign-after.png", after)
+
     def test_public_maintenance_commands_do_not_use_machine_specific_paths(self):
         paths = (ROOT / "README.md", ROOT / "docs/codex-skill-maintenance.md")
         for path in paths:
