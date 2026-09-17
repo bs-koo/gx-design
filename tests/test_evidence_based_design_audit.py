@@ -56,10 +56,10 @@ class RedesignAuditContractTests(unittest.TestCase):
             self,
             text,
             (
-                "UI와 웹 화면은",
+                "UI·웹 화면일 때만",
                 "실제로 발견된 항목만",
                 "해당 없음",
-                "검증 시계",
+                "검증 한계",
                 "왜 어색한지",
                 "무엇으로 바꿀지",
             ),
@@ -71,9 +71,9 @@ class RedesignAuditContractTests(unittest.TestCase):
             self,
             text,
             (
-                "변경 범위 제약",
-                "진단 문제 또는 확인된 개선 브리프의 목표",
-                "진단하지 않은 패턴",
+                "변경 범위 잠금",
+                "진단 문제 또는 승인된 개선 브리프 목표",
+                "진단되지 않은 새 안티패턴",
             ),
         )
 
