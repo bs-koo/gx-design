@@ -1,8 +1,20 @@
----
+﻿---
 name: gx-redesign
 description: 이미 존재하는 디자인·브랜드·화면·영상 산출물의 개선, 리뉴얼, 리디자인 요청이 있을 때, "낡았다", "요즘 느낌으로 바꿔줘", "리뉴얼하고 싶다" 같은 표현이 나올 때 사용한다. 처음부터 새로 만드는 디자인은 gx-design을 사용한다.
 argument-hint: "[개선 대상 한 줄 설명]"
 ---
+
+## Evidence-based audit contract
+
+UI and web screens must be audited against the ANTI-TELL-CHECKLIST.md rules. Record only observed findings, and do not invent an `N/A` list. Each finding records the problem, screen/location, observation evidence, intended result, change rationale, and success criteria. If interaction cannot be verified from the available evidence, record that as a verification boundary rather than an assumption.
+
+Completion requires a research report containing observed findings and a verification boundary, with evidence, intended result, and success criteria reported to the user.
+
+**Change scope lock**: propose only changes directly connected to a diagnosed problem or an approved brief improvement goal. Do not redesign areas that were not diagnosed merely because they are visible.
+
+Every change records before, after, and evidence in three lines; the evidence must name the diagnosed problem or approved brief improvement goal. Changes with no such connection are excluded from the initial scope.
+
+Axis C checks not only problem resolution but also whether undiagnosed patterns were introduced during the starting process.
 
 # GX Redesign — 기존 디자인 개선 오케스트레이터
 

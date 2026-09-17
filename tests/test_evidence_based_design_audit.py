@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import unittest
 
 
@@ -51,3 +51,12 @@ class AntiTellChecklistContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class RedesignAuditContractTests(unittest.TestCase):
+    def test_audit_reports_only_observed_findings(self) -> None:
+        text = read_doc("skills/gx-redesign/SKILL.md")
+        assert_terms(self, text, ("UI and web screens", "observed findings", "N/A", "before", "after", "ANTI-TELL-CHECKLIST.md"))
+
+    def test_changes_are_locked_to_findings_or_approved_brief(self) -> None:
+        text = read_doc("skills/gx-redesign/SKILL.md")
+        assert_terms(self, text, ("Change scope lock", "diagnosed problem or an approved brief improvement goal", "Axis C"))
