@@ -78,5 +78,38 @@ class RedesignAuditContractTests(unittest.TestCase):
         )
 
 
+class RuntimeVerificationContractTests(unittest.TestCase):
+    def test_visual_quality_covers_runtime_ui_checks(self) -> None:
+        text = read_doc("skills/gx-design/VISUAL-QUALITY.md")
+        assert_terms(
+            self,
+            text,
+            (
+                "데스크톱 대표 뷰포트",
+                "모바일 대표 뷰포트",
+                "주요 버튼",
+                "내부·외부 링크",
+                "키보드 Tab 이동 순서",
+                "보이는 포커스",
+                "WCAG AA 대비",
+                "prefers-reduced-motion",
+                "검증 불가: 비실행 산출물",
+            ),
+        )
+
+    def test_review_axis_requires_runtime_log_for_executable_ui(self) -> None:
+        text = read_doc("skills/gx-design/REVIEW-AXES.md")
+        assert_terms(
+            self,
+            text,
+            (
+                "실행 검증 로그",
+                "실행 가능한 UI",
+                "Critical",
+                "비실행 산출물",
+            ),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
