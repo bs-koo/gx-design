@@ -111,5 +111,20 @@ class RuntimeVerificationContractTests(unittest.TestCase):
         )
 
 
+class LoadingAndScopeContractTests(unittest.TestCase):
+    def test_orchestrators_scope_anti_tell_checks_to_visual_ui_outputs(self) -> None:
+        design = read_doc("skills/gx-design/SKILL.md")
+        redesign = read_doc("skills/gx-redesign/SKILL.md")
+        self.assertIn("UI·그래픽·UX/UI·Gemini 웹 생성 산출물", design)
+        self.assertIn("UI·웹 화면일 때만", redesign)
+        self.assertIn("ANTI-TELL-CHECKLIST.md", design)
+        self.assertIn("ANTI-TELL-CHECKLIST.md", redesign)
+
+    def test_no_new_diagnostic_catalog_exists(self) -> None:
+        self.assertFalse(
+            (ROOT / "skills/gx-design/DESIGN-DIAGNOSTIC-CATALOG.md").exists()
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
