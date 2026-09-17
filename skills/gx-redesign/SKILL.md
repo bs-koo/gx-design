@@ -1,20 +1,8 @@
-﻿---
+---
 name: gx-redesign
 description: 이미 존재하는 디자인·브랜드·화면·영상 산출물의 개선, 리뉴얼, 리디자인 요청이 있을 때, "낡았다", "요즘 느낌으로 바꿔줘", "리뉴얼하고 싶다" 같은 표현이 나올 때 사용한다. 처음부터 새로 만드는 디자인은 gx-design을 사용한다.
 argument-hint: "[개선 대상 한 줄 설명]"
 ---
-
-## Evidence-based audit contract
-
-UI and web screens must be audited against the ANTI-TELL-CHECKLIST.md rules. Record only observed findings, and do not invent an `N/A` list. Each finding records the problem, screen/location, observation evidence, intended result, change rationale, and success criteria. If interaction cannot be verified from the available evidence, record that as a verification boundary rather than an assumption.
-
-Completion requires a research report containing observed findings and a verification boundary, with evidence, intended result, and success criteria reported to the user.
-
-**Change scope lock**: propose only changes directly connected to a diagnosed problem or an approved brief improvement goal. Do not redesign areas that were not diagnosed merely because they are visible.
-
-Every change records before, after, and evidence in three lines; the evidence must name the diagnosed problem or approved brief improvement goal. Changes with no such connection are excluded from the initial scope.
-
-Axis C checks not only problem resolution but also whether undiagnosed patterns were introduced during the starting process.
 
 # GX Redesign — 기존 디자인 개선 오케스트레이터
 
@@ -47,9 +35,11 @@ Axis C checks not only problem resolution but also whether undiagnosed patterns 
 단, 진단에서는 축 A의 입력을 조정한다 — 이전 브리프·전략 문서가 있으면 그것과의 일치를, 없으면 개선 브리프에 기록된 현행 목표 대비 적합성을 검수한다.
 "낡았다"는 인상을 구체적 문제 목록(Critical/Major/Minor + 근거)으로 번역하는 단계다.
 
+UI와 웹 화면은 [../gx-design/ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)를 추가 입력으로 읽는다. 모든 관련 규칙을 검증하고 진단시에는 **실제로 발견된 항목만** 기록하며 `해당 없음` 목록은 출력하지 않는다. 각 항목은 `문제 | 화면·위치 | 관찰 근거 | 왜 어색한지 | 무엇으로 바꿀지 | 심각도 | 성공 기준` 형식으로 작성한다. 스크립트만으로 버튼·링크·모달 등의 동작을 확인할 수 없으면 추정하지 않고 `검증 시계`로 기록한다. 카드·흰 배경·아이콘처럼 정상적으로 보여도 데이터 패턴과 제품 목적 및 콘텐츠 구조를 확인한 뒤 판단한다.
+
 **핵심 모드**: 검수 서브에이전트 1개가 두 축을 순차 진단한다(보고는 축별 분리 유지).
 
-완료 기준: outputs/research/에 진단 리포트가 저장되었고, 사용자에게 진단 요약을 보고했다.
+완료 기준: outputs/research/에 발견 항목만 담은 진단서와 검증 시계가 저장되었고, 각 진단 행에 관찰 근거·왜 어색한지·무엇으로 바꿀지·심각도가 있으며 사용자에게 진단 요약을 보고했다.
 
 ## 단계 2 — 갭 리서치 (조건부)
 
@@ -69,6 +59,8 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 - **C안 — 리뉴얼**: 불가침 자산만 남기고 전면 재설계
 
 각 안은 진단 문제 중 무엇을 해결하는지 명시해야 한다. 비교표(해결 범위 / 리스크 / 작업량) + 소신 추천 1안을 제시한 뒤 AskUserQuestion으로 선택받는다(추천안이 첫 번째, "(추천)" 표기, preview에 요약).
+
+**변경 범위 제약**: 개선안은 진단 문제 또는 확인된 개선 브리프의 목표와 직접 연결된 변경만 제안한다. 단순히 눈에 띈다는 이유로 진단하지 않은 영역은 화면을 설계하지 않는다.
 개선 브리프에 디자인 톤 기준이 있으면 세 안 모두 그 팔레트·타이포·톤·형태를 제약으로 삼는다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 선택 게이트에서 승인받는다.
 
 **핵심 모드**: design-strategist 1개가 개선 강도 1안(브리프의 개선 강도 허용치 기준으로 선택) + 반대 강도 미니 대안(10줄 요약)을 작성한다. 선택 게이트는 유지한다.
@@ -79,7 +71,7 @@ design-strategist 서브에이전트 3개를 병렬 스폰하되, 개선 강도 
 
 선택된 전략을 creative-producer에게 위임한다. 위임 11항목(gx-design과 동일)에 더해 진단 리포트 경로와 유지 자산 목록을 전달한다.
 
-**모든 변경 항목은 before → after → 근거(진단 문제 또는 브리프 목표와 연결)의 3열로 기록하게 한다.**
+**모든 변경 항목은 before → after → 근거를 3열로 기록하게 하고, 근거에는 반드시 `진단 문제 또는 확인된 개선 브리프의 목표`를 적는다. 그 중 어느 것에도 연결되지 않는 변경은 시작 범위에서 제외한다.**
 유지 자산으로 지정된 요소는 변경하지 않는다.
 디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션).
@@ -95,6 +87,9 @@ UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 [../gx-design/ANTI-TELL-CHE
 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축에 세 번째 축을 추가해 3축 병렬 검수한다:
 
 - **축 C — 개선 목표 달성**: 진단된 Critical/Major가 해소되었는가, 유지 자산이 보존되었는가, 브리프의 성공 기준을 충족하는가.
+
+축 C는 발견한 문제의 해소뿐 아니라 시작 과정에서 진단하지 않은 패턴을 잡지 않았는지도 추가 검사한다.
+제작 회귀 검수에서는 모든 변경이 진단 문제 또는 확인된 브리프 목표를 해결하는지 다시 확인하고, 근거 없는 신규 패턴이 생기면 제작 단계로 되돌린다.
 
 디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
