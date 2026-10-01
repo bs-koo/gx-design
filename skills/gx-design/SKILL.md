@@ -45,6 +45,7 @@ argument-hint: "[프로젝트 한 줄 설명]"
 전략은 [design-strategy 스킬](../design-strategy/SKILL.md)의 역할과 산출물 계약을 따른다. 위임할 수 없으면 주 에이전트가 근거 있는 대안을 작성하고 사용자 선택을 받는다.
 핵심 전략은 사용자 승인으로만 확정된다.
 브리프에 **디자인 톤 기준**이 있으면 팔레트·타이포·톤·형태는 탐색 축이 아니라 제약이다 — 콘셉트·구조만 그 안에서 탐색한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 전략 선택 게이트에서 승인받는다.
+UX/UI 전략에는 브리프의 화면별 목적·핵심 과업과 [UI-QUALITY.md](UI-QUALITY.md) §1을 전달한다. 디자인 후보 검색이 필요하면 [DESIGN-INTELLIGENCE.md](DESIGN-INTELLIGENCE.md)를 읽고, 실행 가능한 주체가 검색·적합성 확인 후 탐색 기록을 전략 입력으로 전달한다. 후보 생성은 브리프 승인 후에만 수행하며, 검색 미가용이면 기존 근거로 진행한다.
 
 **핵심 모드**: DESIGN-IT-TWICE 대신 주 콘셉트 1안(design-strategy 콘셉트 형식 준수) + 반대 방향 미니 대안(10줄 요약)을 작성한다. 위임이 허용되고 도구가 있으면 전략 역할 1개에 맡긴다. 위임할 수 없으면 주 에이전트가 작성한다. [HOST-COMPAT.md](HOST-COMPAT.md)의 질문·선택 게이트는 유지 — 옵션: 주안 채택(추천) / 대안 확장 / 방향 수정. 대안 확장을 선택하면 가능한 실행 주체가 확장한다. 전략 근거가 부족하면 보충 리서치 1회(상한 100줄)를 수행할 수 있다 — 무단 전체 모드 전환은 금지.
 
@@ -55,6 +56,7 @@ argument-hint: "[프로젝트 한 줄 설명]"
 제작은 [creative-production 스킬](../creative-production/SKILL.md)의 역할과 산출물 계약을 따른다. 위임이 허용되고 서브에이전트 도구가 있으면 선택된 전략과 참조 파일, 입력 11항목을 전달한다. 위임할 수 없으면 주 에이전트가 creative-production과 같은 참조 파일을 읽고 제작한다.
 UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도구를 사용하게 한다(사용 가능한 경우). 렌더·화면 실물이 나오는 제작은 위임 프롬프트에 VISUAL-QUALITY.md 경로를 포함해 시각 품질 루프를 수행하게 한다. UI·그래픽·UX/UI 산출물은 VISUAL-CRAFT.md 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션 — 렌더 없이 명세만 만드는 잡도 서브에이전트가 규칙 원문에 닿도록).
 UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 ANTI-TELL-CHECKLIST.md 경로도 함께 배달한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
+UX/UI 제작에는 [UI-QUALITY.md](UI-QUALITY.md) 경로를 전달해 문구·예외 상태·수용 체크를 적용한다. UX·차트·기술 스택 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](DESIGN-INTELLIGENCE.md)도 전달한다. 위임할 수 없으면 주 에이전트가 해당 참조를 읽는다.
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작(스타일 트랜스퍼·1레퍼런스→N브랜드)이면 위임 프롬프트에 REFERENCE-DRIVEN.md 경로도 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
 디자인 톤 기준이 있으면 위임 프롬프트에 그 원본 파일 경로를 전달하고, hex·폰트·spacing·radius를 그 파일에서 그대로 인용하게 한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4 — 즉흥 팔레트 금지). Gemini 경로가 병행되면 그 팔레트를 PROMPT-PLAYBOOK 공통 스타일 블록에 주입한다.
 
@@ -68,6 +70,7 @@ UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 ANTI-TELL-CHECKLIST.md 경�
 디자인 톤 기준이 있으면 축 A 검수에 톤 준수 점검을 포함한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 REFERENCE-DRIVEN.md 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 ANTI-TELL-CHECKLIST.md 경로를 전달한다(요소·카피 텔 점검).
+UX/UI이면 축 B에 [UI-QUALITY.md](UI-QUALITY.md), 화면별 목적·핵심 과업, 검색 채택 기록(있을 때)을 전달한다. 시각·UX 판단과 구현 증거를 구분해 보고한다.
 
 **핵심 모드**: REVIEW-AXES.md의 핵심 모드 조항을 따른다 — 축 A→축 B를 순차 점검하되 보고는 축별 분리를 유지하고, Critical만 수정 루프를 돈다. 위임할 수 없으면 주 에이전트가 두 축을 각각 기록한다.
 

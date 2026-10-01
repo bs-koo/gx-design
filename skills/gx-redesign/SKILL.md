@@ -35,6 +35,7 @@ argument-hint: "[개선 대상 한 줄 설명]"
 기존 디자인에 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축 독립 검수를 적용한다.
 단, 진단에서는 축 A의 입력을 조정한다 — 이전 브리프·전략 문서가 있으면 그것과의 일치를, 없으면 개선 브리프에 기록된 현행 목표 대비 적합성을 검수한다.
 "낡았다"는 인상을 구체적 문제 목록(Critical/Major/Minor + 근거)으로 번역하는 단계다.
+UX/UI 진단에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §2를 적용해 시각·UX 비평과 구현 점검을 구분한다. 실제 화면·코드·조작 증거와 확인/추정/미검증을 기록하고, 진단 단계에서 임의로 수정하지 않는다.
 
 **핵심 모드**: 축 A→축 B를 순차 진단한다(보고는 축별 분리 유지). 위임할 수 없으면 주 에이전트가 [creative-review 스킬](../creative-review/SKILL.md)을 읽고 각 축을 기록한다.
 
@@ -59,6 +60,7 @@ argument-hint: "[개선 대상 한 줄 설명]"
 
 각 안은 진단 문제 중 무엇을 해결하는지 명시해야 한다. 비교표(해결 범위 / 리스크 / 작업량) + 소신 추천 1안을 제시한 뒤 [../gx-design/HOST-COMPAT.md](../gx-design/HOST-COMPAT.md)의 질문·선택으로 선택받는다(추천안이 첫 번째, "(추천)" 표기, 시각 미리보기가 가능한 경우 요약).
 개선 브리프에 디자인 톤 기준이 있으면 세 안 모두 그 팔레트·타이포·톤·형태를 제약으로 삼는다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 선택 게이트에서 승인받는다.
+UX/UI 전략에는 브리프의 화면 목적·핵심 과업과 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §1을 전달한다. 새 디자인 후보가 필요하면 [DESIGN-INTELLIGENCE.md](../gx-design/DESIGN-INTELLIGENCE.md)의 검증된 검색 결과를 참고한다. 검색으로 유지 자산이나 개선 범위를 바꾸지 않는다.
 
 **핵심 모드**: 개선 강도 1안(브리프의 개선 강도 허용치 기준으로 선택) + 반대 강도 미니 대안(10줄 요약)을 작성한다. 위임이 허용되고 도구가 있으면 전략 역할 1개에 맡긴다. 위임할 수 없으면 주 에이전트가 작성한다. 선택 게이트는 유지한다.
 
@@ -73,6 +75,7 @@ argument-hint: "[개선 대상 한 줄 설명]"
 디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션).
 UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 [../gx-design/ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 경로도 함께 포함한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
+UX/UI 제작에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md)를 전달해 관련 문구·예외 상태를 반영한다. 구현 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](../gx-design/DESIGN-INTELLIGENCE.md)도 전달하며, 위임할 수 없으면 주 에이전트가 읽는다.
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작이면 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로도 위임 프롬프트에 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
 
 **핵심 모드**: 위임 프롬프트에 분량 상한 200줄을 명시한다. before/after 매핑 의무는 모드와 무관하게 유지된다.
@@ -88,6 +91,7 @@ UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 [../gx-design/ANTI-TELL-CHE
 디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 [../gx-design/ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 경로를 전달한다(요소·카피 텔 점검).
+UX/UI이면 축 B에 [UI-QUALITY.md](../gx-design/UI-QUALITY.md), 화면별 목적·핵심 과업, 검색 채택 기록(있을 때)을 전달한다. 축 C는 해당 진단 이슈의 해소를 같은 증거 기준으로 확인한다.
 
 **핵심 모드**: 축 A→B→C를 순차 점검한다(보고는 축별 분리, Critical만 수정 루프). 위임할 수 없으면 주 에이전트가 같은 순서로 점검한다.
 
