@@ -37,9 +37,11 @@ argument-hint: "[개선 대상 한 줄 설명]"
 "낡았다"는 인상을 구체적 문제 목록(Critical/Major/Minor + 근거)으로 번역하는 단계다.
 UX/UI 진단에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §2를 적용해 시각·UX 비평과 구현 점검을 구분한다. 실제 화면·코드·조작 증거와 확인/추정/미검증을 기록하고, 진단 단계에서 임의로 수정하지 않는다.
 
+UI·웹 화면일 때만 [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)를 추가 입력으로 읽는다. 관련 규칙을 검토하되 진단표에는 **실제로 발견된 항목만** 기록하고 `해당 없음` 목록은 출력하지 않는다. 각 행은 `문제 | 화면·위치 | 관찰 증거 | 왜 어색한지 | 무엇으로 바꿀지 | 심각도`를 포함한다. 관찰되지 않은 문제는 추정으로 진단표를 채우지 않고 `검증 한계`에 기록한다. 정상적으로 쓰이는 카드·배경·아이콘 등은 화면 목적과 콘텐츠 구조에 비추어 판단한다.
+
 **핵심 모드**: 축 A→축 B를 순차 진단한다(보고는 축별 분리 유지). 위임할 수 없으면 주 에이전트가 [creative-review 스킬](../creative-review/SKILL.md)을 읽고 각 축을 기록한다.
 
-완료 기준: outputs/research/에 진단 리포트가 저장되었고, 사용자에게 진단 요약을 보고했다.
+완료 기준: outputs/research/에 발견 항목만 담은 진단표와 검증 한계가 저장되었고, 각 진단 행에 관찰 증거·왜 어색한지·무엇으로 바꿀지가 있으며, 사용자에게 진단 요약을 보고했다.
 
 ## 단계 2 — 갭 리서치 (조건부)
 
@@ -59,6 +61,7 @@ UX/UI 진단에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §2를 적용해 
 - **C안 — 리뉴얼**: 불가침 자산만 남기고 전면 재설계
 
 각 안은 진단 문제 중 무엇을 해결하는지 명시해야 한다. 비교표(해결 범위 / 리스크 / 작업량) + 소신 추천 1안을 제시한 뒤 [../gx-design/HOST-COMPAT.md](../gx-design/HOST-COMPAT.md)의 질문·선택으로 선택받는다(추천안이 첫 번째, "(추천)" 표기, 시각 미리보기가 가능한 경우 요약).
+**변경 범위 잠금**: 세 개선안은 진단 문제 또는 승인된 개선 브리프 목표에 연결된 변경만 제안한다. 단순히 더 세련돼 보인다는 이유로 진단되지 않은 영역을 재설계하지 않는다. 검색 후보도 이 범위를 확장하는 근거가 될 수 없다.
 개선 브리프에 디자인 톤 기준이 있으면 세 안 모두 그 팔레트·타이포·톤·형태를 제약으로 삼는다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 선택 게이트에서 승인받는다.
 UX/UI 전략에는 브리프의 화면 목적·핵심 과업과 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §1을 전달한다. 새 디자인 후보가 필요하면 [DESIGN-INTELLIGENCE.md](../gx-design/DESIGN-INTELLIGENCE.md)의 검증된 검색 결과를 참고한다. 검색으로 유지 자산이나 개선 범위를 바꾸지 않는다.
 
@@ -70,7 +73,7 @@ UX/UI 전략에는 브리프의 화면 목적·핵심 과업과 [UI-QUALITY.md](
 
 제작은 [creative-production 스킬](../creative-production/SKILL.md)의 역할과 산출물 계약을 따른다. 위임이 허용되고 서브에이전트 도구가 있으면 선택된 전략과 입력 11항목(gx-design과 동일), 진단 리포트 경로와 유지 자산 목록을 제작 역할에 전달한다. 위임할 수 없으면 주 에이전트가 creative-production, 선택된 전략, 진단 리포트, 유지 자산과 참조 파일을 읽고 제작한다.
 
-**모든 변경 항목은 before → after → 근거(진단 문제 또는 브리프 목표와 연결)의 3열로 기록하게 한다.**
+**모든 변경 항목은 before → after → 근거의 3열로 기록하고, 근거에는 `진단 문제 또는 승인된 개선 브리프 목표`를 적는다.** 둘 중 어느 것에도 연결되지 않는 변경은 제작 범위에서 제외한다.
 유지 자산으로 지정된 요소는 변경하지 않는다.
 디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션).
@@ -87,6 +90,8 @@ UX/UI 제작에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md)를 전달해 관�
 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축에 세 번째 축을 추가해 3축으로 검수한다. 위임이 허용되고 서브에이전트 도구가 있으면 세 축을 분리해 검수한다. 위임할 수 없으면 주 에이전트가 creative-review 스킬을 읽고 축 A→B→C를 순서대로 각각 기록한다:
 
 - **축 C — 개선 목표 달성**: 진단된 Critical/Major가 해소되었는가, 유지 자산이 보존되었는가, 브리프의 성공 기준을 충족하는가.
+
+축 C는 제작 과정에서 진단되지 않은 새 안티패턴이 생기지 않았는지도 회귀 검사한다. 모든 변경이 진단 문제 또는 승인된 개선 브리프 목표를 해결하는지 다시 확인하고, 근거 없는 변경이나 새 결함이 발견되면 제작 단계로 되돌린다. 발견 근거와 심각도는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §2의 기준으로 기록한다.
 
 디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
