@@ -87,7 +87,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 
 | Before | After |
 |---|---|
-| ![개편 후 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드](site/assets/redesign-after.png) | ![개편 전 — 필터 4개와 단순 목록 테이블](site/assets/redesign-before.png) |
+| ![개편 전 — 필터 4개와 단순 목록 테이블](site/assets/redesign-before.png) | ![개편 후 — 상태 요약 카드 6종, 점검 필요 알럿, 단계 배지가 있는 대시보드](site/assets/redesign-after.png) |
 
 ### 진행 모드
 
@@ -123,9 +123,11 @@ Codex는 위 Claude 에이전트 파일의 모델·스킬 자동 주입을 전�
 `gx-design/` — BRIEF-INTERVIEW.md(인터뷰 게이트) · DESIGN-IT-TWICE.md(전략 3안 병렬) · REVIEW-AXES.md(2·3축 독립 검수) · PRODUCTION-HANDOFF.md(실물 제작 게이트) · PROMPT-PLAYBOOK.md(생성형 이미지·영상 프롬프트 규격) · VISUAL-QUALITY.md(코드 렌더링 시각 품질 루프) · DESIGN-TONE-ANCHOR.md(디자인 톤 기준 파일 처리) · VISUAL-CRAFT.md(안티-슬롭·톤 다이얼·모션 크래프트 규칙) · REFERENCE-DRIVEN.md(레퍼런스 구동 생성 — 근접도 다이얼·저작권 가드레일) · ANTI-TELL-CHECKLIST.md(요소·카피·구조 AI-티 점검표)
 `gx-redesign/` — REDESIGN-INTERVIEW.md(자산 인벤토리 + 개선 인터뷰)
 
+UX/UI 작업에는 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)(화면 목적·진단·문구·예외 상태)를 연결하고, 자료 검색이 필요하면 [DESIGN-INTELLIGENCE.md](skills/gx-design/DESIGN-INTELLIGENCE.md)(선택적 UI UX Pro Max 검색·결과 검증)를 읽습니다.
+
 - 산출물: 실행한 프로젝트의 `outputs/brief|research|strategy|production|final/` (저장 시 자동 생성)
 - 파일명 규칙: `YYYY-MM-DD_<project>_<document-type>.md`
-- 상시 토큰 비용: 세션당 약 795 tok — 상세 절차는 호출 시에만 로드됩니다.
+- 상세 절차는 해당 매체·단계를 실행할 때만 로드됩니다. UI 품질·디자인 자료 검색 문서는 UX/UI 작업에서 필요할 때 참조합니다.
 
 ## 사용 예시
 
@@ -166,6 +168,14 @@ Codex에서는 `codex plugin list`로 설치를 확인하고 새 대화의 스�
 
 **Q. 결과가 'AI가 만든 티' 안 나게 하려면?**
 UI·그래픽·코드 렌더 산출물에는 **VISUAL-CRAFT 규칙**이 제작·검수 단계에서 적용됩니다 — AI가 몰리는 기본 룩 4종을 회피하고, accent·radius·라이트/다크를 하나로 잠그며, 모션은 transform·opacity 중심 60fps로 절제하고, 대담함은 시그니처 한 곳에 모읍니다. Anthropic 공식 frontend-design 원칙 + taste·animate·impeccable 커뮤니티 스킬의 구체 규칙을 선택 재서술로 흡수한 것으로, **외부 스킬 설치는 필요 없습니다.** 레퍼런스 이미지를 참고해 생성할 때는 REFERENCE-DRIVEN 규칙이 워드마크·letterform·유명 시그니처의 그대로 재현을 막습니다(참고는 하되 베끼지 않음). 요소 단위 티(side-tab 보더·그래디언트 텍스트·가짜 생동감)와 카피 티(제네릭 인명·필러 동사)는 ANTI-TELL-CHECKLIST가 제작·검수에서 점검하고, 코드 렌더 산출물은 impeccable detect CLI가 가용하면 기계 검사로 보강합니다(설치 불필요 — npx 1회 실행, 미가용 시 수동 점검).
+
+**Q. Impeccable·UI UX Pro Max도 활용하나요?**
+Impeccable의 화면 목적 분류, 시각·UX 비평과 구현 점검 구분, UX 문구·예외 상태 처리 방법을 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)에 재구성했습니다. 업무 화면·소개 페이지·문서·포트폴리오를 서로 다른 성공 기준으로 브리프부터 검수까지 다룹니다. 이 규칙은 외부 스킬 설치 없이 동작합니다.
+
+UI UX Pro Max가 설치되어 있고 Python 3과 실행 도구가 있으면 [DESIGN-INTELLIGENCE.md](skills/gx-design/DESIGN-INTELLIGENCE.md)에 따라 색상·폰트·차트·UX·기술 스택 자료를 선택적으로 검색합니다. 검색 결과의 화면 목적·플랫폼·언어·브랜드 적합성을 확인한 뒤 후보로 사용합니다. 기존 디자인 톤 기준을 우선하며, 후보 검색은 파일을 저장하거나 기존 DESIGN.md를 덮어쓰지 않습니다. 검색이 미가용이면 기존 리서치와 톤 기준으로 진행합니다.
+
+**Q. 리디자인과 UI 검수의 근거는 어떻게 확인하나요?**
+진단표에는 관찰한 문제와 화면·위치·증거·영향·수정 방향을 기록합니다. 변경은 진단 문제나 승인된 개선 브리프 목표에 연결하고, 제작 후 새 결함이 생겼는지도 확인합니다. UI 코드 산출물은 [VISUAL-QUALITY.md](skills/gx-design/VISUAL-QUALITY.md)의 실행 검증 로그에 지원 화면 크기, 버튼·링크, 키보드 포커스, 대비, 모션 감소와 관련 예외의 결과를 남깁니다. 실행 환경이 없으면 이유와 미검증 범위를 기록하며 기능 통과로 표시하지 않습니다.
 
 **Q. 리서치는 건너뛰고 화면 명세만 받고 싶은데요.**
 단계 축소를 요청하면 오케스트레이터가 축소안을 제안하고, 승인 후 그 범위로 진행합니다. 단계를 말없이 건너뛰지 않는 것이 원칙입니다.
@@ -219,6 +229,7 @@ Codex 수정 반영: `.codex-plugin/plugin.json`의 기본 버전을 Claude 매�
   - pencil MCP: .pen 디자인 파일 열람·시안 제작
   - Playwright MCP: 배포 화면 캡처, 프로토타입 실행 확인
   - frontend-design 스킬(공식): UI 프로토타입 품질
+  - UI UX Pro Max 스킬 + Python 3: 디자인 후보와 UX·기술 스택 지침의 로컬 검색(자동 설치 없음)
 
 ## 참고 문서
 

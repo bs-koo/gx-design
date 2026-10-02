@@ -32,7 +32,7 @@ description: 승인된 전략을 BX, 그래픽, UX/UI, 영상 결과물과 구�
 - 공통: 제작 목표 / 적용 전략 / 제작 명세 / 자체 검수 결과 / 미확정 사항 / 수용 체크
 - BX: 컬러 시스템(hex) / 타이포그래피 / 로고 또는 그래픽 모티프 / 브랜드 애플리케이션 최소 1종
 - 그래픽: 레이아웃·그리드 / 색상 / 타이포그래피 / 매체별 사이즈 / (생성형 사용 시) 이미지 생성 프롬프트
-- UX/UI: IA 또는 화면 목록 / 화면별 레이아웃 구조 / 컴포넌트·상태 / 디자인 토큰 / 톤 다이얼(VARIANCE·MOTION·DENSITY — VISUAL-CRAFT §2)
+- UX/UI: IA 또는 화면 목록 / 화면별 목적·핵심 과업 / 화면별 레이아웃 구조 / 컴포넌트·상태 / 디자인 토큰 / 톤 다이얼(VARIANCE·MOTION·DENSITY — VISUAL-CRAFT §2)
 - 영상: 러닝타임·규격 / 씬별 구성(시간 배분 검산 포함) / 자막·카피 전문 / 편집 가이드
 
 ### 수용 체크 (Acceptance Checks)
@@ -56,6 +56,8 @@ UX/UI 산출물에서 생성형 UI 프롬프트가 필요하면 GOAL·FORMAT·LA
 - UI·그래픽·코드 렌더·Gemini 웹 생성 산출물은 완료 전 [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)(요소·카피·구조 텔 점검표)를 1회 자체 점검한다 — 걸린 항목은 수정하거나, 브리프가 요구한 선택이면 근거를 "자체 검수 결과"에 기록한다.
 
 ## 프로토타입 제작 원칙
+
+UX/UI 명세·코드 제작은 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §3~4에 따라 행동·오류·복구 문구와 관련 예외 상태를 수용 체크에 반영한다. 기존 시스템의 값과 확정된 사실·용어를 보존한다. UX·차트·실제 기술 스택의 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](../gx-design/DESIGN-INTELLIGENCE.md)를 읽고, 승인된 전략 안에서 검증한 지침만 사용한다.
 
 코드를 제작하는 경우 다음을 확인한다.
 
