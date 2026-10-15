@@ -73,7 +73,7 @@
 ### 2.9 평가 세트 (`evals/`)
 
 - `evals/README.md` — 목적(비용·품질 측정), 실행 방법, 비용 경고, 해석 주의(표본 작음).
-- `evals/scenarios/*.yaml` — 시나리오 4개: (1) 쇼핑몰 가을 랜딩(신규 UI) (2) 15초 Reels(영상 명세) (3) site/index.html 애니메이션 점검(점검 전용) (4) 대시보드 리디자인(리디자인 UI). 각 시나리오: `skill`, `request`, `mode`, `answers`(게이트별 미리 정한 답 — 질문 순서에 무관하게 쓸 수 있는 자연어 답, 예: "추천안대로 진행", "1A, 2A, 3A, 4A"), `max_turns`, `expected`(체크 항목).
+- `evals/scenarios/*.json` — 시나리오 4개: (1) 쇼핑몰 가을 랜딩(신규 UI) (2) 15초 Reels(영상 명세) (3) site/index.html 애니메이션 점검(점검 전용) (4) 대시보드 리디자인(리디자인 UI). 각 시나리오: `skill`, `request`, `mode`, `answers`(게이트별 미리 정한 답 — 질문 순서에 무관하게 쓸 수 있는 자연어 답, 예: "추천안대로 진행", "1A, 2A, 3A, 4A"), `max_turns`, `expected`(체크 항목).
 - `evals/run_eval.py` — `codex exec --json`으로 시작하고 `codex exec resume <session> <answer>`로 답을 순서대로 넣는다. JSONL 이벤트에서 토큰 사용량·도구 호출 수·턴 수를 합산하고, 최종 산출물 경로를 수집해 `evals/results/<timestamp>/<scenario>-<mode>.json`에 저장. 격리 CODEX_HOME(인자) 지원, 샌드박스 지정, 시나리오·모드 필터, `--dry-run`(명령만 출력). 외부 의존 없는 표준 라이브러리 Python.
 - `evals/rubric.md` — 품질 채점표: 게이트 준수(승인 전 산출물 0) / 슬롭 회피(VISUAL-CRAFT §1 기본 룩 비해당) / 필수 섹션 충족 / 수치 판정 가능 항목 비율 / 진단 행 증거 충실도 / 모션 규칙 위반 수 — 각 0~2점, 채점자(사람 또는 별도 에이전트)가 산출물만 보고 매긴다.
 - `evals/score.py` — 결과 JSON들을 모아 시나리오×모드 비용 표(토큰·턴·도구 호출) 출력. 품질 점수는 rubric 채점 결과 파일을 읽어 합친다.

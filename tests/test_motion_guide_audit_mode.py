@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_VERSION = "0.11.0"
+TARGET_VERSION = "0.12.0"
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
