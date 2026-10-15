@@ -66,7 +66,7 @@ UX/UI가 포함되면 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §1에 따라 
 
 ### 점검 전용 범위 — 경량 개선 브리프
 
-gx-redesign이 **점검 전용** 범위로 시작했으면([SKILL.md](SKILL.md) 모드 결정) 1절 자산 인벤토리는 그대로 전수 수행하고, 2절 결정 트리 대신 아래 항목만 **1라운드**로 확정한다(슬롯은 [HOST-COMPAT.md](../gx-design/HOST-COMPAT.md#질문-슬롯-산정표)의 질문 슬롯 산정표 — 점검 전용 행):
+gx-redesign이 **점검 전용** 범위로 시작했으면([SKILL.md](SKILL.md) 모드 결정) 1절 자산 인벤토리는 그대로 전수 수행하고, 2절 결정 트리 대신 아래 항목만 확정한다 — 열린 슬롯이 빌 때까지 묻는다(슬롯은 [HOST-COMPAT.md](../gx-design/HOST-COMPAT.md#질문-슬롯-산정표)의 질문 슬롯 산정표 — 점검 전용 행):
 
 - 점검 대상(복수 선택 가능함을 밝힌다): 시각·UX / 모션 / AI 티 / 실행 여정
 - 대상 화면·URL(인벤토리로 확인되면 묻지 않는다)
@@ -79,7 +79,7 @@ gx-redesign이 **점검 전용** 범위로 시작했으면([SKILL.md](SKILL.md) 
 
 [../gx-design/BRIEF-INTERVIEW.md](../gx-design/BRIEF-INTERVIEW.md)의 3~7절 규칙을 그대로 따른다:
 frontier 계산(전체 질문, 의존 질문은 다음 라운드) / 라운드 실행([../gx-design/HOST-COMPAT.md](../gx-design/HOST-COMPAT.md)의 질문·선택, 추천안과 근거 우선 제시) / 트리 갱신(총량 무제한) / 탈출구(사용자 전용, [가정] 표기) / 종료 게이트(브리프 전문 제시 → 승인 → 저장).
-핵심 모드의 라운드·슬롯은 [HOST-COMPAT.md](../gx-design/HOST-COMPAT.md#질문-슬롯-산정표)의 질문 슬롯 산정표(리디자인 행)를 따른다. 인벤토리로 이미 확인된 사실(대상·기기 등)은 슬롯을 쓰지 않고 묻지 않는다.
+라운드 규칙은 모드와 무관하게 같다 — 핵심 모드도 frontier가 빌 때까지 묻는다. 첫 라운드 슬롯 순서는 [HOST-COMPAT.md](../gx-design/HOST-COMPAT.md#질문-슬롯-산정표)의 질문 슬롯 산정표(리디자인 행)를 따른다. 인벤토리로 이미 확인된 사실(대상·기기 등)은 슬롯을 쓰지 않고 묻지 않는다.
 첫 라운드 머리말의 **요청 해석 카드**도 준용한다 — 슬롯은 `무엇(개선 대상) / 누구·목적(개선 계기) / 피할 것 / 기준 자료(DESIGN.md·레퍼런스·인벤토리) / 범위·기기`. 인벤토리로 채워진 칸은 ✓로 보여 주고 묻지 않는다.
 디자인 톤 기준이 인벤토리에 없으면 첨부 요청 문항의 "없음" 선택지 설명에 DESIGN.md를 고를 수 있는 곳(designmd.co, awesome-design-md)을 적는다 — 리디자인은 기존 자산이 사실상의 기준이므로 카탈로그 파일은 soft로 제안한다([DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §3).
 
