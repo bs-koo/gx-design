@@ -183,6 +183,12 @@ Codex: `$gx-design 신규 앱 런칭 15초 Instagram Reels. …` — 영상은 U
 
 영상·모션 그래픽 규칙(MOTION.md §B — 프레임 단위 검산, 가독 홀드, 전환 체계, 안전영역)은 위 스킬에 없는 gx-design 자체 규칙입니다.
 
+## 디자인 판단 관점
+
+UI·웹 화면과 정보 전달 중심 그래픽은 [DESIGN-JUDGMENT.md](skills/gx-design/DESIGN-JUDGMENT.md)에 따라 주 과업·시선 경쟁·정보 묶음·상태를 살피고 수정 결과를 같은 조건에서 확인합니다. Claude Code와 Codex에서 같은 문서 기준을 사용하며 외부 영상 서비스의 실시간 접근은 필요하지 않습니다.
+
+사람이 다시 참고할 해설은 [마디아의 디자인 판단 관점과 활용법](docs/design/madia-design-perspective.md), 확인한 출처와 적용 조건은 [근거 지도](skills/gx-design/references/madia-evidence.md), 조사 범위와 미확인 목록은 [조사 기록](docs/research/2026-10-15-madia-design-judgment.md)에 있습니다. 공개 설명·챕터·전사 일부를 바탕으로 구성했으며 전편 시청 분석을 뜻하지 않습니다.
+
 ## 구성
 
 | 종류 | 이름 | 역할 |

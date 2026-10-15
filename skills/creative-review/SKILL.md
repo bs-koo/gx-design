@@ -11,6 +11,8 @@ description: BX, 그래픽, UX/UI, 영상 결과물을 목표 적합성, 전략 
 
 ## 공통 검수 기준
 
+UI·웹 화면과 정보 전달 중심 그래픽은 [DESIGN-JUDGMENT.md](../gx-design/DESIGN-JUDGMENT.md)를 읽고 아래 기준의 판단에 사용한다. 주 과업 대비 예상 시선 흐름·정보 묶음·읽힘·관련 상태를 실물과 대조한다. UI는 UI-QUALITY의 확인·추정·미검증과 기존 이슈 형식을 유지하며, 확인하지 못한 기능이나 사용성 성과를 통과로 추정하지 않는다.
+
 ### 목표 적합성
 
 - 프로젝트 목표를 충족하는가?
@@ -40,7 +42,7 @@ description: BX, 그래픽, UX/UI, 영상 결과물을 목표 적합성, 전략 
 - (UI·그래픽·코드 렌더) 안티-슬롭 — AI 기본 룩 4종을 무심코 답습하지 않았는가? (VISUAL-CRAFT §1)
 - (UI·그래픽·코드 렌더) 일관성 잠금 — accent·radius 체계·라이트/다크가 각각 하나로 고정됐는가? (VISUAL-CRAFT §3)
 - (UI 모션) [MOTION.md](../gx-design/MOTION.md) §A를 지키는가 — 사용 빈도에 비해 과한 모션은 없는가, ease-in을 쓰지 않았는가, 인터랙션이 300ms 이하인가(모달·드로어·마케팅 연출 예외), transform·opacity만 움직이는가, reduced-motion에서 모션을 끄는 대신 "덜" 움직이는가? 모션 지적은 MOTION §C 표(`요소·위치 | Before(전) | After(후) | Why(이유)`)로 쓴다.
-- (UI·그래픽·코드 렌더·Gemini 웹 생성) 요소·카피 텔 — [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 항목을 위반하지 않았는가? 근거 기록 없는 위반은 Major 이상.
+- (UI·그래픽·코드 렌더·Gemini 웹 생성) 요소·카피 텔 — [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md)의 적용 원칙으로 판정했는가? 관찰 근거와 예상 영향으로 심각도를 정하고, 미측정 영향은 휴리스틱 추정으로 표시한다. 필요한 패턴의 존재나 근거 기록 누락만으로 Major를 부여하지 않는다.
 - (코드 렌더) detect 출력이 첨부됐으면 — 실제 확인된 문제의 사용자 영향에 따라 심각도를 판정하고, advisory는 참고한다. CLI 실행 실패는 검증 제약으로 기록하고 수동 점검 근거를 확인한다. 브리프가 의도한 선택을 기계가 지적한 경우 기각 사유가 기록됐는지 확인한다.
 
 ### 생성·렌더 실물 (실물 이미지가 있는 경우)
