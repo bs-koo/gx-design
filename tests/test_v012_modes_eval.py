@@ -125,17 +125,58 @@ class SessionIdTests(unittest.TestCase):
         events, _ = run_eval.parse_jsonl(SAMPLE_JSONL)
         self.assertEqual(run_eval.extract_session_id(events), "019a-thread-abc")
 
-    def test_legacy_session_configured_event(self) -> None:
+    def test_only_documented_thread_id_is_accepted(self) -> None:
         events = [{"id": "0", "msg": {"type": "session_configured", "session_id": "sess-1", "model": "x"}}]
-        self.assertEqual(run_eval.extract_session_id(events), "sess-1")
+        self.assertIsNone(run_eval.extract_session_id(events))
 
     def test_start_event_with_nested_id(self) -> None:
-        events = [{"type": "session.created", "session": {"id": "nested-7"}}]
-        self.assertEqual(run_eval.extract_session_id(events), "nested-7")
+        events = [{"type": "thread.started", "thread_id": "thread-7", "session": {"id": "nested-7"}}]
+        self.assertEqual(run_eval.extract_session_id(events), "thread-7")
 
     def test_fallback_and_missing(self) -> None:
-        self.assertEqual(run_eval.extract_session_id([{"type": "turn.started", "thread_id": "fb"}]), "fb")
+        self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started", "thread_id": "fb"}]))
         self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started"}]))
+
+    def test_resume_stream_id_mismatch_is_detected(self) -> None:
+        original, resumed = "thread-1", "thread-2"
+        self.assertNotEqual(original, resumed)
+
+
+class UsageAggregationTests(unittest.TestCase):
+    def test_cumulative_turn_usage_uses_last_total_and_deltas(self) -> None:
+        samples = [
+            {"input_tokens": 975558, "cached_input_tokens": 900480, "cache_write_input_tokens": 0, "output_tokens": 7439, "reasoning_output_tokens": 706},
+            {"input_tokens": 1066567, "cached_input_tokens": 985728, "cache_write_input_tokens": 0, "output_tokens": 7685, "reasoning_output_tokens": 854},
+            {"input_tokens": 1159958, "cached_input_tokens": 1076608, "cache_write_input_tokens": 0, "output_tokens": 7718, "reasoning_output_tokens": 854},
+        ]
+        deltas, total, mode = run_eval.aggregate_turn_usage(samples)
+        self.assertEqual(mode, "cumulative")
+        self.assertEqual(total["input_tokens"], 1159958)
+        self.assertEqual(total["output_tokens"], 7718)
+        self.assertEqual(total["uncached_input_tokens"], 83350)
+        self.assertEqual([row["input_tokens"] for row in deltas], [975558, 91009, 93391])
+
+    def test_non_monotonic_usage_falls_back_to_sum(self) -> None:
+        _, total, mode = run_eval.aggregate_turn_usage([{"input_tokens": 8}, {"input_tokens": 5}])
+        self.assertEqual(mode, "summed")
+        self.assertEqual(total["input_tokens"], 13)
+
+
+class WorkdirSafetyTests(unittest.TestCase):
+    def test_non_empty_or_repo_nested_workdir_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            root.mkdir()
+            results = root / "evals" / "results"
+            nested = root / "nested"
+            nested.mkdir()
+            with self.assertRaises(run_eval.ScenarioError):
+                run_eval.validate_workdir(nested, results, root)
+            external = Path(tmp) / "external"
+            external.mkdir()
+            (external / "keep.txt").write_text("x")
+            with self.assertRaises(run_eval.ScenarioError):
+                run_eval.prepare_workdir(valid_scenario(), external)
 
 
 class ScenarioLoaderTests(unittest.TestCase):
@@ -253,11 +294,12 @@ class ScoreTests(unittest.TestCase):
         self.assertEqual(core["tool_calls"], 5)
         self.assertEqual(core["usage"]["input_tokens"], 200)
         self.assertEqual(core["usage"]["cached_input_tokens"], 0)
+        self.assertEqual(core["usage"]["uncached_input_tokens"], 0)
         self.assertEqual(core["rubric"], {"got": 3, "max": 4, "n": 1})
         self.assertIsNone(by_key[("s3", "full")]["rubric"])
 
         text = score.format_table(table)
-        self.assertIn("| s3 | core | 2 | 4 | 200 |", text)
+        self.assertIn("| s3 | core | 평균 | 2 | 4 | 200 |", text)
         self.assertIn("3/4", text)
         self.assertIn("미채점", text)
 
@@ -265,6 +307,23 @@ class ScoreTests(unittest.TestCase):
         self.assertEqual(score.rubric_total({k: 2 for k in score.RUBRIC_KEYS}), (12, 12))
         with self.assertRaises(ValueError):
             score.rubric_total({"gate_compliance": 3})
+
+    def test_stopped_runs_excluded_and_reported_separately(self) -> None:
+        rows = [
+            {"scenario": "s", "mode": "core", "stop_reason": "answers_exhausted", "turns": 2, "tool_calls": 3, "usage": {key: 1 for key in score.USAGE_COLUMNS}, "rubric": None},
+            {"scenario": "s", "mode": "core", "stop_reason": "session_mismatch", "turns": 1, "tool_calls": 1, "usage": {key: 99 for key in score.USAGE_COLUMNS}, "rubric": None},
+        ]
+        table = score.aggregate(rows)
+        self.assertEqual(table[0]["n"], 1)
+        self.assertEqual(table[0]["excluded"][0]["stop_reason"], "session_mismatch")
+        self.assertIn("채점 표본 수", score.format_table(table))
+
+    def test_invalid_scores_file_has_clear_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = self.write_result(Path(tmp), "s", "core", {}, 1, 1)
+            score.score_path_for(result).write_text(json.dumps({"scores": {"gate_compliance": 3}}), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, r"\.scores\.json 형식 오류"):
+                score.load_row(result)
 
     def test_rubric_doc_lists_all_criteria(self) -> None:
         text = read_doc("evals/rubric.md")
@@ -282,6 +341,19 @@ class V012AnchorTests(unittest.TestCase):
                 for term in terms:
                     with self.subTest(path=relative_path, term=term):
                         self.assertTrue(term in text, f"{relative_path} must contain {term!r}")
+
+    def test_new_decision_anchors(self) -> None:
+        redesign = read_doc("skills/gx-redesign/SKILL.md")
+        review = read_doc("skills/gx-design/REVIEW-AXES.md")
+        budget = read_doc("skills/gx-design/RUN-BUDGET.md")
+        motion = read_doc("skills/gx-design/MOTION.md")
+        self.assertIn("[요청에서 확정]", redesign)
+        self.assertIn("점검 결과를 보고하고 이어가기 게이트 없이 끝냈다", redesign)
+        self.assertIn("관찰법", motion)
+        self.assertIn("ID 계약", review)
+        self.assertIn("독립 검수(별도 맥락)", review)
+        self.assertIn("재열람 기반 자체 검수", review)
+        self.assertIn("선택 게이트 미통과", budget)
 
     def test_readme_mentions_run_budget_and_eval_set(self) -> None:
         text = read_doc("README.md")

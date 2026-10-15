@@ -31,8 +31,23 @@ python evals/score.py evals/results/<timestamp>
 
 - 작업 폴더: 실행마다 `evals/results/<timestamp>/work/<scenario>-<mode>/`를 새로 만들고 `fixtures`를 복사한다(시나리오 3은 `site/index.html` → `index.html`). `--workdir <경로>`로 상위 경로를 바꿀 수 있다.
 - 결과: `evals/results/<timestamp>/<scenario>-<mode>.json`(턴 수·토큰 합계·도구 호출 수·턴별 마지막 메시지·생성/수정 파일 목록), 원본 이벤트 `<scenario>-<mode>.events.jsonl`, 턴별 마지막 메시지 `<scenario>-<mode>.turnN.last.md`.
+- usage는 턴마다 저장하고, `turn.completed` 값이 단조 증가하면 세션 누적으로 판정해 최종값과 턴별 차이를 함께 기록한다. 단조 증가하지 않으면 합산한다.
 - 옵션: `--mode core|full|both`(기본은 시나리오의 mode), `--sandbox`(기본 `workspace-write`), `--max-turns N`, `--timeout 초`, `--codex-bin 경로`.
 - `evals/results/`는 `.gitignore` 대상이다. 결과를 공유하려면 집계 표만 옮긴다.
+- 기본 샌드박스는 `workspace-write`다. `danger-full-access`는 내용을 버려도 되는 별도 임시 폴더에서만 사용한다. 러너는 작업 폴더가 비어 있지 않거나 저장소 작업 트리 안에 있거나 저장소 루트와 겹치면 실행을 거부한다.
+
+## 시범 결과(2026-10-15)
+
+시나리오 03(core mode)을 같은 세션에서 3턴 실행했다. 도구 호출은 19회였다. 최종 누적 usage는 입력 1,159,958 tokens(캐시 1,076,608, 미캐시 83,350), 출력 7,718 tokens였다. resume 이벤트 usage는 세션 누적값이므로 턴별 값을 더하면 입력이 3,202,083으로 약 3배 부풀려진다.
+
+평가 비용은 대략 컨텍스트 크기 × 모델 호출 수에 따라 늘어난다. 도구 호출 횟수 자체보다 매 턴 읽히는 규칙 문서와 누적 컨텍스트가 비용에 크게 영향을 준다.
+
+실행에서 확인한 동작과 이 수정의 대응:
+
+- 요청에 대상·범위·기기가 이미 있었는데도 브리프 승인 질문 없이 진단을 바로 수행했다. 점검 전용의 확정 브리프는 `[요청에서 확정]`으로 표시하고, 진단 보고와 이어가기 게이트를 같은 메시지에 둔다.
+- 이어가기 게이트가 제시되지 않았다. 점검 진단 보고의 마지막에 세 경로를 항상 제시하도록 했다.
+- 모션 지적 표에 규칙 ID가 없었다. `Why`에 규칙 ID와 관찰법을 함께 쓰도록 했다.
+- 실제 Playwright를 1440×900 및 375×812에서 실행했고 `index.html`은 바뀌지 않았다.
 
 ## 격리 CODEX_HOME
 

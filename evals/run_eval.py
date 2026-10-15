@@ -39,9 +39,7 @@ SKILLS = ("gx-design", "gx-redesign")
 REQUIRED_KEYS = ("id", "skill", "request", "mode", "answers", "max_turns", "expected")
 
 # 세션/스레드 시작 이벤트로 보는 type 값(소문자 비교, 부분 일치 허용).
-_SESSION_EVENT_HINTS = ("thread.started", "thread_started", "session.created",
-                        "session_configured", "session.started", "session_started")
-_SESSION_ID_KEYS = ("thread_id", "session_id", "conversation_id")
+_SESSION_EVENT_HINTS = ("thread.started",)
 # 도구 호출로 세지 않는 아이템 type.
 _NON_TOOL_ITEM_TYPES = {"agent_message", "assistant_message", "message", "reasoning",
                         "user_message", "error", "todo_list"}
@@ -165,27 +163,13 @@ def event_type(event: dict) -> str:
 
 
 def extract_session_id(events: Iterable[dict]) -> str | None:
-    """세션/스레드 시작 이벤트에서 ID를 찾는다. 없으면 아무 이벤트의 thread_id/session_id."""
-    fallback = None
+    """문서화된 thread.started 이벤트의 thread_id만 세션 ID로 사용한다."""
     for event in events:
-        etype = event_type(event).lower()
-        containers = [event]
-        for key in ("msg", "thread", "session", "payload", "data"):
-            if isinstance(event.get(key), dict):
-                containers.append(event[key])
-        is_start = any(hint in etype for hint in _SESSION_EVENT_HINTS)
-        for container in containers:
-            for key in _SESSION_ID_KEYS:
-                value = container.get(key)
-                if isinstance(value, str) and value:
-                    if is_start:
-                        return value
-                    fallback = fallback or value
-            if is_start and container is not event and isinstance(container.get("id"), str):
-                return container["id"]
-        if is_start and isinstance(event.get("id"), str) and event["id"]:
-            return event["id"]
-    return fallback
+        if event_type(event) == "thread.started":
+            value = event.get("thread_id")
+            if isinstance(value, str) and value:
+                return value
+    return None
 
 
 def _iter_usage_objects(node: Any):
@@ -301,7 +285,7 @@ def summarize_events(events: list[dict]) -> dict:
         etype = event_type(event)
         types[etype] = types.get(etype, 0) + 1
     messages = agent_messages(events)
-    usage = sum_usage(events) or last_cumulative_usage(events)
+    usage = turn_completed_usage(events) or sum_usage(events) or last_cumulative_usage(events)
     return {
         "session_id": extract_session_id(events),
         "usage": usage,
@@ -309,6 +293,39 @@ def summarize_events(events: list[dict]) -> dict:
         "event_types": types,
         "last_message": messages[-1] if messages else None,
     }
+
+
+def turn_completed_usage(events: Iterable[dict]) -> dict:
+    """turn.completed usage의 마지막 값을 추출한다(세션 누적값)."""
+    found = {}
+    for event in events:
+        if event_type(event) == "turn.completed" and isinstance(event.get("usage"), dict):
+            found = {k: v for k, v in event["usage"].items()
+                     if isinstance(v, (int, float)) and not isinstance(v, bool)}
+    return found
+
+
+def aggregate_turn_usage(usages: list[dict]) -> tuple[list[dict], dict, str]:
+    """턴 usage를 누적 또는 합산으로 판정하고 턴별 delta와 최종값을 돌려준다."""
+    cumulative = all(
+        all(value >= previous[key] for key, value in current.items() if key in previous)
+        for previous, current in zip(usages, usages[1:])
+    )
+    mode = "cumulative" if cumulative else "summed"
+    deltas, previous = [], {}
+    for usage in usages:
+        delta = {}
+        for key, value in usage.items():
+            delta[key] = value - previous.get(key, 0) if cumulative else value
+        deltas.append(delta)
+        previous = usage
+    total = dict(usages[-1]) if usages and cumulative else {}
+    if usages and not cumulative:
+        for usage in usages:
+            merge_counts(total, usage)
+    uncached = max(0, total.get("input_tokens", 0) - total.get("cached_input_tokens", 0))
+    total["uncached_input_tokens"] = uncached
+    return deltas, total, mode
 
 
 def merge_counts(target: dict, extra: dict) -> dict:
@@ -339,7 +356,11 @@ def changed_files(before: dict, after: dict) -> dict:
 
 
 def prepare_workdir(scenario: dict, workdir: Path) -> list[str]:
-    workdir.mkdir(parents=True, exist_ok=True)
+    if workdir.exists():
+        if not workdir.is_dir() or any(workdir.iterdir()):
+            raise ScenarioError(f"작업 폴더가 이미 있고 비어 있지 않음: {workdir}")
+    else:
+        workdir.mkdir(parents=True)
     copied = []
     for fixture in scenario.get("fixtures", []):
         src = (REPO_ROOT / fixture["src"]).resolve()
@@ -353,6 +374,18 @@ def prepare_workdir(scenario: dict, workdir: Path) -> list[str]:
             shutil.copy2(src, dest)
         copied.append(dest.relative_to(workdir).as_posix())
     return copied
+
+
+def validate_workdir(workdir: Path, results_dir: Path, repo_root: Path = REPO_ROOT) -> None:
+    """작업 폴더의 Git 경계와 저장소 덮어쓰기 위험을 검사한다."""
+    workdir, results_dir, repo_root = (Path(p).resolve() for p in (workdir, results_dir, repo_root))
+    if workdir == repo_root or repo_root in workdir.parents or workdir in repo_root.parents:
+        raise ScenarioError(f"작업 폴더가 저장소 루트와 겹치거나 저장소 안에 있음: {workdir}")
+    if workdir == results_dir or results_dir in workdir.parents or workdir in results_dir.parents:
+        return
+    for parent in (workdir, *workdir.parents):
+        if (parent / ".git").exists():
+            raise ScenarioError(f"작업 폴더가 Git 작업 트리 안에 있음: {workdir}")
 
 
 # ---------------------------------------------------------------- 실행
@@ -395,10 +428,11 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         return {}
 
     run_dir.mkdir(parents=True, exist_ok=True)
+    validate_workdir(workdir, Path(args.results_dir))
     fixtures = prepare_workdir(scenario, workdir)
     before = snapshot(workdir)
     raw_log = run_dir / f"{name}.events.jsonl"
-    turns, usage, tools = [], {}, {}
+    turns, per_turn_usages, tools = [], [], {}
     session_id, stop_reason = None, "answers_exhausted"
 
     with raw_log.open("w", encoding="utf-8") as log:
@@ -415,8 +449,12 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
             log.write(out if out.endswith("\n") or not out else out + "\n")
             events, junk = parse_jsonl(out)
             summary = summarize_events(events)
-            session_id = session_id or summary["session_id"]
-            merge_counts(usage, summary["usage"])
+            reported_id = summary["session_id"]
+            if index == 1:
+                session_id = reported_id
+            elif reported_id is not None and reported_id != session_id:
+                stop_reason = "session_mismatch"
+            per_turn_usages.append(summary["usage"])
             merge_counts(tools, summary["tool_counts"])
             last_message = (last_file.read_text(encoding="utf-8", errors="replace")
                             if last_file.exists() else summary["last_message"])
@@ -424,7 +462,8 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
                 "turn": index,
                 "prompt": prompt,
                 "returncode": code,
-                "usage": summary["usage"],
+            "usage": summary["usage"],
+                "usage_cumulative": summary["usage"],
                 "tool_counts": summary["tool_counts"],
                 "event_types": summary["event_types"],
                 "files": turn_files,  # 이 턴에서 생성·수정·삭제된 파일(게이트 준수 판정용)
@@ -432,6 +471,8 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
                 "stderr_tail": err[-2000:],
                 "last_message": last_message,
             })
+            if index > 1 and stop_reason == "session_mismatch":
+                break
             if code != 0:
                 stop_reason = f"error_turn_{index}"
                 break
@@ -442,6 +483,9 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
             if len(prompts) < 1 + len(scenario["answers"]):
                 stop_reason = "max_turns"
 
+    usage_deltas, usage, usage_mode = aggregate_turn_usage(per_turn_usages)
+    for turn, delta in zip(turns, usage_deltas):
+        turn["usage_delta"] = delta
     files = changed_files(before, snapshot(workdir))
     result = {
         "scenario": scenario["id"],
@@ -452,6 +496,8 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         "stop_reason": stop_reason,
         "turn_count": len(turns),
         "usage": usage,
+        "uncached_input_tokens": usage.get("uncached_input_tokens", 0),
+        "usage_mode": usage_mode,
         "tool_counts": tools,
         "tool_calls": sum(tools.values()),
         "turns": turns,
@@ -501,6 +547,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     run_dir = Path(args.results_dir).resolve() / stamp
+    if run_dir.exists() and any(run_dir.iterdir()):
+        raise ScenarioError(f"결과 폴더가 이미 있고 비어 있지 않음: {run_dir}")
     for scenario in scenarios:
         if args.mode == "scenario":
             modes = [scenario["mode"]]

@@ -27,7 +27,8 @@ RUBRIC_KEYS = (
     "motion_violations",
 )
 MAX_PER_CRITERION = 2
-USAGE_COLUMNS = ("input_tokens", "cached_input_tokens", "output_tokens", "reasoning_output_tokens")
+USAGE_COLUMNS = ("input_tokens", "cached_input_tokens", "uncached_input_tokens", "output_tokens", "reasoning_output_tokens")
+AVERAGE_STOP_REASONS = {"answers_exhausted", "max_turns", ""}
 
 
 def _is_result_file(path: Path) -> bool:
@@ -85,10 +86,24 @@ def load_row(result_path: Path) -> dict | None:
     }
     score_file = score_path_for(Path(result_path))
     if score_file.exists():
-        score_data = json.loads(score_file.read_text(encoding="utf-8"))
-        scores = score_data.get("scores", score_data)
-        got, maximum = rubric_total(scores)
+        try:
+            score_data = json.loads(score_file.read_text(encoding="utf-8"))
+            if not isinstance(score_data, dict):
+                raise ValueError("최상위는 객체여야 함")
+            scores = score_data.get("scores", score_data)
+            if not isinstance(scores, dict):
+                raise ValueError("scores는 객체여야 함")
+            unknown = set(scores) - set(RUBRIC_KEYS)
+            if unknown:
+                raise ValueError(f"알 수 없는 기준: {sorted(unknown)}")
+            got, maximum = rubric_total(scores)
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
+            raise ValueError(f"{score_file}: .scores.json 형식 오류: {exc}") from exc
         row["rubric"] = {"got": got, "max": maximum, "scores": scores, "scorer": score_data.get("scorer")}
+    if row["stop_reason"] not in AVERAGE_STOP_REASONS:
+        row["status"] = f"제외: {row['stop_reason']}"
+    else:
+        row["status"] = row["stop_reason"]
     return row
 
 
@@ -99,15 +114,18 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
         groups.setdefault((row["scenario"], row["mode"]), []).append(row)
     table = []
     for (scenario, mode), group in sorted(groups.items()):
-        n = len(group)
-        rubric_rows = [r["rubric"] for r in group if r["rubric"]]
+        eligible = [r for r in group if r["stop_reason"] in AVERAGE_STOP_REASONS]
+        excluded = [r for r in group if r["stop_reason"] not in AVERAGE_STOP_REASONS]
+        n = len(eligible)
+        rubric_rows = [r["rubric"] for r in eligible if r["rubric"]]
         entry = {
             "scenario": scenario,
             "mode": mode,
             "n": n,
-            "turns": sum(r["turns"] for r in group) / n,
-            "tool_calls": sum(r["tool_calls"] for r in group) / n,
-            "usage": {key: sum(r["usage"][key] for r in group) / n for key in USAGE_COLUMNS},
+            "excluded": excluded,
+            "turns": sum(r["turns"] for r in eligible) / n if n else 0,
+            "tool_calls": sum(r["tool_calls"] for r in eligible) / n if n else 0,
+            "usage": {key: sum(r["usage"][key] for r in eligible) / n if n else 0 for key in USAGE_COLUMNS},
             "rubric": None,
         }
         if rubric_rows:
@@ -125,19 +143,23 @@ def _fmt(value: float) -> str:
 
 
 def format_table(table: list[dict]) -> str:
-    header = ("| 시나리오 | 모드 | n | 턴 | 입력 토큰 | 캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 품질(rubric) |\n"
-              "|---|---|---|---|---|---|---|---|---|---|")
+    header = ("| 시나리오 | 모드 | 상태 | 채점 표본 수 | 턴 | 입력 토큰 | 캐시 입력 | 미캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 품질(rubric) |\n"
+              "|---|---|---|---|---|---|---|---|---|---|---|---|")
     lines = [header]
     for entry in table:
         usage = entry["usage"]
         rubric = entry["rubric"]
         quality = f"{_fmt(rubric['got'])}/{_fmt(rubric['max'])}" if rubric else "미채점"
+        status = "평균" if entry["n"] else "평균 제외"
         lines.append(
-            f"| {entry['scenario']} | {entry['mode']} | {entry['n']} | {_fmt(entry['turns'])} | "
+            f"| {entry['scenario']} | {entry['mode']} | {status} | {entry['n']} | {_fmt(entry['turns'])} | "
             f"{_fmt(usage['input_tokens'])} | {_fmt(usage['cached_input_tokens'])} | "
-            f"{_fmt(usage['output_tokens'])} | {_fmt(usage['reasoning_output_tokens'])} | "
+            f"{_fmt(usage['uncached_input_tokens'])} | {_fmt(usage['output_tokens'])} | {_fmt(usage['reasoning_output_tokens'])} | "
             f"{_fmt(entry['tool_calls'])} | {quality} |"
         )
+        for excluded in entry["excluded"]:
+            status = excluded.get("status", f"제외: {excluded.get('stop_reason', 'unknown')}")
+            lines.append(f"| {entry['scenario']} | {entry['mode']} | {status} | — | — | — | — | — | — | — | — | 미채점 |")
     lines.append("")
     lines.append("표본이 작다(n 열). 토큰 0은 호스트가 사용량을 내보내지 않았다는 뜻일 수 있다 — 원본 .events.jsonl을 확인한다.")
     return "\n".join(lines)
@@ -148,7 +170,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("paths", nargs="+", help="결과 폴더 또는 결과 JSON 파일")
     parser.add_argument("--out", help="마크다운 표 저장 경로(생략 시 표준 출력)")
     args = parser.parse_args(argv)
-    rows = [row for row in (load_row(p) for p in collect_result_files(map(Path, args.paths))) if row]
+    try:
+        rows = [row for row in (load_row(p) for p in collect_result_files(map(Path, args.paths))) if row]
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     if not rows:
         print("결과 JSON을 찾지 못했다", file=sys.stderr)
         return 2
