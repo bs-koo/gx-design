@@ -50,6 +50,7 @@ argument-hint: "[프로젝트 한 줄 설명]"
 [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md)를 읽고 그 절차를 그대로 수행한다 — 철학이 다른 **스케치 3안**(각 10~15줄)으로 전략 선택 게이트를 열고, 선택된 1안만 콘셉트 형식 전체로 **확장**한다.
 전략은 [design-strategy 스킬](../design-strategy/SKILL.md)의 역할과 산출물 계약을 따른다. 위임할 수 없으면 주 에이전트가 근거 있는 대안을 작성하고 사용자 선택을 받는다.
 핵심 전략은 사용자 승인으로만 확정된다.
+UI·웹 화면과 정보 전달 중심 그래픽의 전략에는 [DESIGN-JUDGMENT.md](DESIGN-JUDGMENT.md)를 포함해 과업·정보 우선순위·묶음·필요한 상태를 콘셉트의 근거로 삼는다. 위임할 수 없으면 주 에이전트가 읽는다.
 브리프에 **디자인 톤 기준**이 있으면 팔레트·타이포·톤·형태는 탐색 축이 아니라 제약이다 — 콘셉트·구조만 그 안에서 탐색한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4). hard 강도의 이탈은 근거를 달아 전략 선택 게이트에서 승인받는다.
 UI·그래픽 전략안마다 톤 다이얼(VARIANCE·MOTION·DENSITY) 값과 근거를 표기하고, 모션이 있는 산출물이면 전략 선택 게이트에 모션 범위 문항을 붙인다 — 다이얼은 숫자로 따로 묻지 않고 안 선택으로 확정한다(DESIGN-IT-TWICE 6단계, [MOTION.md](MOTION.md)).
 UX/UI 전략에는 브리프의 화면별 목적·핵심 과업과 [UI-QUALITY.md](UI-QUALITY.md) §1을 전달한다. 디자인 후보 검색이 필요하면 [DESIGN-INTELLIGENCE.md](DESIGN-INTELLIGENCE.md)를 읽고, 실행 가능한 주체가 검색·적합성 확인 후 탐색 기록을 전략 입력으로 전달한다. 후보 생성은 브리프 승인 후에만 수행하며, 검색 미가용이면 기존 근거로 진행한다.
@@ -63,6 +64,7 @@ UX/UI 전략에는 브리프의 화면별 목적·핵심 과업과 [UI-QUALITY.m
 제작은 [creative-production 스킬](../creative-production/SKILL.md)의 역할과 산출물 계약을 따른다. 위임이 허용되고 서브에이전트 도구가 있으면 선택된 전략과 참조 파일, 입력 11항목을 전달한다. 위임할 수 없으면 주 에이전트가 creative-production과 같은 참조 파일을 읽고 제작한다.
 UI 프로토타입은 frontend-design 스킬을, .pen 시안은 pencil MCP 도구를 사용하게 한다(사용 가능한 경우). 렌더·화면 실물이 나오는 제작은 위임 프롬프트에 VISUAL-QUALITY.md 경로를 포함해 시각 품질 루프를 수행하게 한다. UI·그래픽·UX/UI 산출물은 VISUAL-CRAFT.md 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션 — 렌더 없이 명세만 만드는 잡도 서브에이전트가 규칙 원문에 닿도록).
 UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 ANTI-TELL-CHECKLIST.md 경로도 함께 배달한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
+UI·웹 화면과 정보 전달 중심 그래픽은 [DESIGN-JUDGMENT.md](DESIGN-JUDGMENT.md)도 제작 입력에 포함한다. 주 과업·정보 우선순위·묶음·필요한 상태에서 시각적 강약을 도출하고, 선택 이유와 결과 확인을 기존 명세·자체 검수에 기록한다. 위임할 수 없으면 주 에이전트가 읽는다.
 모션이 있는 산출물(UI 인터랙션·영상·모션 그래픽·Veo 프롬프트의 모션 서술)은 [MOTION.md](MOTION.md) 경로와 선택 기록의 다이얼·모션 범위를 함께 배달한다 — UI는 §A, 영상·모션 그래픽은 §B를 적용하고 §A 규칙을 영상에 쓰지 않는다. 위임할 수 없으면 주 에이전트가 해당 절을 읽는다.
 UX/UI 제작에는 [UI-QUALITY.md](UI-QUALITY.md) 경로를 전달해 문구·예외 상태·수용 체크를 적용한다. UX·차트·기술 스택 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](DESIGN-INTELLIGENCE.md)도 전달한다. 위임할 수 없으면 주 에이전트가 해당 참조를 읽는다.
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작(스타일 트랜스퍼·1레퍼런스→N브랜드)이면 위임 프롬프트에 REFERENCE-DRIVEN.md 경로도 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
@@ -80,6 +82,7 @@ UX/UI 제작에는 [UI-QUALITY.md](UI-QUALITY.md) 경로를 전달해 문구·�
 디자인 톤 기준이 있으면 축 A 검수에 톤 준수 점검을 포함한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 REFERENCE-DRIVEN.md 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 ANTI-TELL-CHECKLIST.md 경로를 전달한다(요소·카피 텔 점검).
+UI·웹 화면과 정보 전달 중심 그래픽의 축 B 입력에는 DESIGN-JUDGMENT.md도 포함해 의도한 우선순위·예상 시선 흐름·정보 묶음과 관련 상태를 대조한다. 실물 미확인과 기능 검증 한계를 구분한다.
 모션이 있는 산출물이면 축 B 검수에 [MOTION.md](MOTION.md) 경로를 전달하고, 모션 지적은 MOTION §C 표(`요소·위치 | Before(전) | After(후) | Why(이유)`)로 받는다.
 UX/UI이면 축 B에 [UI-QUALITY.md](UI-QUALITY.md), 화면별 목적·핵심 과업, 핵심 여정(실행 검증 시나리오), 검색 채택 기록(있을 때)을 전달한다. 시각·UX 판단과 구현 증거를 구분해 보고한다.
 

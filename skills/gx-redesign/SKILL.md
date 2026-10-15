@@ -39,6 +39,8 @@ argument-hint: "[개선 대상 한 줄 설명]"
 
 ## 단계 1 — 진단 (Audit)
 
+UI·웹 화면과 정보 전달 중심 그래픽은 [DESIGN-JUDGMENT.md](../gx-design/DESIGN-JUDGMENT.md)를 진단 입력에 포함한다. 실제 발견한 문제만 관찰하고 과업에 미칠 영향은 확인·추정·미검증으로 구분한다. 기존 진단 ID와 UI-QUALITY의 이슈 형식을 유지하며 변경 방향과 확인 방법을 연결한다.
+
 기존 디자인에 [../gx-design/REVIEW-AXES.md](../gx-design/REVIEW-AXES.md)의 2축 독립 검수를 적용한다.
 단, 진단에서는 축 A의 입력을 조정한다 — 이전 브리프·전략 문서가 있으면 그것과의 일치를, 없으면 개선 브리프에 기록된 현행 목표 대비 적합성을 검수한다.
 "낡았다"는 인상을 구체적 문제 목록(Critical/Major/Minor + 근거)으로 번역하는 단계다.
@@ -90,6 +92,8 @@ UI·웹 화면일 때만 [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLI
 
 ## 단계 3 — 개선 전략
 
+UI·웹 화면과 정보 전달 중심 그래픽의 개선안은 DESIGN-JUDGMENT의 판단을 근거로 삼고, 진단 문제 또는 승인된 브리프 목표에 직접 연결되는 변경 범위와 유지 조건을 명시한다.
+
 [design-strategy 스킬](../design-strategy/SKILL.md)의 역할과 산출물 계약과 [DESIGN-IT-TWICE.md](../gx-design/DESIGN-IT-TWICE.md)의 **스케치 → 선택 → 확장**을 따른다 — 개선 강도가 다른 **스케치 3안**(각 10~15줄, 해결하는 진단 ID 포함)으로 선택 게이트를 열고, 선택된 1안만 콘셉트 형식 전체로 **확장**한다. 위임이 허용되고 서브에이전트 도구가 있으면 전략 역할에 입력 11항목과 개선 강도 철학을 전달해 세 스케치를 독립적으로 작성한다. 위임할 수 없으면 주 에이전트가 design-strategy를 읽고 세 스케치를 각각 작성한다:
 
 - **A안 — 최소 개입**: 진단된 문제만 정밀 수정, 유지 자산 최대 보존
@@ -116,6 +120,7 @@ UX/UI 전략에는 브리프의 화면 목적·핵심 과업과 [UI-QUALITY.md](
 디자인 톤 기준이 있으면 위임에 원본 파일 경로를 더하고 hex·폰트·spacing·radius를 그대로 인용하게 한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 UI·그래픽·UX/UI 산출물은 [../gx-design/VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) 경로도 위임 프롬프트에 포함한다(안티-슬롭·톤 다이얼·일관성·모션).
 UI·그래픽·UX/UI·Gemini 웹 생성 산출물은 [../gx-design/ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 경로도 함께 포함한다(요소·카피·구조 텔 자체 점검 — 완료 전 1회).
+UI·웹 화면과 정보 전달 중심 그래픽은 DESIGN-JUDGMENT.md도 제작 입력에 포함한다. 기존 변경 ID·진단/목표 ID의 추적을 유지하고, 변경 후 같은 콘텐츠·뷰포트·상태에서 원래 결함과 새 문제를 재확인한다. 위임할 수 없으면 주 에이전트가 읽는다.
 모션이 있는 산출물은 [MOTION.md](../gx-design/MOTION.md) 경로와 선택 기록의 다이얼·모션 범위를 함께 전달한다(UI = §A, 영상·모션 그래픽 = §B). 모션 변경도 before → after → 근거로 기록한다.
 UX/UI 제작에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md)를 전달해 관련 문구·예외 상태를 반영한다. 구현 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](../gx-design/DESIGN-INTELLIGENCE.md)도 전달하며, 위임할 수 없으면 주 에이전트가 읽는다.
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작이면 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로도 위임 프롬프트에 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
@@ -138,6 +143,7 @@ UX/UI 제작에는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md)를 전달해 관�
 디자인 톤 기준이 있으면 축 A에 톤 준수 점검을 포함한다([../gx-design/DESIGN-TONE-ANCHOR.md](../gx-design/DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 [../gx-design/REFERENCE-DRIVEN.md](../gx-design/REFERENCE-DRIVEN.md) 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 [../gx-design/ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 경로를 전달한다(요소·카피 텔 점검).
+UI·웹 화면과 정보 전달 중심 그래픽이면 축 B에 DESIGN-JUDGMENT.md도 포함해 시선·묶음·읽힘을 확인한다. 축 C는 기존 진단·목표·변경 ID로 문제 해소, 유지 조건 보존과 관련 상태·뷰포트의 회귀를 대조한다.
 모션이 있는 산출물이면 축 B 검수에 [MOTION.md](../gx-design/MOTION.md) 경로를 전달하고 모션 지적은 §C 표로 받는다.
 UX/UI이면 축 B에 [UI-QUALITY.md](../gx-design/UI-QUALITY.md), 화면별 목적·핵심 과업, 핵심 여정, 검색 채택 기록(있을 때)을 전달한다. 축 C는 해당 진단 이슈의 해소를 같은 증거 기준으로 확인한다.
 polish 경로면 축 C는 선택된 진단 ID의 해소와 회귀만 본다(브리프 성공 기준·유지 자산 목록 대신 polish 경로 계약을 기준으로 삼는다).
