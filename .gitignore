@@ -1,3 +1,5 @@
 .omc/
 outputs/
 .worktrees/
+evals/results/
+__pycache__/

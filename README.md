@@ -73,7 +73,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 요청 한 줄
  → 0. 브리프 인터뷰    결정 트리 frontier 라운드 — 승인 전에는 어떤 산출물도 만들지 않음
  → 1. 리서치           시장 / 경쟁사 / 사용자 / 트렌드 조사
- → 2. 전략 3안         본질 우선 / 차별화 우선 / 시스템 우선 — 철학이 다른 3안 개발 후 선택
+ → 2. 전략 3안         본질 우선 / 차별화 우선 / 시스템 우선 — 철학이 다른 스케치 3안 중 선택 → 선택안만 확장
  → 3. 제작             명세 · 카피 · 생성형 AI 프롬프트 · 프로토타입
  → 4. 검수             전략 일치 축 + 완성도 축 독립 검수 → outputs/final/
  → 5. 실물 제작(선택)  코드 렌더링(실제 MP4·PNG) / Gemini 프롬프트 / 편집 도구 핸드오프 중 선택
@@ -86,7 +86,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
  → 0. 자산 인벤토리 + 개선 브리프    기존 문서·.pen·코드·이미지·배포 화면 전수 파악 후 인터뷰
  → 1. 진단(Audit)                   "낡았다"는 인상을 Critical/Major/Minor 문제 목록으로 번역
  → 2. 갭 리서치 (조건부)             경쟁·트렌드 대비 격차 분석
- → 3. 개선 강도 3안                  최소 개입 / 리프레시 / 리뉴얼 중 선택
+ → 3. 개선 강도 3안                  최소 개입 / 리프레시 / 리뉴얼 스케치 중 선택 → 선택안만 확장
  → 4. 제작                          모든 변경을 before → after → 근거 3열로 기록
  → 5. 검수                          2축 + 개선 목표 달성 축 = 3축 독립 검수
  → 6. 실물 제작(선택)                신규 제작과 동일한 게이트 — after 실물까지
@@ -100,8 +100,10 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 
 ### 진행 모드
 
-- **전체 모드**: 리서치 축, 전략 3안, 2축 독립 검수 — 산출물 범위가 넓은 프로젝트용.
-- **핵심 모드**: 인터뷰 1라운드, 리서치·전략·검수 경량화(승인 게이트는 동일 유지) — 단일 산출물·빠른 진행용.
+- **전체 모드**: 열린 질문이 남은 리서치 축만 실행, 전략 스케치 3안 → 선택안 확장, 2축 독립 검수 — 산출물 범위가 넓은 프로젝트용.
+- **핵심 모드**: 인터뷰 1라운드, 통합 리서치 1개, 전략은 전체 모드와 같은 스케치 3안 → 선택안 확장(승인 게이트는 동일 유지). 완성도 검수(축 B)는 제작과 다른 실행 맥락에서 독립으로 수행하고, 위임할 수 없으면 실물을 처음부터 다시 열어 "동일 맥락 검수"로 표기합니다 — 단일 산출물·빠른 진행용.
+- **단계별 승격**: 모드는 시작 깊이일 뿐입니다. 산출물 3종 이상·화면 6개 이상, 톤 기준과 전략 충돌, 스케치 3안 모두 거절, 같은 산출물 검수 Critical 2회 연속 같은 신호가 생기면 해당 단계만 전체 수준으로 올리고 한 줄로 알립니다.
+- **실행량 기록**: 단계 보고마다 `위임 · 외부 열람 · 렌더 · 토큰(호스트가 제공할 때만)` 실행량 줄을 남기고, 최종 보고에 단계별 합계를 저장합니다. 추정치를 측정치처럼 쓰지 않습니다. 수치 기준은 [RUN-BUDGET.md](skills/gx-design/RUN-BUDGET.md)에 있습니다.
 - **점검 전용**(gx-redesign): 요청에 "점검"·"점검만"·"감사"·"audit"·"고치지 말고"·"테스트만" 같은 키워드가 명확히 있으면 점검 전용으로 시작하고, 그 외에는 범위를 추측하지 않고 첫 질문 묶음에서 진행 모드와 함께 범위(리디자인 / 점검 전용)를 묻습니다. 점검 전용은 고치지 않고 진단 보고까지만 진행합니다. 경량 개선 브리프(점검 대상: 시각·UX / 모션 / AI 티 / 실행 여정, 대상 화면·URL, 기기) 승인 → 진단 → 보고 순서이고, 보고 뒤 **이어가기 게이트**에서 여기서 종료 / 이어서 리디자인(진단 재사용) / 지적 항목만 바로 수정(polish) 중 고릅니다. 전체·핵심 모드와 별개 축이라 함께 쓸 수 있습니다.
 - Claude Code의 슬래시 명령, Codex의 `$gx-design` 요청, 또는 첫 질문에서 선택한다.
 
@@ -141,7 +143,7 @@ Codex: `$gx-design 사내 협업툴 소개 랜딩 페이지. …` — 전략 3�
 /gx-design:gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 굼뜨고 어색해. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 대상 http://localhost:3000/onboarding, 모바일 기준.
 ```
 
-Codex: `$gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 …` — [MOTION.md](skills/gx-design/MOTION.md) §A 기준으로 진단하고 `요소·위치 | Before | After | Why` 표로 보고합니다. 그다음 이어가기 게이트에서 종료·리디자인·바로 수정 중 고릅니다.
+Codex: `$gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 …` — [MOTION.md](skills/gx-design/MOTION.md) §A 기준으로 진단하고 `요소·위치 | Before(전) | After(후) | Why(이유)` 표로 보고합니다. 그다음 이어가기 게이트에서 종료·리디자인·바로 수정 중 고릅니다.
 
 **3. 점검 전용 — 모바일 여정 테스트**
 
@@ -198,7 +200,7 @@ Codex: `$gx-design 신규 앱 런칭 15초 Instagram Reels. …` — 영상은 U
 Codex는 위 Claude 에이전트 파일의 모델·스킬 자동 주입을 전제하지 않습니다. 사용 가능한 위임 도구와 프로젝트 지시에 따라 역할을 맡기거나 주 에이전트가 수행합니다.
 
 상세 절차는 참조 파일로 분리되어 있습니다:
-`gx-design/` — BRIEF-INTERVIEW.md(인터뷰 게이트) · DESIGN-IT-TWICE.md(전략 3안 병렬) · REVIEW-AXES.md(2·3축 독립 검수) · PRODUCTION-HANDOFF.md(실물 제작 게이트) · PROMPT-PLAYBOOK.md(생성형 이미지·영상 프롬프트 규격) · VISUAL-QUALITY.md(코드 렌더링 시각 품질 루프) · DESIGN-TONE-ANCHOR.md(디자인 톤 기준 파일 처리) · VISUAL-CRAFT.md(안티-슬롭·VARIANCE·MOTION·DENSITY 다이얼·프리미엄 프리셋) · MOTION.md(모션 규칙 — §A UI 인터랙션 / §B 모션 그래픽·영상 / §C 모션 점검 표) · REFERENCE-DRIVEN.md(레퍼런스 구동 생성 — 근접도 다이얼·저작권 가드레일) · ANTI-TELL-CHECKLIST.md(요소·카피·구조 AI-티 점검표)
+`gx-design/` — BRIEF-INTERVIEW.md(인터뷰 게이트) · DESIGN-IT-TWICE.md(전략 3안 병렬) · REVIEW-AXES.md(2·3축 독립 검수) · PRODUCTION-HANDOFF.md(실물 제작 게이트) · PROMPT-PLAYBOOK.md(생성형 이미지·영상 프롬프트 규격) · VISUAL-QUALITY.md(코드 렌더링 시각 품질 루프) · DESIGN-TONE-ANCHOR.md(디자인 톤 기준 파일 처리) · VISUAL-CRAFT.md(안티-슬롭·VARIANCE·MOTION·DENSITY 다이얼·프리미엄 프리셋) · MOTION.md(모션 규칙 — §A UI 인터랙션 / §B 모션 그래픽·영상 / §C 모션 점검 표) · REFERENCE-DRIVEN.md(레퍼런스 구동 생성 — 근접도 다이얼·저작권 가드레일) · ANTI-TELL-CHECKLIST.md(요소·카피·구조 AI-티 점검표) · RUN-BUDGET.md(단계별 승격·실행량 기록·분량·열람 상한)
 `gx-redesign/` — REDESIGN-INTERVIEW.md(자산 인벤토리 + 개선 인터뷰)
 
 UX/UI 작업에는 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)(화면 목적·진단·문구·예외 상태)를 연결하고, 자료 검색이 필요하면 [DESIGN-INTELLIGENCE.md](skills/gx-design/DESIGN-INTELLIGENCE.md)(선택적 UI UX Pro Max 검색·결과 검증)를 읽습니다.
@@ -220,6 +222,10 @@ UX/UI 작업에는 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)(화면 목적
 ```
 
 요청을 더 구체적으로 쓰는 방법은 [이렇게 시키세요](#이렇게-시키세요)에 있습니다.
+
+## 평가 세트
+
+모드·버전별 비용(토큰·턴·도구 호출)과 품질(채점표)을 실행 기록으로 비교하는 평가 세트가 `evals/`에 있습니다. 시나리오 4개, Codex 비대화 실행 러너, 집계 스크립트, 채점표로 구성되며 실제 모델을 호출하므로 비용이 큽니다. 실행 방법·격리 설정·해석 주의는 [evals/README.md](evals/README.md)를 먼저 읽으세요.
 
 ## 설치 확인
 

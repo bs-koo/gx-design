@@ -1,0 +1,22 @@
+{
+  "id": "03-site-motion-audit",
+  "title": "site/index.html 애니메이션 점검 (점검 전용)",
+  "skill": "gx-redesign",
+  "request": "점검만. 작업 폴더의 index.html 페이지 애니메이션만 점검해줘. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 데스크톱·모바일 기준.",
+  "mode": "core",
+  "answers": [
+    "추천안대로 진행해. 점검 대상은 모션, 대상 화면은 index.html 전체, 기기는 데스크톱·모바일. 브리프 승인.",
+    "여기서 종료."
+  ],
+  "max_turns": 4,
+  "fixtures": [
+    {"src": "site/index.html", "dest": "index.html"}
+  ],
+  "expected": [
+    "index.html이 수정되지 않는다(점검 전용)",
+    "모션 점검 표가 요소·위치 | Before | After | Why 형식이다",
+    "각 진단 행에 위치·증거(선택자·줄·캡처 중 하나)가 있다",
+    "브라우저 실행 검증을 못 했으면 미검증으로 표시한다",
+    "보고 뒤 이어가기 게이트(종료/리디자인/polish)를 연다"
+  ]
+}
