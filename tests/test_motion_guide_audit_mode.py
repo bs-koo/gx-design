@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_VERSION = "0.11.0"
+TARGET_VERSION = "0.12.0"
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
@@ -35,7 +35,7 @@ ANCHORS = {
         "ease-in",
         "프레임",
         "안전영역",
-        "Before | After | Why",
+        "Before(전) | After(후) | Why(이유)",
     ),
     "skills/gx-design/VISUAL-CRAFT.md": ("MOTION.md", "1–3", "8–10", "프리미엄 프리셋"),
     "skills/gx-design/VISUAL-QUALITY.md": ("polish", "핵심 여정", "컨택트 시트", "@playwright/mcp@latest"),
