@@ -1,9 +1,9 @@
-# VISUAL-CRAFT — 시각 크래프트 규칙 (안티-슬롭·톤 다이얼·모션·일관성)
+# VISUAL-CRAFT — 시각 크래프트 규칙 (안티-슬롭·톤 다이얼·모션·일관성·프리미엄 프리셋)
 
 시각 산출물(UI·그래픽·코드 렌더)의 제작·검수·시각 품질 루프가 공통 참조하는 크래프트 규칙.
-근거: Anthropic frontend-design 공식 스킬 원칙 + 커뮤니티 taste·animate 스킬의 구체 규칙 + impeccable 탐지 규칙 일부를 우리 규격으로 **흡수**한 것이다(외부 스킬 런타임 의존 없음).
+근거: Anthropic frontend-design 공식 스킬 원칙 + 커뮤니티 taste·animate 스킬의 구체 규칙 + impeccable 탐지 규칙 일부를 우리 규격으로 **흡수**한 것이다(외부 스킬 런타임 의존 없음). 출처는 문서 끝 절에 적는다.
 
-적용 범위는 UI·그래픽·코드 렌더 산출물이다. Gemini 이미지·영상 프롬프트 패키지는 [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md)를 따른다(§1 안티-슬롭과 §2 다이얼 중 VARIANCE·DENSITY는 생성 이미지에도 참고 가능하나, §3 radius·§4 모션 등 CSS 규칙은 무관).
+적용 범위는 UI·그래픽·코드 렌더 산출물이다. Gemini 이미지·영상 프롬프트 패키지는 [PROMPT-PLAYBOOK.md](PROMPT-PLAYBOOK.md)를 따른다(§1 안티-슬롭과 §2 다이얼 중 VARIANCE·DENSITY는 생성 이미지에도 참고 가능하나, §3 radius 등 CSS 규칙은 무관). 영상 프롬프트의 모션 서술은 [MOTION.md](MOTION.md) §B를 따른다.
 
 **상위 규칙**: 디자인 톤 기준([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md))이 있으면 그것이 상위다 — 아래 다이얼·일관성·팔레트는 톤 기준 안에서 정한다. VISUAL-CRAFT는 톤 기준을 대체하지 않는다.
 
@@ -28,12 +28,19 @@ AI 생성 디자인이 몰리는 4대 기본 룩 — 브리프가 명시하지 �
 
 ## 2. 톤 다이얼 (VARIANCE / MOTION / DENSITY)
 
-UI·그래픽 산출물은 세 다이얼을 브리프의 vibe·타깃에서 도출해 명세에 **명시**한다:
+UI·그래픽 산출물은 세 다이얼을 1~10 레벨로 정해 명세에 **명시**한다. 레벨 구간:
 
-- **VARIANCE** — 레이아웃 비대칭/파격 정도(낮음: 정렬된 그리드 / 높음: 비대칭·의외 구성)
-- **MOTION** — 모션 강도(낮음: hover 미세 인터랙션 / 높음: 스크롤·마그네틱 연출)
-- **DENSITY** — 뷰포트당 정보 밀도(낮음: 여백 중심 / 높음: 대시보드 밀집)
+| 다이얼 | 1–3 | 4–7 | 8–10 |
+|---|---|---|---|
+| **VARIANCE** (레이아웃 파격) | 대칭 그리드·중앙 정렬 | 약한 겹침·혼합 비율·좌정렬 헤더 | 비대칭·분수 컬럼·의도적 큰 여백 |
+| **MOTION** (모션 강도) | 자동 모션 없음, hover·press 피드백만 | 속성을 명시한 transition·공통 이징·로드 시 stagger | 스크롤 연동 reveal·패럴랙스(스크롤 이벤트 직접 구독 대신 관찰자 API) |
+| **DENSITY** (뷰포트당 정보량) | 갤러리급 여백 | 일반 앱 간격 | 콕핏 — 촘촘한 패딩, 박스 대신 1px 구분선, 숫자 고정폭 |
+
+- VARIANCE 4 이상은 좁은 화면에서 단일 컬럼으로 접힌다 — 비대칭을 모바일까지 끌고 가지 않는다.
+- MOTION 레벨의 실행 규칙(이징·지속시간·금지)은 [MOTION.md](MOTION.md) §A를 따른다.
+- **기본값은 고정하지 않는다** — [UI-QUALITY.md](UI-QUALITY.md) §1 화면 목적에서 도출한다: 설득은 VARIANCE를 올리고, 업무 수행은 DENSITY를 올리고 MOTION을 내리고, 읽기는 DENSITY를 내리고, 감상은 DENSITY를 내려 콘텐츠를 앞세운다.
 - 특정 룩을 택하면 그 룩 전용 다이얼(예: glass intensity, mesh visibility, frame visibility, accent restraint)을 위 3다이얼에 덧붙여 명세에 함께 적는다.
+- **다이얼은 사용자에게 숫자로 묻지 않는다** — 전략안마다 세 값과 한 줄 근거를 제시하고, 안 선택으로 확정한다([DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md)).
 
 다이얼은 **승인된 전략에 종속된 실행 보조**다 — vibe만으로 전략을 밀어붙이지 않는다. 디자인 톤 기준이 있으면 그 안에서 정한다.
 
@@ -46,10 +53,9 @@ UI·그래픽 산출물은 세 다이얼을 브리프의 vibe·타깃에서 도�
 
 ## 4. 모션 규칙 (모션이 있는 산출물만)
 
-- **transform·opacity만** 애니메이트해 60fps를 확보한다 — layout·paint를 유발하는 속성(width·top·box-shadow 등) 금지.
-- **나가는 모션은 들어오는 모션보다 빠르게.**
+모션 규칙의 원본은 [MOTION.md](MOTION.md)다 — §A UI 인터랙션(웹·앱 화면)과 §B 모션 그래픽·영상을 분리하며, §A 규칙을 영상에 적용하지 않는다.
+- UI 요약: 빈도가 잦은 동작일수록 모션을 줄이고, ease-in을 쓰지 않으며, 300ms 이하·transform·opacity만, 나가는 모션은 들어오는 모션보다 짧게, reduced-motion은 "0이 아니라 덜".
 - 모션은 주제를 섬기는 곳에만 — 흩뿌린 효과보다 **연출된 한 순간**이 강하다. 과한 모션은 "AI가 만든" 인상을 준다.
-- reduced-motion을 존중한다.
 
 ## 5. 시그니처와 절제
 
@@ -63,3 +69,28 @@ UI·그래픽 산출물은 세 다이얼을 브리프의 vibe·타깃에서 도�
 - 카피가 템플릿처럼 읽히면 디자인도 템플릿이 된다. 사용자 관점 능동태("Save changes", not "Submit"), 시스템 용어 대신 사람이 아는 말, 흐름 내내 동일 동사(버튼 "Publish" → 토스트 "Published").
 - 빈 화면·오류도 무드가 아니라 방향 제시다 — 무엇이 잘못됐고 어떻게 고치는지 인터페이스의 목소리로.
 - 콘텐츠도 텔이 된다 — 제네릭 인명·완벽한 숫자·필러 동사·가짜 캡션은 [ANTI-TELL-CHECKLIST.md](ANTI-TELL-CHECKLIST.md) §2로 점검한다.
+
+## 7. 프리미엄 프리셋 (선택)
+
+**발동 조건**: 브리프나 디자인 톤 기준이 프리미엄·럭셔리·하이엔드를 명시할 때만 쓴다. 그 외에는 로드하지 않는다. 톤 기준이 있으면 그 팔레트·타이포 안에서만 적용한다.
+
+- **Double-Bezel 카드**: 바깥 셸(반투명 면 + 헤어라인 + 작은 패딩) 안에 안쪽 코어를 두고, 두 radius를 동심으로 맞춘다(바깥 radius = 안쪽 radius + 셸 패딩).
+- **버튼**: pill 형태, 화살표는 작은 원 안에 넣는다.
+- **경계와 깊이**: 1px 회색 테두리·진한 drop shadow 대신 헤어라인 링과 은은한 ambient shadow.
+- **아이콘**: 굵은 stroke 아이콘 대신 초경량 라인 아이콘.
+- **여백**: 섹션 간 여백은 표준의 약 2배.
+- **내비**: 화면 상단에 붙은 바 대신 떠 있는 내비.
+- **반응형**: 768px 미만은 단일 컬럼.
+
+**충돌 해소**
+- 프리셋의 긴 모션(~700ms)은 마케팅 스크롤 연출에만 쓴다. UI 인터랙션은 [MOTION.md](MOTION.md) §A3 지속시간이 우선한다.
+- 글래스 연출은 §1 워치리스트(dark-glass-clean)와 겹친다 — 쓸 때는 "not X, not Y" 부정 정의로 못박는다(예: "헤어라인으로 경계를 잡은 반투명 면 — 네온 글로우 패널도 파스텔 glassmorphism도 아님").
+- §3 일관성 잠금은 프리셋에도 그대로 적용된다(accent·radius 체계 각 하나).
+
+## 출처
+
+- §2 다이얼 레벨 구간: taste-skill(Leonxlnx/taste-skill, MIT)의 `taste-skill-v2-experimental` 3다이얼 정의를 재서술. 2026-10-13 v2.0.0부터 기본 `design-taste-frontend`에는 다이얼이 없다.
+- §7 프리미엄 프리셋: taste-skill `high-end-visual-design`(MIT)의 규칙을 선택형으로 재서술.
+- §1·§3 일부: impeccable(pbakaus/impeccable, Apache-2.0) 탐지 규칙에서 선택.
+- §4 모션 요약: emil-design-eng(emilkowalski/skills, MIT) — 상세는 [MOTION.md](MOTION.md).
+- 모두 원문 복제가 아니라 우리 규격으로 다시 쓴 것이며 외부 런타임 의존은 없다.

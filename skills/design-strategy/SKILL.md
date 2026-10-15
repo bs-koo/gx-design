@@ -53,4 +53,8 @@ description: 리서치와 요구사항을 문제 정의, 가치 제안, 디자�
 - Verbal Expression
 - UX Expression
 - Motion Expression
+- Dials — VARIANCE·MOTION·DENSITY 값(1~10)과 한 줄 근거 (UI·그래픽일 때 — [VISUAL-CRAFT.md](../gx-design/VISUAL-CRAFT.md) §2)
+- Motion Scope — 모션 범위 제안(UI: 피드백만 / 진입 연출 / 스크롤 연출, 영상: 정적+컷 편집 / 키네틱 타이포 / 풀 모션 그래픽)과 근거 (모션이 있을 때 — [MOTION.md](../gx-design/MOTION.md))
 - Risks
+
+다이얼과 모션 범위는 안을 비교하는 정보다 — 사용자에게 숫자로 따로 묻지 않고, 안 선택과 전략 선택 게이트의 모션 범위 문항으로 확정된다([DESIGN-IT-TWICE.md](../gx-design/DESIGN-IT-TWICE.md)).
