@@ -143,7 +143,7 @@ Codex: `$gx-design 사내 협업툴 소개 랜딩 페이지. …` — 전략 3�
 /gx-design:gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 굼뜨고 어색해. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 대상 http://localhost:3000/onboarding, 모바일 기준.
 ```
 
-Codex: `$gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 …` — [MOTION.md](skills/gx-design/MOTION.md) §A 기준으로 진단하고 `요소·위치 | Before | After | Why` 표로 보고합니다. 그다음 이어가기 게이트에서 종료·리디자인·바로 수정 중 고릅니다.
+Codex: `$gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 …` — [MOTION.md](skills/gx-design/MOTION.md) §A 기준으로 진단하고 `요소·위치 | Before(전) | After(후) | Why(이유)` 표로 보고합니다. 그다음 이어가기 게이트에서 종료·리디자인·바로 수정 중 고릅니다.
 
 **3. 점검 전용 — 모바일 여정 테스트**
 

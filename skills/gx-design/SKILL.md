@@ -80,7 +80,7 @@ UX/UI 제작에는 [UI-QUALITY.md](UI-QUALITY.md) 경로를 전달해 문구·�
 디자인 톤 기준이 있으면 축 A 검수에 톤 준수 점검을 포함한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4).
 레퍼런스 입력을 쓴 제작이면 축 A 검수에 REFERENCE-DRIVEN.md 경로를 전달하고 근접도·저작권 가드 점검을 포함한다(REFERENCE-DRIVEN §6).
 UI·그래픽·코드 렌더·Gemini 웹 생성 산출물이면 축 B 검수에 ANTI-TELL-CHECKLIST.md 경로를 전달한다(요소·카피 텔 점검).
-모션이 있는 산출물이면 축 B 검수에 [MOTION.md](MOTION.md) 경로를 전달하고, 모션 지적은 MOTION §C 표(`요소·위치 | Before | After | Why`)로 받는다.
+모션이 있는 산출물이면 축 B 검수에 [MOTION.md](MOTION.md) 경로를 전달하고, 모션 지적은 MOTION §C 표(`요소·위치 | Before(전) | After(후) | Why(이유)`)로 받는다.
 UX/UI이면 축 B에 [UI-QUALITY.md](UI-QUALITY.md), 화면별 목적·핵심 과업, 핵심 여정(실행 검증 시나리오), 검색 채택 기록(있을 때)을 전달한다. 시각·UX 판단과 구현 증거를 구분해 보고한다.
 
 **핵심 모드**: REVIEW-AXES.md의 핵심 모드 조항을 따른다. 검수 보고 머리에는 별도 실행 맥락이 실제로 축 B를 수행한 경우 `독립 검수(별도 맥락)`, 그 외에는 `재열람 기반 자체 검수(동일 맥락 검수)`를 쓴다. 후자는 실물·로그를 처음부터 다시 연다. 보고는 축별 분리를 유지하고, Critical만 수정 루프를 돈다.
