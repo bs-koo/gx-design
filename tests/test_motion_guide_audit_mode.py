@@ -100,6 +100,49 @@ class MotionDeliveryTests(unittest.TestCase):
         self.assertIn("$gx-redesign", default_prompt)
 
 
+class ReadFailureAndSlotContractTests(unittest.TestCase):
+    SLOT_TABLE_HEADER = "| 흐름 | 전체 모드 | 핵심 모드 |"
+
+    def test_host_compat_defines_read_failure_and_slot_table(self) -> None:
+        host = read_doc("skills/gx-design/HOST-COMPAT.md")
+        self.assertIn("## 참조 파일 읽기 실패", host)
+        self.assertIn("### 질문 슬롯 산정표", host)
+        self.assertIn(self.SLOT_TABLE_HEADER, host)
+        self.assertEqual(host.count(self.SLOT_TABLE_HEADER), 1)
+
+    def test_both_skills_point_to_read_failure_section(self) -> None:
+        for relative_path in ("skills/gx-design/SKILL.md", "skills/gx-redesign/SKILL.md"):
+            text = read_doc(relative_path)
+            with self.subTest(path=relative_path):
+                self.assertIn("HOST-COMPAT.md#참조-파일-읽기-실패", text)
+                self.assertIn("지침을 못 읽었으니 일단 시안부터", text)
+                stage0 = text.split("## 단계 0", 1)[1].split("\n## ", 1)[0]
+                self.assertIn("참조 파일 읽기 실패", stage0)
+
+    def test_redesign_polish_contract(self) -> None:
+        redesign = read_doc("skills/gx-redesign/SKILL.md")
+        self.assertNotIn("2·3을 고른 뒤", redesign)
+        for term in ("polish 경로 계약", "지적 항목 외 전부", "생략 보고", "진단 ID"):
+            with self.subTest(term=term):
+                self.assertIn(term, redesign)
+
+    def test_interviews_reference_slot_table(self) -> None:
+        for relative_path in (
+            "skills/gx-design/BRIEF-INTERVIEW.md",
+            "skills/gx-redesign/REDESIGN-INTERVIEW.md",
+            "skills/gx-redesign/SKILL.md",
+        ):
+            text = read_doc(relative_path)
+            with self.subTest(path=relative_path):
+                self.assertRegex(text, r"\]\((?:\.\./gx-design/)?HOST-COMPAT\.md#질문-슬롯-산정표\)")
+                self.assertNotIn("최대 4문항", text)
+
+    def test_readme_scope_rule_matches_redesign(self) -> None:
+        readme = read_doc("README.md")
+        self.assertNotIn("점검·테스트만 원하면", readme)
+        self.assertIn("진행 모드와 함께 범위", readme)
+
+
 class ActiveSkillHostCompatTests(unittest.TestCase):
     FORBIDDEN = ("AskUserQuestion", "multiSelect", "preview를 쓴다", "WebSearch")
 
