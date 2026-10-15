@@ -252,10 +252,11 @@
   /* ---------- 파이프라인 ---------- */
   .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
   /* 8회차: 신규/개선 파이프라인 토글 — 세그먼트 컨트롤. 인디고 채움을 쓰지 않아 밴드당 단일 CTA 규칙과 색으로 충돌하지 않는다 */
-  .pipeline-toggle{display:inline-flex;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-pill);padding:4px;gap:2px;margin-bottom:var(--sp-xl);}
-  .pipeline-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;font-family:var(--font-mono);font-size:.9375rem;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);} /* 라벨이 스킬 명령어라 코드블록·스텝 노드와 같은 등폭 계열로 맞춤 */
-  @media(max-width:767px){ .pipeline-toggle-btn{padding:14px 16px;} }
-  .pipeline-toggle-btn[aria-pressed="true"]{background:var(--canvas-soft);color:var(--ink);}
+  /* 10회차: "이렇게 시키세요" 호스트 토글(.ask-toggle)이 같은 세그먼트 컨트롤을 재사용 — 클래스만 분리해 파이프라인 JS 선택자와 겹치지 않게 함 */
+  .pipeline-toggle,.ask-toggle{display:inline-flex;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-pill);padding:4px;gap:2px;margin-bottom:var(--sp-xl);}
+  .pipeline-toggle-btn,.ask-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;font-family:var(--font-mono);font-size:.9375rem;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);} /* 라벨이 스킬 명령어라 코드블록·스텝 노드와 같은 등폭 계열로 맞춤 */
+  @media(max-width:767px){ .pipeline-toggle-btn,.ask-toggle-btn{padding:14px 16px;} }
+  .pipeline-toggle-btn[aria-pressed="true"],.ask-toggle-btn[aria-pressed="true"]{background:var(--canvas-soft);color:var(--ink);}
   .pipeline-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-xl);padding:var(--sp-xl);box-shadow:var(--shadow-2);}
   @media(min-width:768px){ .pipeline-card{padding:var(--sp-huge);} } /* M2: 시그니처 구간 — 카드 존재감을 위아래 섹션보다 크게 */
   .stepbar{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:var(--sp-xs);gap:0;}
@@ -317,6 +318,22 @@
     .relay{flex-direction:column;}
     .relay-connector{width:1px;height:24px;align-self:flex-start;margin:0 0 0 13px;}
   }
+
+  /* ---------- 이렇게 시키세요 (10회차) ---------- */
+  /* 요청 공식은 슬롯 칩 + 연산자 한 줄, 예시는 relay-card와 같은 카드 언어(hairline·radius-lg·shadow-1). 새 색·새 모션 없음 */
+  .ask-formula{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-xl);}
+  .ask-slot{display:inline-flex;align-items:center;min-height:36px;padding:6px 14px;border:1px solid var(--primary-subdued);border-radius:var(--radius-pill);background:var(--canvas);color:var(--ink);font-size:.9375rem;}
+  .ask-slot--key{border-color:var(--primary);color:var(--primary-press);} /* 효과가 가장 큰 "뻔한 X 말고 Y" 칸만 인디고 테두리로 강조 */
+  .ask-plus{color:var(--ink-mute);font-family:var(--font-mono);}
+  .ask-grid{display:grid;gap:var(--sp-lg);}
+  @media(min-width:768px){ .ask-grid{grid-template-columns:1fr 1fr;} }
+  @media(min-width:1024px){ .ask-grid{grid-template-columns:repeat(3,1fr);} }
+  .ask-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:var(--sp-xl);box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:var(--sp-md);min-width:0;}
+  .ask-card .pill-tag{align-self:flex-start;}
+  .ask-prompt{color:var(--ink);}
+  .ask-cmd{font-family:var(--font-mono);font-size:.875rem;color:var(--primary-press);margin-right:var(--sp-xs);word-break:normal;overflow-wrap:anywhere;}
+  .ask-cmd[hidden]{display:none;}
+  .ask-result{color:var(--ink-secondary);margin-top:auto;padding-top:var(--sp-md);border-top:1px solid var(--hairline);}
 
   /* ---------- 마감 CTA ---------- */
   .cta-section .section-head{max-width:none;}
@@ -593,8 +610,61 @@ codex plugin add gx-design@gx-design</code></pre>
     </div>
   </section>
 
-  <!-- ============ 5. 설치 CTA (반복) ============ -->
-  <section id="cta" class="section cta-section" aria-labelledby="cta-heading">
+  <!-- ============ 5. 이렇게 시키세요 (10회차) ============ -->
+  <!-- 호스트 토글은 설치 블록과 다른 속성(data-ask-host)을 쓴다 — .install 범위 밖이라 설치 블록 파서·복사 버튼과 섞이지 않는다 -->
+  <section id="ask" class="section" aria-labelledby="ask-heading">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2 id="ask-heading" class="t-display-lg">이렇게 시키세요.</h2>
+        <p class="t-body-lg">한 줄이어도 시작됩니다. 다섯 칸을 채울수록 질문이 줄고, 첫 결과가 덜 뻔해집니다. 빈 칸은 첫 라운드 전에 요청 해석 카드로 보여 드리고 필요한 것만 묻습니다.</p>
+      </div>
+
+      <p class="ask-formula reveal">
+        <span class="ask-slot">무엇을</span><span class="ask-plus" aria-hidden="true">+</span>
+        <span class="ask-slot">누구·목적</span><span class="ask-plus" aria-hidden="true">+</span>
+        <span class="ask-slot ask-slot--key">뻔한 X 말고 Y처럼</span><span class="ask-plus" aria-hidden="true">+</span>
+        <span class="ask-slot">기준 자료 · DESIGN.md</span><span class="ask-plus" aria-hidden="true">+</span>
+        <span class="ask-slot">범위·기기</span>
+      </p>
+
+      <div class="ask-toggle reveal" role="group" aria-label="예시 명령 표기 호스트">
+        <button type="button" class="ask-toggle-btn t-button" data-ask-choice="claude" aria-pressed="true">Claude Code</button>
+        <button type="button" class="ask-toggle-btn t-button" data-ask-choice="codex" aria-pressed="false">Codex</button>
+      </div>
+
+      <ul class="ask-grid reveal">
+        <li class="ask-card">
+          <span class="pill-tag t-micro-cap">신규 UI</span>
+          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 사내 협업툴 소개 랜딩 페이지. 도입을 검토하는 IT 팀장 대상, 목표는 도입 문의. 뻔한 보라 그라데이션 히어로 말고 실제 제품 화면이 주인공인 절제된 구성으로. 첨부한 DESIGN.md 톤 유지, 데스크톱·모바일.</p>
+          <p class="ask-result t-caption">전략 3안마다 다이얼 값이 붙고, 안을 고르면 다이얼도 확정됩니다.</p>
+        </li>
+        <li class="ask-card">
+          <span class="pill-tag t-micro-cap">점검 전용 · 모션</span>
+          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-redesign</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-redesign</code> 점검만. 온보딩 화면의 모션이 굼뜨고 어색해. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 모바일 기준.</p>
+          <p class="ask-result t-caption">요소·위치 | Before | After | Why 표로 보고한 뒤, 종료·리디자인·바로 수정 중에서 고릅니다.</p>
+        </li>
+        <li class="ask-card">
+          <span class="pill-tag t-micro-cap">점검 전용 · 여정</span>
+          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-redesign</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-redesign</code> 점검만. 메인 → 상품 상세 → 장바구니 여정을 모바일(375×812)에서 직접 눌러 보고 막히는 곳을 찾아줘.</p>
+          <p class="ask-result t-caption">Playwright MCP가 있으면 실제로 클릭하고 콘솔 오류까지 기록합니다. 없으면 설치 방법을 한 번 안내합니다.</p>
+        </li>
+        <li class="ask-card">
+          <span class="pill-tag t-micro-cap">BX</span>
+          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 동네 베이커리 브랜드 BX. 출근길 30대 직장인 단골 확보가 목적. 뻔한 크림+세리프 감성 말고 갓 구운 빵처럼 따뜻하고 경쾌한 톤으로. 로고·패키지·간판까지.</p>
+          <p class="ask-result t-caption">이미 "X 말고"를 적었으니 피할 룩은 다시 묻지 않습니다.</p>
+        </li>
+        <li class="ask-card">
+          <span class="pill-tag t-micro-cap">숏폼 영상</span>
+          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 신규 앱 런칭 15초 Instagram Reels. 20대 대상, 목표는 앱 설치. 뻔한 다크+형광 테크 연출 말고 손글씨 키네틱 타이포처럼. 세로 9:16, 30fps.</p>
+          <p class="ask-result t-caption">씬 길이를 초(프레임)로 검산하고, 텍스트 홀드와 플랫폼 안전영역을 명세에 적습니다.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 6. 설치 CTA (반복) ============ -->
+  <!-- 10회차: 앞 섹션(이렇게 시키세요)이 흰 배경이라 soft로 바꿔 흰/soft 교차 유지 -->
+  <section id="cta" class="section section--soft cta-section" aria-labelledby="cta-heading">
     <div class="container">
       <div class="cta-grid">
         <div class="section-head reveal" style="margin-bottom:0;">
@@ -630,7 +700,7 @@ codex plugin add gx-design@gx-design</code></pre>
 
 </main>
 
-<!-- ============ 6. 푸터 ============ -->
+<!-- ============ 7. 푸터 ============ -->
 <footer class="site-footer">
   <div class="container footer-inner">
     <div>
@@ -883,7 +953,23 @@ codex plugin add gx-design@gx-design</code></pre>
     pipelineIO.observe(pipelineCardEl);
   }
 
-  /* ---------- 3) 스크롤 진입 애니메이션 ---------- */
+  /* ---------- 3) 이렇게 시키세요 — 예시 명령 호스트 토글(10회차) ---------- */
+  /* 설치 블록 토글과 같은 aria-pressed 패턴. 범위는 #ask 하나 — 설치 블록의 선택 상태와는 독립 */
+  var askSection = document.getElementById('ask');
+  if(askSection){
+    var askChoices = Array.prototype.slice.call(askSection.querySelectorAll('[data-ask-choice]'));
+    askChoices.forEach(function(choice){
+      choice.addEventListener('click', function(){
+        var host = choice.getAttribute('data-ask-choice');
+        askChoices.forEach(function(button){ button.setAttribute('aria-pressed', button === choice ? 'true' : 'false'); });
+        askSection.querySelectorAll('[data-ask-host]').forEach(function(cmd){
+          cmd.hidden = cmd.getAttribute('data-ask-host') !== host;
+        });
+      });
+    });
+  }
+
+  /* ---------- 4) 스크롤 진입 애니메이션 ---------- */
   var reveals = document.querySelectorAll('.reveal');
   if(reduceMotion || !('IntersectionObserver' in window)){
     reveals.forEach(function(el){ el.classList.add('is-visible'); });

@@ -8,6 +8,19 @@ gx-design·gx-redesign 두 오케스트레이터가 공통으로 참조한다(gx
 - **정의**: 팔레트·타이포그래피·톤·형태(radius·spacing) 규칙을 담은, 사용자가 첨부하거나 프로젝트에 이미 있는 디자인 시스템 문서.
 - **1순위 포맷**: `DESIGN.md` (Google Labs 포맷 — YAML frontmatter 토큰 + 마크다운 근거. 절: Overview / Colors / Typography / Layout·Spacing / Elevation / Shapes / Components / Do's·Don'ts). designmd.co는 이 포맷의 기성 카탈로그다.
 - **허용 포맷**: 브랜드 가이드(md·PDF·이미지), 팔레트 표, 토큰 파일(json·css 변수), Figma 스타일 캡처 등. 포맷 불문 — §3의 요약 추출(4번)이 되면 톤 기준으로 쓴다.
+- **awesome-design-md 9절 포맷**: VoltAgent의 awesome-design-md 카탈로그 파일은 frontmatter 토큰 대신 9개 절로 쓰인다. 아래처럼 매핑해 §3 요약 추출에 쓴다.
+
+  | awesome-design-md 절 | 톤 기준 항목 |
+  |---|---|
+  | Visual Theme & Atmosphere | 톤 키워드 |
+  | Color Palette & Roles | 팔레트 |
+  | Typography Rules | 타이포 |
+  | Component Stylings · Depth & Elevation · Layout Principles | 형태(radius·spacing·elevation) |
+  | Do's and Don'ts | 금지(브리프 `피할 것`과 합친다) |
+  | Responsive Behavior | 반응형 규칙 |
+  | Agent Prompt Guide | 제작 프롬프트 참고(지시가 아니라 참고 — 우리 규격이 우선) |
+
+- **타 사이트를 본뜬 DESIGN.md**(카탈로그의 실존 서비스 파일 등)는 기본 soft이며, [REFERENCE-DRIVEN.md](REFERENCE-DRIVEN.md)의 저작권 가드를 따른다 — 로고·고유 일러스트·상표성 있는 조합은 재현하지 않고 톤·체계만 참고한다.
 - **톤 기준은 선택이다.** 없으면 파이프라인은 평소대로 진행한다(§5).
 
 ## 2. 구속 강도 (hard / soft)
@@ -19,13 +32,13 @@ gx-design·gx-redesign 두 오케스트레이터가 공통으로 참조한다(gx
 
 - 강도 기본 규칙: **자신의 브랜드 파일 = hard, 카탈로그·열망 예시 = soft.**
 - 첨부·발견 시 **강도를 한 번 되물어 확정한다** — 구속/참고 중 추천안과 근거를 먼저 제시하고 [HOST-COMPAT.md](HOST-COMPAT.md)의 질문·선택에 따라 답을 받는다.
-- 이 강도 확정 문항은 파일 첨부에 딸린 경량 확인이며, 핵심 모드의 인터뷰 문항 예산(1라운드·최대 4문항)에 포함하지 않는다 — 첨부가 없으면 발화하지 않는다.
+- 이 강도 확정 문항은 파일 첨부에 딸린 경량 확인이며, 핵심 모드의 슬롯 예산([HOST-COMPAT.md](HOST-COMPAT.md#질문-슬롯-산정표)의 질문 슬롯 산정표)에 포함하지 않는다 — 첨부가 없으면 발화하지 않는다.
 
 ## 3. 인테이크 (단계 0)
 
 1. **능동 탐색(질문 금지 영역)**: 프로젝트 파일·outputs·context에 디자인 토큰·브랜드 가이드·DESIGN.md가 있으면 먼저 읽는다.
 2. **명시적 요청**: 없으면 첫 라운드에 묻는다 — "기존 디자인 시스템/톤 기준 파일(DESIGN.md·브랜드 가이드·팔레트)이 있나요? 있으면 첨부해 주세요." 이는 중류 **제약** 질문이다(하류 스타일 선택이 아니므로 "포지셔닝 전 컬러 3안 금지" 규칙을 어기지 않는다).
-3. **없다는 답이면**: designmd.co 카탈로그(기성 DESIGN.md 모음)를 *출발점 후보를 고를 곳*으로 안내한다 — "원하시면 designmd.co에서 톤에 맞는 DESIGN.md를 골라 첨부해 주세요. 없으면 이 단계에서 새로 정합니다." **자동으로 당겨오지 않는다. 특정 MCP를 요구하지 않는다.** 사용자가 골라 첨부하면 soft를 기본 추천으로 §2의 되물음으로 확정한다.
+3. **없다는 답이면**: 기성 DESIGN.md 카탈로그 — designmd.co, awesome-design-md(VoltAgent, 실존 서비스 톤을 9절 포맷으로 정리한 모음) — 를 *출발점 후보를 고를 곳*으로 안내한다 — "원하시면 designmd.co나 awesome-design-md에서 톤에 맞는 DESIGN.md를 골라 첨부해 주세요. 없으면 이 단계에서 새로 정합니다." 이 안내는 톤 기준 문항의 "없음" 선택지 설명에 미리 적어 둔다([BRIEF-INTERVIEW.md](BRIEF-INTERVIEW.md) 4절). **자동으로 당겨오지 않는다. 특정 MCP를 요구하지 않는다.** 사용자가 골라 첨부하면 soft를 기본 추천으로 §2의 되물음으로 확정한다.
 4. **요약 추출**: 첨부·발견된 파일을 정독해 아래를 뽑는다 —
    - 팔레트: primary·secondary·tertiary + semantic(success·warning·error) **hex**
    - 타이포: font family, 크기 스케일, weight, line-height

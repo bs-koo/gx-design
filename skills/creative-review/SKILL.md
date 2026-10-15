@@ -39,7 +39,7 @@ description: BX, 그래픽, UX/UI, 영상 결과물을 목표 적합성, 전략 
 - 이미지 스타일이 일관적인가?
 - (UI·그래픽·코드 렌더) 안티-슬롭 — AI 기본 룩 4종을 무심코 답습하지 않았는가? (VISUAL-CRAFT §1)
 - (UI·그래픽·코드 렌더) 일관성 잠금 — accent·radius 체계·라이트/다크가 각각 하나로 고정됐는가? (VISUAL-CRAFT §3)
-- (모션 있는 산출물) transform·opacity 중심 60fps인가, 나가는 모션이 들어오는 모션보다 빠른가? (VISUAL-CRAFT §4)
+- (UI 모션) [MOTION.md](../gx-design/MOTION.md) §A를 지키는가 — 사용 빈도에 비해 과한 모션은 없는가, ease-in을 쓰지 않았는가, 인터랙션이 300ms 이하인가(모달·드로어·마케팅 연출 예외), transform·opacity만 움직이는가, reduced-motion에서 모션을 끄는 대신 "덜" 움직이는가? 모션 지적은 MOTION §C 표(`요소·위치 | Before | After | Why`)로 쓴다.
 - (UI·그래픽·코드 렌더·Gemini 웹 생성) 요소·카피 텔 — [ANTI-TELL-CHECKLIST.md](../gx-design/ANTI-TELL-CHECKLIST.md) 항목을 위반하지 않았는가? 근거 기록 없는 위반은 Major 이상.
 - (코드 렌더) detect 출력이 첨부됐으면 — 실제 확인된 문제의 사용자 영향에 따라 심각도를 판정하고, advisory는 참고한다. CLI 실행 실패는 검증 제약으로 기록하고 수동 점검 근거를 확인한다. 브리프가 의도한 선택을 기계가 지적한 경우 기각 사유가 기록됐는지 확인한다.
 
@@ -70,6 +70,11 @@ UX/UI 진단·검수는 [UI-QUALITY.md](../gx-design/UI-QUALITY.md) §2~4를 읽
 - 장면과 내레이션이 중복되지 않는가?
 - 자막의 가독성과 노출 시간이 적절한가?
 - 러닝타임에 불필요한 장면이 없는가?
+- (모션·영상 — [MOTION.md](../gx-design/MOTION.md) §B) fps가 고정되고 씬 합이 러닝타임과 프레임 단위로 맞는가? (B1)
+- 화면 텍스트마다 등장 후 정지 홀드가 명세·실물에 있는가? (B2)
+- 첫 1~3초에 핵심 메시지 또는 시각 사건이 있는가? (B5)
+- 자막·CTA·로고가 게시 플랫폼의 안전영역 안에 있고, 플랫폼 UI가 덮는 영역을 피했는가? (B6)
+- 렌더 실물이 있으면 컨택트 시트·핵심 구간 프리뷰로 확인했는가? (VISUAL-QUALITY 영상 분기)
 
 ### 제작 가능성
 

@@ -9,7 +9,7 @@ AI 크리에이티브 디렉터가 결정 트리가 빌 때까지 인터뷰하�
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-%EC%86%8C%EA%B0%9C%20%ED%8E%98%EC%9D%B4%EC%A7%80-533afd?style=for-the-badge&logo=github&logoColor=white)](https://bs-koo.github.io/gx-design/)
 
-[빠른 시작](#빠른-시작) • [왜 gx-design인가?](#왜-gx-design인가) • [어떻게 작동하나?](#어떻게-작동하나) • [구성](#구성) • [FAQ](#faq)
+[빠른 시작](#빠른-시작) • [왜 gx-design인가?](#왜-gx-design인가) • [어떻게 작동하나?](#어떻게-작동하나) • [이렇게 시키세요](#이렇게-시키세요) • [구성](#구성) • [FAQ](#faq)
 
 </div>
 
@@ -38,7 +38,16 @@ codex plugin marketplace add bs-koo/gx-design
 codex plugin add gx-design@gx-design
 ```
 
-새 Codex 대화에서 `$gx-design 대학생 캠퍼스 중고거래 서비스 UX/UI` 또는 `$gx-redesign 커머스 앱 화면 개선`처럼 요청합니다. 설치·스킬 수정·재설치 검증은 [두 호스트 유지보수 안내](docs/codex-skill-maintenance.md)를 따릅니다.
+새 Codex 대화에서 `$gx-design 대학생 캠퍼스 중고거래 서비스 UX/UI` 또는 `$gx-redesign 커머스 앱 화면 개선`처럼 요청합니다. `$` 호출이 안정적인 진입 방법입니다. 설치·스킬 수정·재설치 검증은 [두 호스트 유지보수 안내](docs/codex-skill-maintenance.md)를 따릅니다.
+
+Codex 호출 예:
+
+```text
+$gx-design 의류 쇼핑몰 가을 신상 랜딩
+$gx-redesign 지금 페이지 애니메이션만 점검해줘
+```
+
+실제 화면 점검에는 URL 또는 화면 파일이 필요하며, 브라우저 실행 검증은 Playwright MCP가 연결된 경우에만 수행합니다.
 
 슬래시 커맨드 없이 자연어로 "○○ 브랜드 만들어줘", "○○ 화면 리뉴얼하고 싶어"라고 해도 신규 제작/기존 개선을 판별해 해당 워크플로가 자동으로 시작됩니다.
 
@@ -93,6 +102,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 
 - **전체 모드**: 리서치 축, 전략 3안, 2축 독립 검수 — 산출물 범위가 넓은 프로젝트용.
 - **핵심 모드**: 인터뷰 1라운드, 리서치·전략·검수 경량화(승인 게이트는 동일 유지) — 단일 산출물·빠른 진행용.
+- **점검 전용**(gx-redesign): 요청에 "점검"·"점검만"·"감사"·"audit"·"고치지 말고"·"테스트만" 같은 키워드가 명확히 있으면 점검 전용으로 시작하고, 그 외에는 범위를 추측하지 않고 첫 질문 묶음에서 진행 모드와 함께 범위(리디자인 / 점검 전용)를 묻습니다. 점검 전용은 고치지 않고 진단 보고까지만 진행합니다. 경량 개선 브리프(점검 대상: 시각·UX / 모션 / AI 티 / 실행 여정, 대상 화면·URL, 기기) 승인 → 진단 → 보고 순서이고, 보고 뒤 **이어가기 게이트**에서 여기서 종료 / 이어서 리디자인(진단 재사용) / 지적 항목만 바로 수정(polish) 중 고릅니다. 전체·핵심 모드와 별개 축이라 함께 쓸 수 있습니다.
 - Claude Code의 슬래시 명령, Codex의 `$gx-design` 요청, 또는 첫 질문에서 선택한다.
 
 ### 브리프 인터뷰는 이렇게 묻습니다
@@ -103,12 +113,80 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 - 질문 총량 제한은 없습니다(전체 모드 기준). 지겨우면 **"그만, 진행해"** — 남은 결정은 [가정]으로 표기하고 진행합니다.
 - 사용자 승인이 필요한 지점은 **브리프 승인**과 **전략 선택** 두 곳입니다.
 
+## 이렇게 시키세요
+
+한 줄이어도 시작은 됩니다. 다만 아래 다섯 칸을 채울수록 인터뷰가 짧아지고 첫 결과가 덜 뻔해집니다.
+
+```
+[무엇을] + [누구·목적] + [뻔한 X 말고 Y처럼] + [기준 자료: DESIGN.md·레퍼런스] + [범위·기기]
+```
+
+- 다 채울 필요는 없습니다. 첫 라운드 전에 요청을 이 다섯 칸으로 펼친 **요청 해석 카드**(채운 칸 ✓, 빈 칸 ?)를 보여 주고, 빈 칸 중 지금 정해야 하는 것만 묻습니다. 요청을 다시 써 오라고 돌려보내지 않습니다.
+- **"뻔한 X 말고"** 가 가장 효과가 큽니다. 크림+세리프, 다크+형광, AI 보라 그라데이션, 중앙 정렬 히어로처럼 AI가 몰리는 룩을 하나 찍어 두면, 그 칸은 묻지 않고 바로 피합니다.
+- 기준 자료가 없으면 [designmd.co](https://www.designmd.co/)나 [awesome-design-md](https://github.com/VoltAgent/awesome-design-md)에서 DESIGN.md를 골라 첨부해도 됩니다.
+
+아래 예시는 Claude Code 슬래시 명령입니다. Codex에서는 앞의 명령만 `$gx-design` / `$gx-redesign`으로 바꾸고 같은 문장을 씁니다.
+
+**1. 신규 UI — 랜딩 페이지**
+
+```
+/gx-design:gx-design 사내 협업툴 소개 랜딩 페이지. 도입을 검토하는 IT 팀장이 대상이고 목표는 도입 문의. 뻔한 보라 그라데이션 히어로 말고 실제 제품 화면이 주인공인 절제된 구성으로. 첨부한 DESIGN.md 톤 유지, 데스크톱·모바일 둘 다.
+```
+
+Codex: `$gx-design 사내 협업툴 소개 랜딩 페이지. …` — 전략 3안마다 VARIANCE·MOTION·DENSITY 다이얼 값이 표기되고, 안을 고르면 다이얼도 확정됩니다.
+
+**2. 점검 전용 — 모션 점검 (전/후/이유 표)**
+
+```
+/gx-design:gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 굼뜨고 어색해. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 대상 http://localhost:3000/onboarding, 모바일 기준.
+```
+
+Codex: `$gx-redesign 점검만. 우리 앱 온보딩 화면의 모션이 …` — [MOTION.md](skills/gx-design/MOTION.md) §A 기준으로 진단하고 `요소·위치 | Before | After | Why` 표로 보고합니다. 그다음 이어가기 게이트에서 종료·리디자인·바로 수정 중 고릅니다.
+
+**3. 점검 전용 — 모바일 여정 테스트**
+
+```
+/gx-design:gx-redesign 점검만. 쇼핑몰 메인 → 상품 상세 → 장바구니 여정을 모바일(375×812)에서 직접 눌러 보고 막히는 곳을 찾아줘. 대상 https://shop.example.com
+```
+
+Codex: `$gx-redesign 점검만. 쇼핑몰 메인 → 상품 상세 → 장바구니 여정을 …` — Playwright MCP가 있으면 실제로 클릭하며 콘솔 오류까지 실행 검증 로그에 남깁니다. 없으면 설치 방법을 한 번 안내하고, 확인하지 못한 범위는 미검증으로 표시합니다.
+
+**4. BX — 브랜드 아이덴티티**
+
+```
+/gx-design:gx-design 동네 베이커리 브랜드 BX. 출근길 30대 직장인 단골 확보가 목적. 뻔한 크림+세리프 감성 말고 갓 구운 빵처럼 따뜻하고 경쾌한 톤으로. 로고·패키지·간판까지.
+```
+
+Codex: `$gx-design 동네 베이커리 브랜드 BX. …`
+
+**5. 숏폼 영상 — 모션 그래픽**
+
+```
+/gx-design:gx-design 신규 앱 런칭 15초 Instagram Reels. 20대 대상, 목표는 앱 설치. 뻔한 다크+형광 테크 연출 말고 손글씨 키네틱 타이포처럼. 세로 9:16, 30fps.
+```
+
+Codex: `$gx-design 신규 앱 런칭 15초 Instagram Reels. …` — 영상은 UI와 다른 규칙(MOTION.md §B)을 씁니다. 씬 길이를 초(프레임)로 검산하고, 텍스트 홀드·전환 체계·플랫폼 안전영역을 명세에 적습니다.
+
+### 디자인 스킬 5개를 따로 설치하지 않아도
+
+"디자인 잘하려면 이 스킬 5개를 깔아라"는 조합의 핵심 규칙을 gx-design 단계 안에 우리 문장으로 재서술해 넣었습니다. 외부 스킬이 없어도 동작하고, Playwright MCP처럼 실행 도구가 필요한 것만 설치돼 있으면 더 정확해집니다.
+
+| 스킬 | gx-design에서 맡는 곳 | 출처 · 라이선스 |
+|---|---|---|
+| DESIGN.md | 단계 0 디자인 톤 기준 — 팔레트·타이포·톤을 전략부터 검수까지 구속, awesome-design-md 9절 포맷 매핑 ([DESIGN-TONE-ANCHOR.md](skills/gx-design/DESIGN-TONE-ANCHOR.md)) | [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) · MIT |
+| taste | 전략 단계 다이얼 VARIANCE·MOTION·DENSITY 1~10 + 프리미엄 프리셋(선택) ([VISUAL-CRAFT.md](skills/gx-design/VISUAL-CRAFT.md)) | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (taste-skill-v2-experimental · high-end-visual-design) · MIT |
+| impeccable audit·polish | 진단 = audit(읽기 전용), 수정 회차 = polish 패스, detect CLI 선택 실행 ([VISUAL-QUALITY.md](skills/gx-design/VISUAL-QUALITY.md) · [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)) | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) · Apache-2.0 |
+| emil-design-eng | UI 인터랙션 모션 규칙 — 빈도·이징·지속시간·press·reduced-motion ([MOTION.md](skills/gx-design/MOTION.md) §A) | [emilkowalski/skills](https://github.com/emilkowalski/skills) · MIT |
+| Playwright MCP | 핵심 여정 실행 검증 — 모바일·데스크톱 실제 클릭, 콘솔 오류 수집(가용 시, 자동 설치 없음) ([VISUAL-QUALITY.md](skills/gx-design/VISUAL-QUALITY.md)) | [microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) · Apache-2.0 |
+
+영상·모션 그래픽 규칙(MOTION.md §B — 프레임 단위 검산, 가독 홀드, 전환 체계, 안전영역)은 위 스킬에 없는 gx-design 자체 규칙입니다.
+
 ## 구성
 
 | 종류 | 이름 | 역할 |
 |---|---|---|
 | 스킬 | `gx-design` | 신규 디자인 진입점: 브리프 인터뷰 게이트 + 5단계 파이프라인 지휘 |
-| 스킬 | `gx-redesign` | 기존 디자인 개선 진입점: 자산 인벤토리 → 진단(Audit) → 개선 파이프라인 지휘 |
+| 스킬 | `gx-redesign` | 기존 디자인 개선 진입점: 자산 인벤토리 → 진단(Audit) → 개선 파이프라인 지휘, 점검 전용 모드 |
 | 스킬 | `design-research` | 리서치 방법론과 역할·산출물 계약 |
 | 스킬 | `design-strategy` | 전략 방법론과 역할·산출물 계약 |
 | 스킬 | `creative-production` | 제작 방법론과 역할·산출물 계약 |
@@ -120,7 +198,7 @@ BX든 화면이든 영상이든 실무는 Research → Strategy → Production �
 Codex는 위 Claude 에이전트 파일의 모델·스킬 자동 주입을 전제하지 않습니다. 사용 가능한 위임 도구와 프로젝트 지시에 따라 역할을 맡기거나 주 에이전트가 수행합니다.
 
 상세 절차는 참조 파일로 분리되어 있습니다:
-`gx-design/` — BRIEF-INTERVIEW.md(인터뷰 게이트) · DESIGN-IT-TWICE.md(전략 3안 병렬) · REVIEW-AXES.md(2·3축 독립 검수) · PRODUCTION-HANDOFF.md(실물 제작 게이트) · PROMPT-PLAYBOOK.md(생성형 이미지·영상 프롬프트 규격) · VISUAL-QUALITY.md(코드 렌더링 시각 품질 루프) · DESIGN-TONE-ANCHOR.md(디자인 톤 기준 파일 처리) · VISUAL-CRAFT.md(안티-슬롭·톤 다이얼·모션 크래프트 규칙) · REFERENCE-DRIVEN.md(레퍼런스 구동 생성 — 근접도 다이얼·저작권 가드레일) · ANTI-TELL-CHECKLIST.md(요소·카피·구조 AI-티 점검표)
+`gx-design/` — BRIEF-INTERVIEW.md(인터뷰 게이트) · DESIGN-IT-TWICE.md(전략 3안 병렬) · REVIEW-AXES.md(2·3축 독립 검수) · PRODUCTION-HANDOFF.md(실물 제작 게이트) · PROMPT-PLAYBOOK.md(생성형 이미지·영상 프롬프트 규격) · VISUAL-QUALITY.md(코드 렌더링 시각 품질 루프) · DESIGN-TONE-ANCHOR.md(디자인 톤 기준 파일 처리) · VISUAL-CRAFT.md(안티-슬롭·VARIANCE·MOTION·DENSITY 다이얼·프리미엄 프리셋) · MOTION.md(모션 규칙 — §A UI 인터랙션 / §B 모션 그래픽·영상 / §C 모션 점검 표) · REFERENCE-DRIVEN.md(레퍼런스 구동 생성 — 근접도 다이얼·저작권 가드레일) · ANTI-TELL-CHECKLIST.md(요소·카피·구조 AI-티 점검표)
 `gx-redesign/` — REDESIGN-INTERVIEW.md(자산 인벤토리 + 개선 인터뷰)
 
 UX/UI 작업에는 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)(화면 목적·진단·문구·예외 상태)를 연결하고, 자료 검색이 필요하면 [DESIGN-INTELLIGENCE.md](skills/gx-design/DESIGN-INTELLIGENCE.md)(선택적 UI UX Pro Max 검색·결과 검증)를 읽습니다.
@@ -138,7 +216,10 @@ UX/UI 작업에는 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)(화면 목적
 /gx-design:gx-design 신제품 런칭 캠페인 키 비주얼과 SNS 그래픽
 /gx-design:gx-design 서비스 소개 30초 Instagram Reels 영상
 /gx-design:gx-redesign 사내 그룹웨어 대시보드 UX 리뉴얼
+/gx-design:gx-redesign 점검만 — 결제 화면 모션과 모바일 결제 여정
 ```
+
+요청을 더 구체적으로 쓰는 방법은 [이렇게 시키세요](#이렇게-시키세요)에 있습니다.
 
 ## 설치 확인
 
@@ -167,7 +248,7 @@ Codex에서는 `codex plugin list`로 설치를 확인하고 새 대화의 스�
 `DESIGN.md`나 브랜드 가이드·팔레트 파일을 브리프 단계에서 첨부하세요. 첨부한 **디자인 톤 기준**의 팔레트·타이포·톤을 전략부터 검수까지 강제로 지킵니다(자신의 브랜드 = 구속, 참고 예시 = soft). 값은 제작 명세와 Gemini 프롬프트에 그대로 반영되고, 검수 축이 이탈을 잡습니다. 톤 기준이 없으면 이 단계에서 새로 정하며, [designmd.co](https://www.designmd.co/) 같은 DESIGN.md 카탈로그에서 골라 첨부해도 됩니다 — 외부 도구를 자동 연동하지 않고 첨부만 받습니다.
 
 **Q. 결과가 'AI가 만든 티' 안 나게 하려면?**
-UI·그래픽·코드 렌더 산출물에는 **VISUAL-CRAFT 규칙**이 제작·검수 단계에서 적용됩니다 — AI가 몰리는 기본 룩 4종을 회피하고, accent·radius·라이트/다크를 하나로 잠그며, 모션은 transform·opacity 중심 60fps로 절제하고, 대담함은 시그니처 한 곳에 모읍니다. Anthropic 공식 frontend-design 원칙 + taste·animate·impeccable 커뮤니티 스킬의 구체 규칙을 선택 재서술로 흡수한 것으로, **외부 스킬 설치는 필요 없습니다.** 레퍼런스 이미지를 참고해 생성할 때는 REFERENCE-DRIVEN 규칙이 워드마크·letterform·유명 시그니처의 그대로 재현을 막습니다(참고는 하되 베끼지 않음). 요소 단위 티(side-tab 보더·그래디언트 텍스트·가짜 생동감)와 카피 티(제네릭 인명·필러 동사)는 ANTI-TELL-CHECKLIST가 제작·검수에서 점검하고, 코드 렌더 산출물은 impeccable detect CLI가 가용하면 기계 검사로 보강합니다(설치 불필요 — npx 1회 실행, 미가용 시 수동 점검).
+UI·그래픽·코드 렌더 산출물에는 **VISUAL-CRAFT 규칙**이 제작·검수 단계에서 적용됩니다 — AI가 몰리는 기본 룩 4종을 회피하고, accent·radius·라이트/다크를 하나로 잠그며, 모션은 [MOTION.md](skills/gx-design/MOTION.md) 기준(UI는 빈도·이징·지속시간, 영상은 프레임·안전영역)으로 절제하고, 대담함은 시그니처 한 곳에 모읍니다. Anthropic 공식 frontend-design 원칙 + taste·animate·impeccable 커뮤니티 스킬의 구체 규칙을 선택 재서술로 흡수한 것으로, **외부 스킬 설치는 필요 없습니다.** 레퍼런스 이미지를 참고해 생성할 때는 REFERENCE-DRIVEN 규칙이 워드마크·letterform·유명 시그니처의 그대로 재현을 막습니다(참고는 하되 베끼지 않음). 요소 단위 티(side-tab 보더·그래디언트 텍스트·가짜 생동감)와 카피 티(제네릭 인명·필러 동사)는 ANTI-TELL-CHECKLIST가 제작·검수에서 점검하고, 코드 렌더 산출물은 impeccable detect CLI가 가용하면 기계 검사로 보강합니다(설치 불필요 — npx 1회 실행, 미가용 시 수동 점검).
 
 **Q. Impeccable·UI UX Pro Max도 활용하나요?**
 Impeccable의 화면 목적 분류, 시각·UX 비평과 구현 점검 구분, UX 문구·예외 상태 처리 방법을 [UI-QUALITY.md](skills/gx-design/UI-QUALITY.md)에 재구성했습니다. 업무 화면·소개 페이지·문서·포트폴리오를 서로 다른 성공 기준으로 브리프부터 검수까지 다룹니다. 이 규칙은 외부 스킬 설치 없이 동작합니다.
@@ -227,7 +308,7 @@ Codex 수정 반영: `.codex-plugin/plugin.json`의 기본 버전을 Claude 매�
 - Claude Code의 이름 붙은 에이전트 및 frontmatter 자동 로드는 Claude Code 경로에만 적용됩니다.
 - 선택 연동 — 있으면 더 강해집니다:
   - pencil MCP: .pen 디자인 파일 열람·시안 제작
-  - Playwright MCP: 배포 화면 캡처, 프로토타입 실행 확인
+  - Playwright MCP: 배포 화면 캡처, 프로토타입 실행 확인, 핵심 여정 클릭 검증 (Codex CLI: `codex mcp add playwright -- npx @playwright/mcp@latest`; 설정 후 재시작. Windows에서 `npx`가 해석되지 않으면 `npx.cmd` 사용. Claude Code: `claude mcp add playwright npx @playwright/mcp@latest`)
   - frontend-design 스킬(공식): UI 프로토타입 품질
   - UI UX Pro Max 스킬 + Python 3: 디자인 후보와 UX·기술 스택 지침의 로컬 검색(자동 설치 없음)
 

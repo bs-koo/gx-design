@@ -1,6 +1,6 @@
 {
   "name": "gx-design",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "\uB514\uC790\uC778 \uBA40\uD2F0\uC5D0\uC774\uC804\uD2B8 \uD300 \u2014 \uBE0C\uB9AC\uD504 \uC778\uD130\uBDF0 \uAC8C\uC774\uD2B8\uC640 Research \u2192 Strategy \u2192 Production \u2192 Review \u2192 \uC2E4\uBB3C \uC81C\uC791(\uCF54\uB4DC \uB80C\uB354\uB9C1\u00B7Gemini \uD504\uB86C\uD504\uD2B8) \uD30C\uC774\uD504\uB77C\uC778\uC73C\uB85C BX\u00B7\uADF8\uB798\uD53D\u00B7UX/UI\u00B7\uC601\uC0C1 \uC0B0\uCD9C\uBB3C\uC744 \uC81C\uC791. DESIGN.md \uB4F1 \uB514\uC790\uC778 \uD1A4 \uAE30\uC900 \uCCA8\uBD80 \uC2DC \uD314\uB808\uD2B8\u00B7\uD0C0\uC774\uD3EC\u00B7\uD1A4\uC744 \uC804 \uB2E8\uACC4\uC5D0 \uBC18\uC601",
   "author": {
     "name": "\uAD6C\uBCF8\uC2B9"
@@ -13,6 +13,6 @@
     "developerName": "\uAD6C\uBCF8\uC2B9",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
-    "defaultPrompt": "Help me research, plan, produce, or review a design deliverable."
+    "defaultPrompt": "새 디자인은 $gx-design <요청>, 기존 디자인 개선·점검·감사·테스트는 $gx-redesign <요청>으로 시작하세요. 예: $gx-design 의류 쇼핑몰 가을 신상 랜딩 / $gx-redesign 지금 페이지 애니메이션만 점검해줘"
   }
 }
