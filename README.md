@@ -38,7 +38,16 @@ codex plugin marketplace add bs-koo/gx-design
 codex plugin add gx-design@gx-design
 ```
 
-새 Codex 대화에서 `$gx-design 대학생 캠퍼스 중고거래 서비스 UX/UI` 또는 `$gx-redesign 커머스 앱 화면 개선`처럼 요청합니다. 설치·스킬 수정·재설치 검증은 [두 호스트 유지보수 안내](docs/codex-skill-maintenance.md)를 따릅니다.
+새 Codex 대화에서 `$gx-design 대학생 캠퍼스 중고거래 서비스 UX/UI` 또는 `$gx-redesign 커머스 앱 화면 개선`처럼 요청합니다. `$` 호출이 안정적인 진입 방법입니다. 설치·스킬 수정·재설치 검증은 [두 호스트 유지보수 안내](docs/codex-skill-maintenance.md)를 따릅니다.
+
+Codex 호출 예:
+
+```text
+$gx-design 의류 쇼핑몰 가을 신상 랜딩
+$gx-redesign 지금 페이지 애니메이션만 점검해줘
+```
+
+실제 화면 점검에는 URL 또는 화면 파일이 필요하며, 브라우저 실행 검증은 Playwright MCP가 연결된 경우에만 수행합니다.
 
 슬래시 커맨드 없이 자연어로 "○○ 브랜드 만들어줘", "○○ 화면 리뉴얼하고 싶어"라고 해도 신규 제작/기존 개선을 판별해 해당 워크플로가 자동으로 시작됩니다.
 
@@ -299,7 +308,7 @@ Codex 수정 반영: `.codex-plugin/plugin.json`의 기본 버전을 Claude 매�
 - Claude Code의 이름 붙은 에이전트 및 frontmatter 자동 로드는 Claude Code 경로에만 적용됩니다.
 - 선택 연동 — 있으면 더 강해집니다:
   - pencil MCP: .pen 디자인 파일 열람·시안 제작
-  - Playwright MCP: 배포 화면 캡처, 프로토타입 실행 확인, 핵심 여정 클릭 검증 (Claude Code: `claude mcp add playwright npx @playwright/mcp@latest`, Codex: 호스트의 MCP 설정 방법)
+  - Playwright MCP: 배포 화면 캡처, 프로토타입 실행 확인, 핵심 여정 클릭 검증 (Codex CLI: `codex mcp add playwright -- npx @playwright/mcp@latest`; 설정 후 재시작. Windows에서 `npx`가 해석되지 않으면 `npx.cmd` 사용. Claude Code: `claude mcp add playwright npx @playwright/mcp@latest`)
   - frontend-design 스킬(공식): UI 프로토타입 품질
   - UI UX Pro Max 스킬 + Python 3: 디자인 후보와 UX·기술 스택 지침의 로컬 검색(자동 설치 없음)
 

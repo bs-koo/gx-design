@@ -80,6 +80,25 @@ class MotionDeliveryTests(unittest.TestCase):
         self.assertLess(ui, video)
         self.assertLess(video, review)
 
+    def test_flow_contracts_for_join_points_questions_and_codex_entry(self) -> None:
+        redesign = read_doc("skills/gx-redesign/SKILL.md")
+        self.assertIn("선택지 | 합류 단계 | 재사용 산출물 | 새로 필요한 산출물·게이트", redesign)
+        self.assertIn("여기서 종료", redesign)
+        self.assertIn("고치지 말고", redesign)
+
+        brief = read_doc("skills/gx-design/BRIEF-INTERVIEW.md")
+        self.assertRegex(brief, r"핵심 여정.{0,200}\[가정\]")
+        self.assertIn("피할 것", brief)
+        self.assertIn("톤 기준 첨부", brief)
+
+        self.assertIn("마케팅 페이지의 스크롤 연출", read_doc("skills/gx-design/MOTION.md"))
+        self.assertIn("마케팅 페이지의 스크롤 연출", read_doc("skills/gx-design/VISUAL-CRAFT.md"))
+        self.assertIn("1A, 2C", read_doc("skills/gx-design/HOST-COMPAT.md"))
+        manifest = json.loads(read_doc(".codex-plugin/plugin.json"))
+        default_prompt = manifest["interface"]["defaultPrompt"]
+        self.assertIn("$gx-design", default_prompt)
+        self.assertIn("$gx-redesign", default_prompt)
+
 
 class ActiveSkillHostCompatTests(unittest.TestCase):
     FORBIDDEN = ("AskUserQuestion", "multiSelect", "preview를 쓴다", "WebSearch")

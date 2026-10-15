@@ -14,6 +14,11 @@ UX/UI 방법론은 [UI-QUALITY.md](../skills/gx-design/UI-QUALITY.md)의 화면 
 
 ## 자동 검증
 
+### Codex 사용성 점검
+
+- 스킬 description에 한국어 트리거 문구가 있고, 기본 프롬프트에 `$gx-design`·`$gx-redesign` 호출 예가 있는지 확인합니다.
+- 질문이 번호가 있는 Markdown으로 렌더링되고 `1A, 2C` 답변 형식과 복수 선택·자유 응답 안내가 있는지 확인합니다.
+
 저장소 루트에서 다음을 실행합니다. 검증기는 설치된 plugin-creator 스킬의 경로를 사용합니다.
 
 ```powershell

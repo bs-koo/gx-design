@@ -57,7 +57,7 @@
 UI 코드 산출물인데 브라우저 자동화 도구가 없으면 렌더 PNG 열기·수동 확인으로 폴백하되, 설치 방법을 **세션당 1회** 안내한다. 자동 설치하지 않는다.
 
 - Claude Code: `claude mcp add playwright npx @playwright/mcp@latest`
-- Codex: 호스트의 MCP 서버 설정 방법으로 같은 패키지(`@playwright/mcp@latest`)를 등록한다.
+- Codex CLI: `codex mcp add playwright -- npx @playwright/mcp@latest`를 실행한 뒤 Codex를 재시작한다. Windows에서 `npx`가 해석되지 않으면 `npx.cmd`를 사용한다.
 
 ## detect 선택 게이트 (선택 — 코드 렌더 산출물만)
 

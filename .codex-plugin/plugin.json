@@ -13,6 +13,6 @@
     "developerName": "\uAD6C\uBCF8\uC2B9",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
-    "defaultPrompt": "Help me research, plan, produce, or review a design deliverable."
+    "defaultPrompt": "새 디자인은 $gx-design <요청>, 기존 디자인 개선·점검·감사·테스트는 $gx-redesign <요청>으로 시작하세요. 예: $gx-design 의류 쇼핑몰 가을 신상 랜딩 / $gx-redesign 지금 페이지 애니메이션만 점검해줘"
   }
 }
