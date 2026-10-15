@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_VERSION = "0.12.0"
+TARGET_VERSION = "0.12.1"
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
@@ -101,7 +101,7 @@ class MotionDeliveryTests(unittest.TestCase):
 
 
 class ReadFailureAndSlotContractTests(unittest.TestCase):
-    SLOT_TABLE_HEADER = "| 흐름 | 전체 모드 | 핵심 모드 |"
+    SLOT_TABLE_HEADER = "| 흐름 | 라운드 | 첫 라운드 슬롯 우선순위 |"
 
     def test_host_compat_defines_read_failure_and_slot_table(self) -> None:
         host = read_doc("skills/gx-design/HOST-COMPAT.md")
