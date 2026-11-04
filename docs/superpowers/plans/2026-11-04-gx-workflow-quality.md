@@ -86,3 +86,18 @@
 The user additionally requested reducing long, heavy default execution while this implementation was active. Add core-by-default routing, progressive target-only discovery, unchanged-reference reuse, core recommendation1 plus comparison1 only if useful (explicit counts/full preserved), one orchestrator for small work, risk-based batched evidence, compact logs and runtime measurement. Required intent/wait/final criteria stay unchanged; no claimed wall-time speedup without matched real runs. Browser integration is opt-in so normal unit checks remain fast.
 
 PR: https://github.com/bs-koo/gx-design/pull/18
+
+## Follow-up hardening approved in chat
+
+The user approved all findings and usability recommendations from the additional edge-case review. Update the existing PR; retain version 0.14.0 until this unreleased PR is merged.
+
+- [x] Evaluation owner: reject escaping fixture/result paths before writes; terminate and await the complete process tree on timeout; preserve scored waiting/stopped outcomes separately from successful cost averages; preserve observed usage when later keys are absent. Add executable regression cases, including resume identity changes.
+- [x] Observation owner: fix error descriptions through initial/invalid/recovered form states; expose effective opacity and preserve the capture budget for visible elements; bound browser connections and clean up child processes after failure or termination.
+- [x] Workflow owner: reconcile brand preservation, partial-polish records, requested devices and actual candidate counts; clarify first versus repeated rejection, concise questions, independent task switching and available deliverables. Extend only missing dialogue acceptance cases.
+- [x] Root: add an optional reviewed timing report for first useful turn and rework; distinguish CLI active time from human waiting and total elapsed time. No mandatory product-user instrumentation.
+- [x] Root: run independent, isolated model forward checks for unanswered/partial/cancelled decisions, task switching and targeted fixes; record actual outcomes and limits without claiming a production benchmark.
+- [ ] Root: review changes, run the full deterministic and explicit Chrome suites, validate packaging and dry-runs, update validation evidence, commit and push to PR #18. Do not merge or deploy.
+
+Ownership: evaluation worker owns evals/run_eval.py, evals/score.py, eval tests and the existing eval README; observation worker owns the example/observer/browser tests and observation reference; workflow worker owns skill Markdown except that reference and dialogue fixtures; root owns the optional benchmark module/tests, plans, evidence and PR integration. Shared files are coordinated before edits.
+
+Independent code review additionally reproduced Python 3.10 junction traversal and normal CLI exits being misclassified as timeouts when a child inherited its output pipes. Both failed regression cases were added, fixed, and independently retested. The final Windows suite executes 178 tests, including 13 browser/transport tests, with no failures or skips. See the validation report for the five isolated model samples and the explicit platform/benchmark limits.

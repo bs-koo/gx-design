@@ -22,12 +22,15 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import re
 import shutil
+import signal
+import stat
 import subprocess
 import sys
 import time
 import uuid
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Iterable
 
 EVALS_DIR = Path(__file__).resolve().parent
@@ -66,14 +69,32 @@ class ScenarioError(ValueError):
 
 # ---------------------------------------------------------------- 시나리오
 
+def relative_fixture_path(value: Any, label: str) -> Path:
+    """Accept portable relative paths, never drives, roots, or parent traversal."""
+    if not isinstance(value, str) or not value.strip() or "\0" in value:
+        raise ScenarioError(f"{label}: nonempty relative path required")
+    windows = PureWindowsPath(value)
+    portable = PurePosixPath(value.replace("\\", "/"))
+    if windows.drive or windows.root or portable.is_absolute() or ".." in portable.parts:
+        raise ScenarioError(f"{label}: absolute paths and parent traversal are forbidden")
+    return Path(*portable.parts)
+
+
+def validate_scenario_id(value: Any) -> None:
+    reserved = {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"}
+    reserved.update(f"{prefix}{number}" for prefix in ("COM", "LPT") for number in range(1, 10))
+    if (not isinstance(value, str) or not re.fullmatch(r"[\w-][\w.-]*", value)
+            or value.endswith(".") or value.split(".", 1)[0].upper() in reserved):
+        raise ScenarioError("id must be one safe filename component (letters, numbers, _, -, .)")
+
+
 def validate_scenario(data: Any, source: str = "<scenario>") -> dict:
     if not isinstance(data, dict):
         raise ScenarioError(f"{source}: 최상위는 객체여야 한다")
     missing = [key for key in REQUIRED_KEYS if key not in data and not (key == "answers" and "dialogue" in data)]
     if missing:
         raise ScenarioError(f"{source}: 필수 키 누락 {missing}")
-    if not isinstance(data["id"], str) or not data["id"].strip():
-        raise ScenarioError(f"{source}: id는 비어 있지 않은 문자열")
+    validate_scenario_id(data["id"])
     if data["skill"] not in SKILLS:
         raise ScenarioError(f"{source}: skill은 {SKILLS} 중 하나")
     if not isinstance(data["request"], str) or not data["request"].strip():
@@ -95,6 +116,9 @@ def validate_scenario(data: Any, source: str = "<scenario>") -> dict:
     for fixture in fixtures:
         if not (isinstance(fixture, dict) and isinstance(fixture.get("src"), str)):
             raise ScenarioError(f"{source}: fixture는 {{src, dest?}} 객체")
+        relative_fixture_path(fixture["src"], f"{source}: fixture.src")
+        if "dest" in fixture:
+            relative_fixture_path(fixture["dest"], f"{source}: fixture.dest")
     if "dialogue" in data:
         dialogue = data["dialogue"]
         if not isinstance(dialogue, dict) or type(dialogue.get("version")) is not int or dialogue["version"] != 1:
@@ -430,10 +454,11 @@ def turn_completed_usage(events: Iterable[dict]) -> dict:
 
 def aggregate_turn_usage(usages: list[dict]) -> tuple[list[dict], dict, str]:
     """턴 usage를 누적 또는 합산으로 판정하고 턴별 delta와 최종값을 돌려준다."""
-    cumulative = all(
-        all(value >= previous[key] for key, value in current.items() if key in previous)
-        for previous, current in zip(usages, usages[1:])
-    )
+    cumulative, observed = True, {}
+    for usage in usages:
+        if any(value < observed[key] for key, value in usage.items() if key in observed):
+            cumulative = False
+        observed.update(usage)
     mode = "cumulative" if cumulative else "summed"
     deltas, previous = [], {}
     for usage in usages:
@@ -441,14 +466,26 @@ def aggregate_turn_usage(usages: list[dict]) -> tuple[list[dict], dict, str]:
         for key, value in usage.items():
             delta[key] = value - previous.get(key, 0) if cumulative else value
         deltas.append(delta)
-        previous = usage
-    total = dict(usages[-1]) if usages and cumulative else {}
+        previous.update(usage)
+    total = dict(previous) if cumulative else {}
     if usages and not cumulative:
         for usage in usages:
             merge_counts(total, usage)
     uncached = max(0, total.get("input_tokens", 0) - total.get("cached_input_tokens", 0))
     total["uncached_input_tokens"] = uncached
     return deltas, total, mode
+
+
+def usage_observation_gaps(usages: list[dict]) -> dict:
+    """Missing observations are unknown, not zero; keep the public numeric usage map."""
+    keys = {"input_tokens", "output_tokens"}
+    keys.update(set().union(*(usage.keys() for usage in usages)) if usages else ())
+    missing_turns = [index for index, usage in enumerate(usages, 1) if not usage]
+    missing_keys = [{"turn": index, "keys": sorted(keys - usage.keys())}
+                    for index, usage in enumerate(usages, 1) if keys - usage.keys()]
+    return {"usage_incomplete": bool(missing_turns or missing_keys or not usages),
+            "usage_missing_turns": missing_turns,
+            "usage_missing_keys": missing_keys}
 
 
 def merge_counts(target: dict, extra: dict) -> dict:
@@ -485,17 +522,36 @@ def changed_files(before: dict, after: dict) -> dict:
 
 
 def prepare_workdir(scenario: dict, workdir: Path) -> list[str]:
+    workdir = Path(workdir).resolve()
+    repo_root = REPO_ROOT.resolve()
     if workdir.exists():
         if not workdir.is_dir() or any(workdir.iterdir()):
             raise ScenarioError(f"작업 폴더가 이미 있고 비어 있지 않음: {workdir}")
-    else:
-        workdir.mkdir(parents=True)
-    copied = []
+    # Validate the entire copy plan before mkdir/copy, including symlink resolution.
+    plan = []
     for fixture in scenario.get("fixtures", []):
-        src = (REPO_ROOT / fixture["src"]).resolve()
-        dest = workdir / fixture.get("dest", Path(fixture["src"]).name)
+        if not isinstance(fixture, dict):
+            raise ScenarioError("fixture must be an object")
+        relative_src = relative_fixture_path(fixture.get("src"), "fixture.src")
+        relative_dest = relative_fixture_path(fixture.get("dest", relative_src.name or "."), "fixture.dest")
+        src = contained_path(repo_root, relative_src, "fixture.src")
+        dest = contained_path(workdir, relative_dest, "fixture.dest")
         if not src.exists():
             raise ScenarioError(f"{scenario['id']}: fixture 없음 {fixture['src']}")
+        if src.is_dir():
+            if dest == src or src in dest.parents:
+                raise ScenarioError("fixture destination must not be inside its source")
+            # copytree follows links by default; reject recursive and external links.
+            for child in src.rglob("*"):
+                # Python 3.10 has no Path.is_junction(); lstat exposes Windows
+                # reparse points without following junctions into another tree.
+                reparse = getattr(child.lstat(), "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+                if child.is_symlink() or reparse:
+                    raise ScenarioError(f"directory fixture contains a link: {child}")
+        plan.append((src, dest))
+    workdir.mkdir(parents=True, exist_ok=True)
+    copied = []
+    for src, dest in plan:
         dest.parent.mkdir(parents=True, exist_ok=True)
         if src.is_dir():
             shutil.copytree(src, dest, dirs_exist_ok=True)
@@ -503,6 +559,18 @@ def prepare_workdir(scenario: dict, workdir: Path) -> list[str]:
             shutil.copy2(src, dest)
         copied.append(dest.relative_to(workdir).as_posix())
     return copied
+
+
+def contained_path(root: Path, relative: Path, label: str, *, direct_child: bool = False) -> Path:
+    root = Path(root).resolve()
+    target = (root / relative).resolve()
+    if (target != root and root not in target.parents) or (direct_child and target.parent != root):
+        raise ScenarioError(f"{label}: path escapes {root}")
+    return target
+
+
+def result_path(run_dir: Path, filename: str) -> Path:
+    return contained_path(run_dir, Path(filename), "result", direct_child=True)
 
 
 def validate_workdir(workdir: Path, results_dir: Path, repo_root: Path = REPO_ROOT) -> None:
@@ -522,26 +590,200 @@ def validate_workdir(workdir: Path, results_dir: Path, repo_root: Path = REPO_RO
 
 # ---------------------------------------------------------------- 실행
 
-def _run_turn(cmd: list[str], prompt: str, env: dict, cwd: Path, timeout: int) -> tuple[int, str, str]:
+class _WindowsJob:
+    """An unnamed, non-breakaway Job Object; only constructed on Windows."""
+
+    def __init__(self):
+        import ctypes
+        from ctypes import wintypes
+
+        class BasicLimits(ctypes.Structure):
+            _fields_ = [("process_time", ctypes.c_longlong), ("job_time", ctypes.c_longlong),
+                        ("flags", wintypes.DWORD), ("min_working_set", ctypes.c_size_t),
+                        ("max_working_set", ctypes.c_size_t), ("active_limit", wintypes.DWORD),
+                        ("affinity", ctypes.c_size_t), ("priority", wintypes.DWORD),
+                        ("scheduling", wintypes.DWORD)]
+
+        class ExtendedLimits(ctypes.Structure):
+            _fields_ = [("basic", BasicLimits), ("io_counters", ctypes.c_ulonglong * 6),
+                        ("process_memory", ctypes.c_size_t), ("job_memory", ctypes.c_size_t),
+                        ("peak_process_memory", ctypes.c_size_t), ("peak_job_memory", ctypes.c_size_t)]
+
+        class Accounting(ctypes.Structure):
+            _fields_ = [("times", ctypes.c_longlong * 4), ("page_faults", wintypes.DWORD),
+                        ("total", wintypes.DWORD), ("active", wintypes.DWORD),
+                        ("terminated", wintypes.DWORD)]
+
+        api = ctypes.WinDLL("kernel32", use_last_error=True)
+        declarations = {
+            "CreateJobObjectW": ([ctypes.c_void_p, wintypes.LPCWSTR], wintypes.HANDLE),
+            "SetInformationJobObject": ([wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD], wintypes.BOOL),
+            "QueryInformationJobObject": ([wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p,
+                                           wintypes.DWORD, ctypes.c_void_p], wintypes.BOOL),
+            "AssignProcessToJobObject": ([wintypes.HANDLE, wintypes.HANDLE], wintypes.BOOL),
+            "TerminateJobObject": ([wintypes.HANDLE, wintypes.UINT], wintypes.BOOL),
+            "OpenProcess": ([wintypes.DWORD, wintypes.BOOL, wintypes.DWORD], wintypes.HANDLE),
+            "CloseHandle": ([wintypes.HANDLE], wintypes.BOOL),
+        }
+        for name, (arguments, result) in declarations.items():
+            function = getattr(api, name)
+            function.argtypes, function.restype = arguments, result
+        self.ctypes, self.api, self.Accounting = ctypes, api, Accounting
+        self.handle = api.CreateJobObjectW(None, None)
+        if not self.handle:
+            raise ctypes.WinError(ctypes.get_last_error())
+        limits = ExtendedLimits()
+        limits.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE; no breakaway flags.
+        if not api.SetInformationJobObject(self.handle, 9, ctypes.byref(limits), ctypes.sizeof(limits)):
+            error = ctypes.WinError(ctypes.get_last_error())
+            self.close()
+            raise error
+
+    def assign(self, pid: int) -> None:
+        process = self.api.OpenProcess(0x0101, False, pid)  # PROCESS_SET_QUOTA | PROCESS_TERMINATE
+        if not process:
+            raise self.ctypes.WinError(self.ctypes.get_last_error())
+        try:
+            if not self.api.AssignProcessToJobObject(self.handle, process):
+                raise self.ctypes.WinError(self.ctypes.get_last_error())
+        finally:
+            self.api.CloseHandle(process)
+
+    def terminate(self) -> None:
+        if not self.api.TerminateJobObject(self.handle, 1):
+            raise self.ctypes.WinError(self.ctypes.get_last_error())
+        deadline = time.monotonic() + 10
+        while True:
+            accounting = self.Accounting()
+            if not self.api.QueryInformationJobObject(self.handle, 1, self.ctypes.byref(accounting),
+                                                     self.ctypes.sizeof(accounting), None):
+                raise self.ctypes.WinError(self.ctypes.get_last_error())
+            if accounting.active == 0:
+                return
+            if time.monotonic() >= deadline:
+                raise RuntimeError("Could not confirm termination of the Windows job")
+            time.sleep(.01)
+
+    def close(self) -> None:
+        if self.handle:
+            self.api.CloseHandle(self.handle)
+            self.handle = None
+
+
+# The wrapper cannot launch the actual CLI until its stdin payload arrives, after
+# assignment to the job. This closes the spawn-before-assignment race without
+# undocumented thread APIs. The CLI inherits stdout/stderr unchanged.
+_WINDOWS_TURN_WRAPPER = (
+    "import json,subprocess,sys; p=json.loads(sys.stdin.buffer.read()); "
+    "c=subprocess.Popen(p['cmd'],stdin=subprocess.PIPE,creationflags=subprocess.CREATE_NO_WINDOW); "
+    "c.communicate(p['prompt'].encode('utf-8')); sys.exit(c.returncode)"
+)
+
+
+def _posix_group_running(pgid: int) -> bool:
     try:
-        proc = subprocess.run(cmd, input=prompt.encode("utf-8"), stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE, env=env, cwd=str(cwd), timeout=timeout)
-    except subprocess.TimeoutExpired as exc:
-        out = (exc.stdout or b"").decode("utf-8", "replace")
-        err = (exc.stderr or b"").decode("utf-8", "replace")
-        return -1, out, err + f"\n[timeout after {timeout}s]"
-    return (proc.returncode, proc.stdout.decode("utf-8", "replace"),
-            proc.stderr.decode("utf-8", "replace"))
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    if sys.platform.startswith("linux") and Path("/proc").is_dir():
+        # Dead grandchildren can remain zombies until their new parent reaps them.
+        # They cannot execute or mutate files and must not prevent cleanup forever.
+        for path in Path("/proc").glob("[0-9]*/stat"):
+            try:
+                fields = path.read_text().rsplit(")", 1)[1].split()
+                if int(fields[2]) == pgid and fields[0] not in {"Z", "X"}:
+                    return True
+            except (OSError, ValueError, IndexError):
+                continue
+        return False
+    return True
+
+
+def _terminate_turn_tree(proc: subprocess.Popen, job: _WindowsJob | None) -> None:
+    if job is not None:
+        job.terminate()
+        proc.wait(timeout=10)
+        return
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    proc.wait(timeout=10)
+    deadline = time.monotonic() + 10
+    while _posix_group_running(proc.pid):
+        if time.monotonic() >= deadline:
+            raise RuntimeError("Could not confirm termination of the CLI process group")
+        time.sleep(.01)
+
+
+def _run_turn(cmd: list[str], prompt: str, env: dict, cwd: Path, timeout: int) -> tuple[int, str, str]:
+    job = _WindowsJob() if os.name == "nt" else None
+    proc = None
+    timed_out = False
+    try:
+        command = [sys.executable, "-c", _WINDOWS_TURN_WRAPPER] if job is not None else cmd
+        payload = (json.dumps({"cmd": cmd, "prompt": prompt}).encode("utf-8")
+                   if job is not None else prompt.encode("utf-8"))
+        proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, env=env, cwd=str(cwd),
+                                start_new_session=job is None,
+                                creationflags=subprocess.CREATE_NO_WINDOW if job is not None else 0)
+        if job is not None:
+            job.assign(proc.pid)
+        deadline = time.monotonic() + timeout
+        while True:
+            try:
+                out, err = proc.communicate(payload, timeout=max(0, min(.1, deadline - time.monotonic())))
+                break
+            except subprocess.TimeoutExpired:
+                # communicate() may still await inherited output pipes after the
+                # CLI has exited. Preserve its real status and stop leftover tools.
+                payload = None
+                if proc.poll() is not None:
+                    _terminate_turn_tree(proc, job)
+                    out, err = proc.communicate(timeout=10)
+                    break
+                if time.monotonic() >= deadline:
+                    timed_out = True
+                    _terminate_turn_tree(proc, job)
+                    out, err = proc.communicate(timeout=10)
+                    break
+        returncode = -1 if timed_out else proc.returncode
+    finally:
+        try:
+            if proc is not None:
+                if job is not None and proc.poll() is None:
+                    # Also covers assignment failure: the wrapper still has no payload.
+                    proc.kill()
+                _terminate_turn_tree(proc, job)
+                for pipe in (proc.stdin, proc.stdout, proc.stderr):
+                    if pipe is not None:
+                        pipe.close()
+        finally:
+            if job is not None:
+                job.close()
+    stderr = err.decode("utf-8", "replace")
+    if timed_out:
+        stderr += f"\n[timeout after {timeout}s; process tree terminated]"
+    return returncode, out.decode("utf-8", "replace"), stderr
 
 
 def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: Path) -> dict:
     scenario = validate_scenario(scenario)
+    if mode not in MODES:
+        raise ScenarioError(f"invalid execution mode: {mode}")
+    run_dir = Path(run_dir).resolve()
     name = f"{scenario['id']}-{mode}"
     base = Path(args.workdir).resolve() if args.workdir else run_dir / "work"
     workdir = base / name
     max_turns = min(scenario["max_turns"], args.max_turns) if args.max_turns else scenario["max_turns"]
     prompt = build_initial_prompt(scenario, mode)
     checkpoints = scenario.get("dialogue", {}).get("checkpoints", [])
+    out_path = result_path(run_dir, f"{name}.json")
+    raw_log = result_path(run_dir, f"{name}.events.jsonl")
+    # Check all planned outputs before creating the workdir or dispatching work.
+    last_files = [result_path(run_dir, f"{name}.turn{index}.last.md")
+                  for index in range(1, max_turns + 1)]
 
     env = os.environ.copy()
     if args.codex_home:
@@ -551,7 +793,7 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         print(f"# {name}  (workdir: {workdir}, turns ≤ {max_turns})")
         if args.codex_home:
             print(f"#   CODEX_HOME={env['CODEX_HOME']}")
-        cmd = build_start_command(args.codex_bin, workdir, args.sandbox, run_dir / f"{name}.turn1.last.md")
+        cmd = build_start_command(args.codex_bin, workdir, args.sandbox, last_files[0])
         print("  $ " + " ".join(cmd))
         print("    stdin: " + prompt.replace("\n", " / "))
         print(f"    evaluator protocol: {PROTOCOL}; fresh nonce required each turn")
@@ -566,7 +808,6 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
     validate_workdir(workdir, Path(args.results_dir))
     fixtures = prepare_workdir(scenario, workdir)
     before = snapshot(workdir)
-    raw_log = run_dir / f"{name}.events.jsonl"
     turns, per_turn_usages, tools = [], [], {}
     session_id, stop_reason = None, "max_turns"
     cursor = 0
@@ -577,7 +818,7 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         for index in range(1, max_turns + 1):
             nonce = uuid.uuid4().hex
             turn_prompt = protocol_prompt(prompt, nonce, scenario)
-            last_file = run_dir / f"{name}.turn{index}.last.md"
+            last_file = result_path(run_dir, last_files[index - 1].name)
             if index == 1:
                 cmd = build_start_command(args.codex_bin, workdir, args.sandbox, last_file)
             else:
@@ -689,6 +930,7 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         "usage": usage,
         "uncached_input_tokens": usage.get("uncached_input_tokens", 0),
         "usage_mode": usage_mode,
+        **usage_observation_gaps(per_turn_usages),
         "tool_counts": tools,
         "tool_calls": sum(tools.values()),
         "turns": turns,
@@ -702,7 +944,8 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         "codex_home": env.get("CODEX_HOME") if args.codex_home else None,
         "raw_events": raw_log.name,
     }
-    out_path = run_dir / f"{name}.json"
+    # Recheck in case a CLI replaced the output with a link.
+    out_path = result_path(run_dir, f"{name}.json")
     out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[{name}] turns={len(turns)} stop={stop_reason} tool_calls={result['tool_calls']} "
           f"usage={usage} -> {out_path}")

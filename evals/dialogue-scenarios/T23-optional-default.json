@@ -1,0 +1,29 @@
+{
+  "id": "T23",
+  "title": "T23 optional-default",
+  "skill": "gx-redesign",
+  "request": "index.html 신청 폼의 '입력값 오류'만 연락처 형식을 알려주는 쉬운 문장으로 바꿔줘. 그 외 디자인·기능·문구는 유지해. 말투 추가 선호는 선택사항이고, 답이 없으면 현행의 담백한 말투를 유지하면 돼.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "이미 확정된 대상·수정 범위·실행 승인을 재질문하지 않는다.",
+    "선택적 선호를 묻는다면 답이 없을 때 유지할 말투를 간결하게 알린다.",
+    "선택적 선호가 미응답이어도 승인된 한 문장 수정과 관련 검증을 진행한다.",
+    "현행 말투 적용은 제작자 판단 또는 기존 요청의 기준으로 기록하며, 빈 응답을 사용자 승인·위임으로 기록하지 않는다.",
+    "단일 문장 변경에 새 전략 문서·무관한 모바일 여정·전체 재승인을 강제하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {"id": "tone", "type": "optional_preference", "scope_version": "v1"},
+        "response": {"status": "empty", "value": null}
+      }
+    ]
+  },
+  "fixtures": [{"src": "tests/fixtures/eval-ui.html", "dest": "index.html"}],
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Optional questions may be skipped entirely; completion without dispatching this checkpoint is valid if the approved single-item change and evidence meet the expected contract."
+  ]
+}

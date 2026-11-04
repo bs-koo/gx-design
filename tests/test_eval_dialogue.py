@@ -241,9 +241,9 @@ class EvaluationScoreTests(unittest.TestCase):
 
 
 class AcceptanceFixtureTests(unittest.TestCase):
-    def test_all_21_acceptance_cases_are_valid_explicitly_unexecuted(self):
+    def test_all_23_acceptance_cases_are_valid_explicitly_unexecuted(self):
         cases = runner.load_scenarios(ROOT / "evals" / "dialogue-scenarios")
-        self.assertEqual({c["id"] for c in cases}, {f"T{i:02d}" for i in range(1, 22)})
+        self.assertEqual({c["id"] for c in cases}, {f"T{i:02d}" for i in range(1, 24)})
         for case in cases:
             with self.subTest(case=case["id"]):
                 self.assertIn("dialogue", case)

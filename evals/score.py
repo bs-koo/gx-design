@@ -89,6 +89,7 @@ def load_row(result_path: Path) -> dict | None:
         "dialogue": None,
         "artifact": None,
         "eligible_for_success_average": data.get("eligible_for_success_average", True),
+        "usage_incomplete": data.get("usage_incomplete", False),
         "source": str(result_path),
     }
     score_file = score_path_for(Path(result_path))
@@ -137,7 +138,9 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
         eligible = [r for r in group if is_eligible(r)]
         excluded = [r for r in group if not is_eligible(r)]
         n = len(eligible)
-        rubric_rows = [r["rubric"] for r in eligible if r["rubric"]]
+        # Outcome scores are evidence about the run, including correct waiting/stopping
+        # and failed tasks. Only cost averages require a completed run.
+        rubric_rows = [r["rubric"] for r in group if r["rubric"]]
         entry = {
             "scenario": scenario,
             "mode": mode,
@@ -146,6 +149,7 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
             "turns": sum(r["turns"] for r in eligible) / n if n else 0,
             "tool_calls": sum(r["tool_calls"] for r in eligible) / n if n else 0,
             "usage": {key: sum(r["usage"][key] for r in eligible) / n if n else 0 for key in USAGE_COLUMNS},
+            "usage_incomplete_n": sum(r.get("usage_incomplete", False) is True for r in eligible),
             "rubric": None,
         }
         if rubric_rows:
@@ -155,7 +159,7 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
                 "n": len(rubric_rows),
             }
         for dimension in ("dialogue", "artifact"):
-            values = [r[dimension] for r in eligible if r.get(dimension)]
+            values = [r[dimension] for r in group if r.get(dimension)]
             entry[dimension] = ({"got": sum(v["got"] for v in values) / len(values),
                                  "max": sum(v["max"] for v in values) / len(values), "n": len(values)}
                                 if values else None)
@@ -167,17 +171,25 @@ def _fmt(value: float) -> str:
     return f"{value:,.0f}" if float(value).is_integer() else f"{value:,.1f}"
 
 
+def _quality(value: dict | None, include_n: bool = False) -> str:
+    if value is None:
+        return "미채점"
+    suffix = f" (n={value['n']})" if include_n else ""
+    return f"{_fmt(value['got'])}/{_fmt(value['max'])}{suffix}"
+
+
 def format_table(table: list[dict]) -> str:
-    header = ("| 시나리오 | 모드 | 상태 | 채점 표본 수 | 턴 | 입력 토큰 | 캐시 입력 | 미캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 절차(rubric) | 대화 | 실물 |\n"
+    header = ("| 시나리오 | 모드 | 상태 | 완료 비용 표본 수 | 턴 | 입력 토큰 | 캐시 입력 | 미캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 절차(rubric) | 대화 | 실물 |\n"
               "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     lines = [header]
     for entry in table:
         usage = entry["usage"]
         rubric = entry["rubric"]
-        quality = f"{_fmt(rubric['got'])}/{_fmt(rubric['max'])}" if rubric else "미채점"
-        dimensions = [f"{_fmt(entry[d]['got'])}/{_fmt(entry[d]['max'])} (n={entry[d]['n']})"
-                      if entry.get(d) else "미채점" for d in ("dialogue", "artifact")]
+        quality = _quality(rubric, include_n=True)
+        dimensions = [_quality(entry.get(d), include_n=True) for d in ("dialogue", "artifact")]
         status = "평균" if entry["n"] else "평균 제외"
+        if entry.get("usage_incomplete_n"):
+            status += f" (사용량 일부 누락 n={entry['usage_incomplete_n']})"
         lines.append(
             f"| {entry['scenario']} | {entry['mode']} | {status} | {entry['n']} | {_fmt(entry['turns'])} | "
             f"{_fmt(usage['input_tokens'])} | {_fmt(usage['cached_input_tokens'])} | "
@@ -186,9 +198,13 @@ def format_table(table: list[dict]) -> str:
         )
         for excluded in entry["excluded"]:
             status = excluded.get("status", f"제외: {excluded.get('stop_reason', 'unknown')}")
-            lines.append(f"| {entry['scenario']} | {entry['mode']} | {status} | — | — | — | — | — | — | — | — | 미채점 | 미채점 | 미채점 |")
+            qualities = " | ".join(_quality(excluded.get(d)) for d in ("rubric", "dialogue", "artifact"))
+            lines.append(f"| {entry['scenario']} | {entry['mode']} | {status} | — | — | — | — | — | — | — | — | {qualities} |")
     lines.append("")
     lines.append("표본이 작다(n 열). 토큰 0은 호스트가 사용량을 내보내지 않았다는 뜻일 수 있다 — 원본 .events.jsonl을 확인한다.")
+    lines.append("비용 평균은 completed만 포함한다. 절차·대화·실물 점수는 대기·중단·실패 실행의 관측도 포함하며 비용 표본 수와 다를 수 있다.")
+    if any(entry.get("usage_incomplete_n") for entry in table):
+        lines.append("사용량 일부 누락 표본의 토큰은 관측된 값만 보존한 불완전 집계이며, 전체 비용이나 절감 근거로 사용하지 않는다.")
     return "\n".join(lines)
 
 

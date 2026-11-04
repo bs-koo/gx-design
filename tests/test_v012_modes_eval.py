@@ -137,11 +137,6 @@ class SessionIdTests(unittest.TestCase):
         self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started", "thread_id": "fb"}]))
         self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started"}]))
 
-    def test_resume_stream_id_mismatch_is_detected(self) -> None:
-        original, resumed = "thread-1", "thread-2"
-        self.assertNotEqual(original, resumed)
-
-
 class UsageAggregationTests(unittest.TestCase):
     def test_cumulative_turn_usage_uses_last_total_and_deltas(self) -> None:
         samples = [
@@ -317,7 +312,7 @@ class ScoreTests(unittest.TestCase):
         table = score.aggregate(rows)
         self.assertEqual(table[0]["n"], 1)
         self.assertEqual(table[0]["excluded"][0]["stop_reason"], "session_mismatch")
-        self.assertIn("채점 표본 수", score.format_table(table))
+        self.assertIn("완료 비용 표본 수", score.format_table(table))
 
     def test_invalid_scores_file_has_clear_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
