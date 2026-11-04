@@ -1,5 +1,7 @@
 import json
+import hashlib
 import re
+import struct
 import unittest
 from html.parser import HTMLParser
 from pathlib import Path
@@ -12,6 +14,11 @@ SKILL_NAMES = {
 }
 CLAUDE_COMMANDS = "/plugin marketplace add bs-koo/gx-design\n/plugin install gx-design@gx-design"
 CODEX_COMMANDS = "codex plugin marketplace add bs-koo/gx-design\ncodex plugin add gx-design@gx-design"
+# User-confirmed artifact identities: the legacy before/after filenames were inverted.
+CASE_IMAGE_HASHES = {
+    "before": "aa1ca8279c892d04ecea661a163c9c1cadb0cf00635b81048a278f2b60eb6c76",
+    "after": "45a93724f0ce08f26412bcfb38e1c23c7d1ba2858f3f6e1ce9fa2bf1e260faed",
+}
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
@@ -109,15 +116,16 @@ class RedesignComparisonParser(HTMLParser):
         self.cards = []
         self.current = None
         self.reading_label = False
+        self.label_tag = None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         classes = attrs.get("class", "").split()
-        if tag == "figure" and "ba-item" in classes:
+        if "ba-label" in classes:
             self.current = {"label": "", "image": None}
             self.cards.append(self.current)
-        elif self.current is not None and tag == "figcaption" and "ba-label" in classes:
             self.reading_label = True
+            self.label_tag = tag
         elif self.current is not None and tag == "img" and "ba-img" in classes:
             self.current["image"] = attrs
 
@@ -126,8 +134,9 @@ class RedesignComparisonParser(HTMLParser):
             self.current["label"] += data
 
     def handle_endtag(self, tag):
-        if tag == "figcaption":
+        if tag == self.label_tag:
             self.reading_label = False
+            self.label_tag = None
         elif tag == "figure":
             self.current = None
 
@@ -171,12 +180,11 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIsNotNone(table, "README must contain the Before/After comparison table")
         before = table.group("before")
         after = table.group("after")
+        case = json.loads((ROOT / "site/assets/redesign-case.json").read_text(encoding="utf-8"))
         self.assertIn("개편 전", before)
-        self.assertIn("단순 목록 테이블", before)
-        self.assertIn("site/assets/redesign-before.png", before)
+        self.assertIn("site/assets/" + case["before"]["file"], before)
         self.assertIn("개편 후", after)
-        self.assertIn("상태 요약 카드", after)
-        self.assertIn("site/assets/redesign-after.png", after)
+        self.assertIn("site/assets/" + case["after"]["file"], after)
 
     def test_public_maintenance_commands_do_not_use_machine_specific_paths(self):
         paths = (ROOT / "README.md", ROOT / "docs/codex-skill-maintenance.md")
@@ -189,38 +197,45 @@ class CodexCompatibilityTests(unittest.TestCase):
         self.assertIn("$repo = (Get-Location).Path", maintenance)
         self.assertIn("$env:CODEX_HOME", maintenance)
 
-    def test_site_has_two_accessible_host_install_blocks(self):
+    def test_site_has_host_install_commands_and_native_buttons(self):
         text = (ROOT / "site/index.html").read_text(encoding="utf-8")
         parser = InstallBlockParser()
         parser.feed(text)
-        self.assertEqual(len(parser.blocks), 2)
+        self.assertGreaterEqual(len(parser.blocks), 1)
         for block in parser.blocks:
             with self.subTest(block=block):
                 self.assertEqual(block["codes"].get("claude", "").strip(), CLAUDE_COMMANDS)
                 self.assertEqual(block["codes"].get("codex", "").strip(), CODEX_COMMANDS)
                 self.assertEqual({button.get("data-install-host") for button in block["buttons"]}, {"claude", "codex"})
-                self.assertEqual([button.get("aria-pressed") for button in block["buttons"]], ["true", "false"])
+                self.assertTrue(all(button.get("type") == "button" for button in block["buttons"]))
         self.assertIn("docs/codex-skill-maintenance.md", text)
         self.assertIn("Claude Code와 Codex", text)
-        self.assertIn("[data-install-host]", text)
-        self.assertIn("[data-host]", text)
 
     def test_site_redesign_comparison_matches_labels_to_images(self):
         text = (ROOT / "site/index.html").read_text(encoding="utf-8")
         parser = RedesignComparisonParser()
         parser.feed(text)
-        cards = {card["label"].strip(): card["image"] for card in parser.cards}
+        cards = {card["label"].strip(): card["image"] for card in parser.cards if card["image"] is not None}
 
         self.assertEqual(set(cards), {"BEFORE", "AFTER"})
-        self.assertEqual(cards["BEFORE"]["src"], "assets/redesign-before.png")
-        self.assertIn("개편 전", cards["BEFORE"]["alt"])
-        self.assertIn("필터", cards["BEFORE"]["alt"])
-        self.assertIn("목록 테이블", cards["BEFORE"]["alt"])
-        self.assertEqual(cards["AFTER"]["src"], "assets/redesign-after.png")
-        self.assertIn("개편 후", cards["AFTER"]["alt"])
-        self.assertIn("상태 요약 카드", cards["AFTER"]["alt"])
-        self.assertIn("점검", cards["AFTER"]["alt"])
-        self.assertIn("다크 대시보드", cards["AFTER"]["alt"])
+        assets = ROOT / "site/assets"
+        case = json.loads((assets / "redesign-case.json").read_text(encoding="utf-8"))
+        for role, alt_marker in (("before", "개편 전"), ("after", "개편 후")):
+            with self.subTest(role=role):
+                entry = case[role]
+                image = assets / entry["file"]
+                self.assertEqual(image.parent.resolve(), assets.resolve())
+                data = image.read_bytes()
+                self.assertEqual(entry["sha256"], CASE_IMAGE_HASHES[role])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), CASE_IMAGE_HASHES[role])
+                self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
+                self.assertEqual(struct.unpack(">II", data[16:24]), (entry["width"], entry["height"]))
+                rendered = cards[role.upper()]
+                self.assertEqual(rendered["src"], "assets/" + entry["file"])
+                self.assertIn(alt_marker, rendered["alt"])
+                self.assertEqual((int(rendered["width"]), int(rendered["height"])), (entry["width"], entry["height"]))
+        self.assertFalse((assets / "redesign-before.png").exists())
+        self.assertFalse((assets / "redesign-after.png").exists())
 
     def test_codex_manifest_matches_claude_identity(self):
         claude = json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))

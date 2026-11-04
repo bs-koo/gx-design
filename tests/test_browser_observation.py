@@ -1,4 +1,5 @@
 """Exercise the observation helper in a real local headless browser when available."""
+import importlib.util
 import json
 import os
 import shutil
@@ -14,6 +15,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "skills/gx-design/scripts/observe-ui.js"
+
+
+def load_eval_runner():
+    spec = importlib.util.spec_from_file_location("browser_probe_eval_runner", ROOT / "evals/run_eval.py")
+    loaded = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(loaded)
+    return loaded
 
 
 def stop_owned_process_tree(pid):
@@ -59,8 +67,20 @@ def cleanup_browser_profiles(profile_parent):
 
 def run_browser_probe(node, browser, fixture, profile_parent, timeout=55):
     env = dict(os.environ, GX_BROWSER_PROFILE_PARENT=str(profile_parent.resolve()))
+    command = [node, str(ROOT / "tests/browser_probe.cjs"), browser, str(fixture)]
+    if os.name == "nt":
+        # Keep Node and every Chrome descendant in one Job Object. Unlike
+        # taskkill /T, this still tracks children after their parent exits.
+        eval_runner = load_eval_runner()
+        try:
+            returncode, stdout, stderr = eval_runner._run_turn(command, "", env, ROOT, timeout)
+            if returncode == -1:
+                raise subprocess.TimeoutExpired(command, timeout, stdout.encode(), stderr.encode())
+            return subprocess.CompletedProcess(command, returncode, stdout.encode(), stderr.encode())
+        finally:
+            cleanup_browser_profiles(profile_parent)
     options = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {"start_new_session": True}
-    proc = subprocess.Popen([node, str(ROOT / "tests/browser_probe.cjs"), browser, str(fixture)],
+    proc = subprocess.Popen(command,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **options)
     try:
         stdout, stderr = proc.communicate(timeout=timeout)

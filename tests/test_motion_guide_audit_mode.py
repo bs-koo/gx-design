@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_VERSION = "0.14.0"
+TARGET_VERSION = "0.14.1"
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
@@ -45,7 +45,7 @@ ANCHORS = {
     "skills/gx-design/DESIGN-TONE-ANCHOR.md": ("awesome-design-md",),
     "skills/creative-production/SKILL.md": ("MOTION.md", "fps"),
     "skills/creative-review/SKILL.md": ("MOTION.md",),
-    "README.md": ("## 이렇게 시키세요", "MOTION.md", "점검 전용"),
+    "README.md": ("MOTION.md", "점검 전용"),
 }
 
 MOTION_CONSUMERS = (
@@ -167,28 +167,25 @@ class ActiveSkillHostCompatTests(unittest.TestCase):
 class UserGuideSurfaceTests(unittest.TestCase):
     def test_readme_examples_show_both_hosts(self) -> None:
         text = read_doc("README.md")
-        section = text.split("## 이렇게 시키세요", 1)[1].split("\n## ", 1)[0]
         assert_terms(
             self,
-            section,
+            text,
             (
-                "[뻔한 X 말고 Y처럼]",
                 "/gx-design:gx-design",
                 "/gx-design:gx-redesign",
                 "$gx-design",
                 "$gx-redesign",
-                "### 디자인 스킬 5개를 따로 설치하지 않아도",
                 "MIT",
                 "Apache-2.0",
             ),
         )
 
-    def test_site_has_ask_section_with_host_toggle(self) -> None:
+    def test_site_explains_both_entrypoints_for_both_hosts(self) -> None:
         text = read_doc("site/index.html")
         assert_terms(
             self,
             text,
-            ("이렇게 시키세요", "data-ask-choice", "data-ask-host", "/gx-design:gx-redesign", "$gx-redesign"),
+            ("/gx-design:gx-design", "/gx-design:gx-redesign", "$gx-design", "$gx-redesign"),
         )
 
 

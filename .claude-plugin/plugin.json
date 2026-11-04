@@ -1,7 +1,7 @@
 {
   "name": "gx-design",
-  "description": "사용자 의도·응답 대기와 승인 재사용, 작업 범위별 제작, 최종 결과물 검수로 BX·그래픽·UI·영상을 제작하는 디자인 워크플로",
-  "version": "0.14.0",
+  "description": "브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로.",
+  "version": "0.14.1",
   "author": {
     "name": "구본승",
     "email": "bonseung@sqisoft.com"

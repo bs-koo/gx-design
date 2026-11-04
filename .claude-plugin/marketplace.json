@@ -1,6 +1,6 @@
 {
   "name": "gx-design",
-  "description": "GX 디자인 멀티에이전트 팀 마켓플레이스 — BX·그래픽·UX/UI·영상 공용 디자인 워크플로 플러그인 제공",
+  "description": "브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로.",
   "owner": {
     "name": "구본승",
     "email": "bonseung@sqisoft.com"
@@ -9,7 +9,7 @@
     {
       "name": "gx-design",
       "source": "./",
-      "description": "디자인 멀티에이전트 팀 플러그인 (gx-design·gx-redesign 오케스트레이터 + 전문 에이전트 3종 + 방법론 스킬 4종, 응답 대기·승인 재사용·범위별 제작·최종 버전 검수·디자인 톤 기준(DESIGN.md)·시각 크래프트·레퍼런스 구동 생성·AI-티 점검표·화면 목적별 UI 품질·선택적 디자인 자료 검색 지원)"
+      "description": "브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로."
     }
   ]
 }

@@ -1,990 +1,542 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#533afd">
-<title>gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.</title>
-<meta name="description" content="Claude Code와 Codex에서 쓰는 gx-design 디자인 워크플로. 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
-<meta property="og:title" content="gx-design — 디자인 팀처럼 묻고, 디자인 팀처럼 진행합니다.">
-<meta property="og:description" content="Claude Code와 Codex에서 한 줄로 요청하면 리서치·전략·제작·검수가 순서대로 움직입니다.">
-<meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23533afd'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css">
-<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
-<style>
-  /* ============ 토큰 (출처: outputs/brief/2026-07-30_gx-landing_DESIGN.md — hard) ============ */
-  :root{
-    color-scheme: light;
-    --primary:#533afd;
-    --primary-deep:#4434d4;
-    --primary-press:#2e2b8c;
-    --primary-soft:#665efd;
-    --primary-subdued:#b9b9f9;
-    --brand-dark-900:#1c1e54;
-    --ink:#0d253d;
-    --ink-secondary:#273951;
-    --ink-mute:#64748d;
-    --on-primary:#ffffff;
-    --canvas:#ffffff;
-    --canvas-soft:#f6f9fc;
-    --canvas-cream:#f5e9d4;
-    --hairline:#e3e8ee;
-    --hairline-input:#a8c3de;
-    --ruby:#ea2261;
-    --magenta:#f96bee;
-    --lemon:#9b6829;
-
-    --radius-xs:4px; --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-pill:9999px;
-
-    --sp-xxs:2px; --sp-xs:4px; --sp-sm:8px; --sp-md:12px; --sp-lg:16px; --sp-xl:24px; --sp-xxl:32px; --sp-huge:64px;
-
-    --font-kr:'Pretendard','Inter',-apple-system,'Malgun Gothic',system-ui,sans-serif;
-    --font-mono:ui-monospace,'SFMono-Regular','SF Mono',Consolas,'Liberation Mono',Menlo,monospace;
-
-    --shadow-1: 0 1px 3px rgba(0,55,112,.08);
-    --shadow-2: 0 8px 24px rgba(0,55,112,.08), 0 2px 6px rgba(0,55,112,.04);
-
-    --ease: cubic-bezier(.22,.7,.32,1);
-    --dur-in: 480ms;
-    --dur-fast: 180ms;
-    --dur-out: 120ms;
-
-    --container: 1200px;
-  }
-
-  *,*::before,*::after{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--canvas);
-    color:var(--ink);
-    font-family:var(--font-kr);
-    font-weight:400; /* 승인된 이탈: 한글 본문 400 (18px 미만) — 근거: 리서치 §4 */
-    font-feature-settings:"ss01";
-    -webkit-font-smoothing:antialiased;
-    line-height:1.5;
-    word-break:keep-all; /* 한글 어절 중간 줄바꿈 방지 — 코드 블록은 .code-lines code에서 예외 처리 */
-    overflow-wrap:break-word;
-  }
-  h1,h2,h3,p,ul,ol,dl,dd,figure,table{margin:0;}
-  ul,ol{padding:0;list-style:none;}
-  a{color:inherit;text-decoration:none;}
-  img,svg{display:block;max-width:100%;}
-  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
-  table{border-collapse:collapse;width:100%;}
-
-  /* ---------- 접근성 ---------- */
-  .skip-link{
-    position:absolute;left:var(--sp-md);top:-56px;z-index:100;
-    background:var(--ink);color:var(--canvas);
-    padding:var(--sp-sm) var(--sp-lg);border-radius:var(--radius-sm);
-    transition:top var(--dur-fast) var(--ease);
-  }
-  .skip-link:focus{top:var(--sp-md);}
-  /* 5회차: 이중 링(흰색 2px + 인디고 2px) — 단일 outline:primary는 다크 코드블록(#1c1e54) 위에서 2.49:1로 WCAG 1.4.11(3:1) 미달.
-     흰 안쪽 링은 다크 표면에서 15.41:1, 인디고 바깥 링은 라이트 표면(canvas/canvas-soft)에서 6.19:1 — 두 표면 모두 3:1 이상 확보(계산 근거 §9 5회차).
-     6회차 R-2: outline:2px solid transparent를 병기 — Windows 고대비(forced-colors) 모드는 box-shadow를 렌더하지 않고
-     outline은 transparent를 시스템 강조색으로 강제 치환하므로, 그 모드에서도 포커스 표시가 남는다(WCAG 2.4.7). */
-  :focus-visible{outline:2px solid transparent;outline-offset:2px;box-shadow:0 0 0 2px var(--canvas), 0 0 0 4px var(--primary);border-radius:var(--radius-xs);}
-  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-
-  /* ---------- 타이포 역할 (DESIGN.md 토큰) ---------- */
-  /* letter-spacing은 DESIGN.md 각 토큰의 px/font-size 비율(예: -1.4px/56px=-0.025em)을 em으로 환산 —
-     56px 렌더 시 정확히 -1.4px와 동일하되, clamp()로 줄어드는 렌더 크기에도 비례 유지(반응형 대응, 값은 이탈 아님) */
-  /* 히어로 h1 전용 최소 크기 하향(1.5rem=24px) — 확정 카피 2행 중 긴 행("디자인 팀처럼 진행합니다.")이
-     375px에서 keep-all 적용 후에도 한 줄에 들어가도록 여유를 둔 값. DESIGN.md 참고치(모바일 36px)보다 작지만
-     고정 <br> 2행 요구를 지키기 위한 근거 있는 조정(렌더 품질 로그 2회차 C2 참조) */
-  .t-display-xxl{font-weight:300;line-height:1.1;letter-spacing:-0.025em;font-size:clamp(1.5rem,.8rem + 3vw,3.5rem);}
-  .t-display-xl{font-weight:300;line-height:1.15;letter-spacing:-0.02em;font-size:clamp(1.75rem,1.2rem + 2.2vw,3rem);}
-  /* 5회차 M-4: 375px 실측 h1 24.06px = h2 24.00px(위계 소멸). h1(§ line99, 2행 확정 카피 유지 필요·이미 실측 통과)은 무변경하고
-     h2 쪽 하한을 20px로 낮춰 분리(24 vs 20, 20px는 DESIGN.md heading-md 실재 토큰) — desktop 상한 32px는 그대로 */
-  .t-display-lg{font-weight:300;line-height:1.16;letter-spacing:-0.02em;font-size:clamp(1.25rem,.985rem + 1.13vw,2rem);}
-  .t-display-md{font-weight:300;line-height:1.2;letter-spacing:-0.01em;font-size:clamp(1.25rem,1.05rem + .8vw,1.625rem);}
-  .t-heading-sm{font-weight:300;line-height:1.4;font-size:clamp(1rem,.9rem + .4vw,1.125rem);}
-  /* A-M2: t-heading-sm의 clamp 전개식(.9rem+.4vw)이 18px(승인 이탈의 헤드라인급 기준)에 도달하는 지점은 뷰포트 900px —
-     그 아래에서는 렌더 크기가 18px 미만인데 weight가 300으로 남아 있어 승인 이탈("18px 미만 한글 본문 400")을 자기 위반했다.
-     900px 미만에서만 400으로 전환 — 900px 이상(18px 렌더)은 헤드라인급이라 300 유지 */
-  @media(max-width:899px){ .t-heading-sm{font-weight:400;} }
-  .t-body-lg{font-weight:400;line-height:1.55;font-size:1rem;}
-  .t-body-md{font-weight:400;line-height:1.55;font-size:.9375rem;}
-  .t-caption{font-weight:400;line-height:1.4;letter-spacing:-0.39px;font-size:.8125rem;color:var(--ink-mute);}
-  .t-micro-cap{font-weight:400;line-height:1.15;letter-spacing:.1px;font-size:.625rem;text-transform:uppercase;}
-  .t-button{font-weight:400;line-height:1;font-size:1rem;}
-
-  /* ---------- 레이아웃 ---------- */
-  .container{max-width:var(--container);margin:0 auto;padding:0 var(--sp-xl);}
-  @media(max-width:767px){ .container{padding:0 var(--sp-lg);} }
-  .section{padding-top:64px;padding-bottom:64px;position:relative;}
-  @media(min-width:1024px){ .section{padding-top:96px;padding-bottom:96px;} }
-  .section--soft{background:var(--canvas-soft);}
-  .section-head{max-width:640px;margin-bottom:var(--sp-xxl);}
-  .section-head h2{color:var(--ink);}
-  .section-head p{margin-top:var(--sp-md);color:var(--ink-secondary);max-width:56ch;}
-
-  /* ---------- 스크롤 리빌 ---------- */
-  .reveal{opacity:0;transform:translateY(16px);transition:opacity var(--dur-in) var(--ease),transform var(--dur-in) var(--ease);}
-  .reveal.is-visible{opacity:1;transform:translateY(0);}
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1!important;transform:none!important;transition:none!important;}
-  }
-  /* B-M1: opacity:0이 인쇄 시에도 상속돼 히어로 아래가 백지로 나옴 — noscript 폴백과 같은 이유의 다른 경로 */
-  @media print{
-    .reveal{opacity:1!important;transform:none!important;transition:none!important;}
-  }
-
-  /* ---------- 버튼 ---------- */
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-sm);
-    border-radius:var(--radius-pill);padding:8px 16px;border:1px solid transparent; /* 6회차 R-4: 테두리를 .btn 기저로 이동 — .btn-secondary 존재 여부에 암묵 결합되지 않도록, 항상 1px 박스 높이를 예약 */
-    font-family:var(--font-kr);font-weight:400;font-size:1rem;line-height:1;
-    transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
-    white-space:nowrap;
-  }
-  @media(max-width:767px){ .btn{padding:14px 16px;} } /* 터치 타깃 44px 확보 — 세로 패딩만 확대 */
-  .btn-primary{background:var(--primary);color:var(--on-primary);}
-  .btn-primary:hover{background:var(--primary-deep);}
-  .btn-primary:active{background:var(--primary-press);transform:translateY(1px);}
-  .btn-primary.is-copied{background:var(--primary-press);} /* 5회차: 복사 완료 상태 — 같은 인디고 계열, 신규 색상 아님 */
-  .btn-primary svg{width:14px;height:14px;flex:0 0 auto;}
-  .btn-secondary{background:var(--canvas);color:var(--primary);border:1px solid var(--primary);}
-  .btn-secondary:hover{background:var(--canvas-soft);}
-  .btn-row{display:flex;flex-wrap:wrap;gap:var(--sp-md);align-items:center;}
-
-  /* ---------- pill 태그 (pill-tag-soft) ---------- */
-  /* 접근성 조정: DESIGN.md 원안 text=primary-deep(대비 4.23:1, AA 미달) → primary-press(6.19:1)로 교체. 색상군은 동일(인디고), 신규 색상 아님 */
-  .pill-tag{
-    display:inline-flex;align-items:center;background:var(--primary-subdued);color:var(--primary-press);
-    border-radius:var(--radius-pill);padding:4px 8px;
-    font-size:.6875rem; /* 11px = DESIGN.md micro 토큰. micro-cap(10px)은 기능 라벨 가독성 하한 미달이라 상향 — 접근성 이탈 2 */
-  }
-
-  /* ---------- 상단 크롬(단일 줄) ---------- */
-  .chrome{position:relative;z-index:2;padding-top:var(--sp-xl);}
-  .chrome-inner{display:flex;align-items:center;justify-content:space-between;}
-  .brand-word{font-family:var(--font-kr);font-weight:400;font-size:1rem;color:var(--ink);}
-  .chrome-link{color:var(--primary);font-size:.9375rem;}
-  .chrome-link:hover{text-decoration:underline;}
-
-  /* ---------- 히어로 ---------- */
-  .hero{position:relative;overflow:hidden;padding-top:var(--sp-xxl);padding-bottom:var(--sp-huge);}
-  .hero-mesh{
-    position:absolute;top:0;left:0;width:100%;height:clamp(360px,52vw,620px);
-    z-index:0;pointer-events:none;
-    -webkit-mask-image:linear-gradient(to bottom, black 0%, black 52%, transparent 94%);
-    mask-image:linear-gradient(to bottom, black 0%, black 52%, transparent 94%);
-  }
-  .hero-mesh svg{width:100%;height:100%;}
-  .blob-cream{fill:var(--canvas-cream);opacity:.95;}
-  .blob-lemon{fill:var(--lemon);opacity:.28;}
-  .blob-lavender{fill:var(--primary-subdued);opacity:.55;}
-  .blob-indigo{fill:var(--primary);opacity:.42;}
-  .blob-ruby{fill:var(--ruby);opacity:.32;}
-  .blob-magenta{fill:var(--magenta);opacity:.22;}
-
-  .hero-content{position:relative;z-index:1;padding-top:var(--sp-huge);}
-  .hero h1{color:var(--ink);} /* max-width 제거 — ch단위가 한글 실폭을 절반가량 과소평가해 강제 개행 유발(렌더 품질 로그 2회차 C2) */
-  .hero .sub{color:var(--ink-secondary);margin-top:var(--sp-lg);}
-  .hero-grid{display:grid;gap:var(--sp-xxl);}
-  @media(min-width:1024px){
-    .hero-grid{
-      grid-template-columns:1.1fr .9fr;
-      grid-template-areas:"headline mockup" "sub mockup" "install mockup";
-      align-items:start;column-gap:var(--sp-huge);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#533afd">
+  <title>gx-design — 디자인의 기획부터 제작과 개선까지</title>
+  <meta name="description" content="브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로. Claude Code와 Codex에서 gx-design을 사용하세요.">
+  <link rel="canonical" href="https://bs-koo.github.io/gx-design/">
+  <meta property="og:title" content="gx-design — 디자인의 기획부터 제작과 개선까지">
+  <meta property="og:description" content="브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:url" content="https://bs-koo.github.io/gx-design/">
+  <meta property="og:image" content="https://bs-koo.github.io/gx-design/assets/redesign-after-light.png">
+  <meta property="og:image:width" content="1260">
+  <meta property="og:image:height" content="1038">
+  <meta property="og:image:alt" content="gx-design 개선 사례: 흰 바탕에 조회 조건과 진행 목록을 배치한 인증조회 개선 시안">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23533afd'/%3E%3C/svg%3E">
+  <!-- Fonts enhance the system fallback without blocking the page or its controls. -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" crossorigin onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #533afd;
+      --primary-deep: #4434d4;
+      --primary-press: #2e2b8c;
+      --brand-dark: #1c1e54;
+      --ink: #0d253d;
+      --ink-secondary: #273951;
+      --ink-muted: #64748d;
+      --canvas: #ffffff;
+      --canvas-soft: #f6f9fc;
+      --hairline: #e3e8ee;
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-pill: 9999px;
+      --font: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', system-ui, sans-serif;
+      --mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+      --container: 1240px;
     }
-    #hero-heading{grid-area:headline;align-self:end;}
-    .hero .sub{grid-area:sub;}
-    .hero .mockup-card{grid-area:mockup;margin-top:0;align-self:start;}
-    .hero .install{grid-area:install;margin-top:0;}
-  }
-
-  .mockup-card{
-    margin-top:var(--sp-xxl);background:var(--canvas);border-radius:var(--radius-lg);
-    box-shadow:var(--shadow-2);padding:var(--sp-xl);max-width:560px;
-  }
-  .mockup-topline{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-lg);padding-bottom:var(--sp-md);border-bottom:1px solid var(--hairline);}
-  .mockup-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex:0 0 auto;}
-  .mockup-label{font-family:var(--font-mono);letter-spacing:.1em;color:var(--ink-mute);}
-  .mockup-caption{margin-left:auto;color:var(--ink-mute);}
-  .mockup-row{display:flex;align-items:flex-start;gap:var(--sp-sm);}
-  .mockup-input{color:var(--ink);margin-bottom:var(--sp-xl);}
-  .prompt-icon{color:var(--primary);font-family:var(--font-mono);flex:0 0 auto;}
-  .chip-row{display:flex;flex-wrap:wrap;gap:var(--sp-sm);}
-  /* 8회차: 대화 흐름형 재설계 — 사용자 발화(prompt-icon)와 gx-design 발화(dot+label)를 아이콘으로만 구분(테두리·배경 없이 절제) */
-  .mockup-turn{margin-top:var(--sp-xl);}
-  .mockup-turn:first-of-type{margin-top:0;}
-  .mockup-speaker{display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-xs);}
-  .mockup-turn-text{color:var(--ink);}
-  .mockup-question{margin-top:var(--sp-lg);}
-  .mockup-q-text{color:var(--ink);margin-bottom:var(--sp-sm);}
-
-  .install{margin-top:var(--sp-xxl);max-width:560px;min-width:0;} /* CTA 섹션의 grid item으로 쓰일 때 min-width:auto가 코드 줄 폭만큼 트랙을 밀어 넓히는 현상(grid blowout) 방지 — 렌더 품질 로그 2회차 C3 */
-  .cta-grid > .install{min-width:0;}
-  /* 5회차 C-1: 복사 버튼을 다크 코드블록 밖(.btn-row, 라이트 배경)으로 이동 — 채워진 인디고 CTA가
-     다크 표면 위에서 3:1 미달(2.49:1)이 되는 함정을 배치 자체로 제거하고, DESIGN.md "밴드당 채워진 버튼 1개"를 충족 */
-  .code-block{background:var(--brand-dark-900);border-radius:var(--radius-lg);padding:var(--sp-xl);}
-  .code-head{margin-bottom:var(--sp-md);}
-  .install-hosts{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--sp-sm);}
-  .install-host-btn{min-height:44px;padding:9px 14px;border:1px solid rgba(255,255,255,.45);border-radius:var(--radius-pill);color:var(--on-primary);font-family:var(--font-mono);font-size:.875rem;}
-  .install-host-btn[aria-pressed="true"]{background:var(--on-primary);color:var(--brand-dark-900);border-color:var(--on-primary);}
-  .install-host-btn:focus-visible{outline:3px solid var(--primary-soft);outline-offset:3px;}
-  .code-lines[hidden]{display:none;}
-  .code-label{font-family:var(--font-mono);letter-spacing:.1em;color:rgba(255,255,255,.55);}
-  .code-lines{margin:0;overflow-x:auto;}
-  .code-lines code{
-    font-family:var(--font-mono);font-size:.9375rem;line-height:1.7;color:var(--on-primary);
-    white-space:pre;display:block;word-break:normal;overflow-wrap:normal; /* 전역 keep-all 예외 */
-  }
-  @media(max-width:767px){
-    .code-block{padding:var(--sp-lg);}
-    .code-lines code{font-size:.75rem;} /* 375px 가로 오버플로 방지 — 코드 줄이 뷰포트 안에 들어오도록 축소 */
-  }
-  .code-lines code .op{color:var(--primary-soft);}
-  .install .btn-row{margin-top:var(--sp-lg);}
-  .install-help{margin-top:var(--sp-md);color:var(--ink-secondary);}
-  .install-help a{color:var(--primary);text-decoration:underline;text-underline-offset:3px;}
-
-  /* ---------- 파이프라인 ---------- */
-  .pipeline-pain{color:var(--ink-secondary);margin-bottom:var(--sp-sm);} /* 삭제된 문제 제기 섹션의 통증 리드 문장 이설 — 제목(t-display-lg)보다 작고 본문보다 큰 위계 */
-  /* 8회차: 신규/개선 파이프라인 토글 — 세그먼트 컨트롤. 인디고 채움을 쓰지 않아 밴드당 단일 CTA 규칙과 색으로 충돌하지 않는다 */
-  /* 10회차: "이렇게 시키세요" 호스트 토글(.ask-toggle)이 같은 세그먼트 컨트롤을 재사용 — 클래스만 분리해 파이프라인 JS 선택자와 겹치지 않게 함 */
-  .pipeline-toggle,.ask-toggle{display:inline-flex;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-pill);padding:4px;gap:2px;margin-bottom:var(--sp-xl);}
-  .pipeline-toggle-btn,.ask-toggle-btn{padding:8px 16px;border-radius:var(--radius-pill);color:var(--ink-secondary);line-height:1;font-family:var(--font-mono);font-size:.9375rem;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);} /* 라벨이 스킬 명령어라 코드블록·스텝 노드와 같은 등폭 계열로 맞춤 */
-  @media(max-width:767px){ .pipeline-toggle-btn,.ask-toggle-btn{padding:14px 16px;} }
-  .pipeline-toggle-btn[aria-pressed="true"],.ask-toggle-btn[aria-pressed="true"]{background:var(--canvas-soft);color:var(--ink);}
-  .pipeline-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-xl);padding:var(--sp-xl);box-shadow:var(--shadow-2);}
-  @media(min-width:768px){ .pipeline-card{padding:var(--sp-huge);} } /* M2: 시그니처 구간 — 카드 존재감을 위아래 섹션보다 크게 */
-  .stepbar{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:var(--sp-xs);gap:0;}
-  .step-trigger{display:flex;flex-direction:column;align-items:center;gap:var(--sp-sm);padding:var(--sp-xs);flex:0 0 auto;min-width:64px;border-radius:var(--radius-md);}
-  .step-node{
-    width:44px;height:44px;border-radius:50%;border:1px solid var(--hairline);
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-mono);font-size:.8125rem;color:var(--ink-mute);background:var(--canvas);
-    transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease);
-  }
-  .step-label{color:var(--ink-mute);font-size:.8125rem;white-space:nowrap;transition:color var(--dur-fast) var(--ease);}
-  .step-trigger.is-active .step-node{border-color:var(--primary);color:var(--on-primary);background:var(--primary);} /* M2: 인디고 채움으로 활성 단계 강조 */
-  .step-trigger.is-active .step-label{color:var(--ink);}
-  .step-connector{flex:1 1 32px;height:1px;background:var(--hairline);margin-top:22px;min-width:20px;}
-  /* 4회차: 767px 이하 세로 스텝바(전략 §5.4 "모바일: 스텝바가 세로선으로 전환" 준수) —
-     가로 스크롤로 4/6단계만 보이던 문제 해소, 6개 전부 한 화면 흐름에 들어오게 함. 데스크톱(≥768px)은 무변경. */
-  @media(max-width:767px){
-    .stepbar{flex-direction:column;align-items:stretch;overflow-x:visible;gap:0;padding-bottom:0;}
-    .step-trigger{flex-direction:row;align-items:center;justify-content:flex-start;gap:var(--sp-md);width:100%;min-width:0;padding:var(--sp-sm) var(--sp-xs);}
-    .step-node{flex:0 0 auto;}
-    .step-label{white-space:normal;font-size:.9375rem;}
-    .step-connector{flex:0 0 auto;width:1px;height:14px;min-width:0;margin:0 0 0 25px;} /* 44px 노드(4px 패딩 포함) 중심축과 정렬 */
-  }
-  /* 6회차 R-3: max-width가 border-top까지 잘라 구분선이 카드 폭의 49%만 그려지던 버그 —
-     구분선(.step-panel, 카드 폭 100%)과 텍스트 폭 제한(.step-panel-inner)을 분리 */
-  .step-panel{margin-top:var(--sp-xl);padding-top:var(--sp-xl);border-top:1px solid var(--hairline);opacity:1;transition:opacity var(--dur-fast) var(--ease);} /* 들어오는 페이드 180ms(dur-fast) */
-  .step-panel-inner{max-width:520px;} /* 5회차 M-5 의도 유지 — 텍스트만 캡, 우측 여백은 넓은 카드에서 짧은 텍스트가 왼쪽 정렬로 숨쉬는 의도된 여백(§9 6회차) */
-  .step-panel.is-swapping{opacity:0;transition:opacity var(--dur-out) var(--ease);} /* 7회차: 나가는 페이드 120ms(dur-out) — VISUAL-CRAFT §4 "나가는 모션 < 들어오는 모션" */
-  .step-panel-index{display:block;font-family:var(--font-mono);color:var(--primary);margin-bottom:var(--sp-sm);}
-  .step-panel-desc{color:var(--ink);}
-  .step-panel-detail{color:var(--ink-secondary);margin-top:var(--sp-sm);}
-  /* ---------- gx-redesign 실사례(before/after, 9회차) ---------- */
-  /* 나란히 2열(≥860px) 채택 — "시연" 원칙상 즉시 대비가 보이는 편이 낫고, 파이프라인 토글 직후 두 번째 토글형 인터랙션을
-     또 넣으면 시그니처가 분산된다(§9 9회차). 텍스트 완전 가독보다 다크/라이트·구조 대비 자체가 메시지라 축소에도 무리 없음. */
-  .ba-grid{display:grid;gap:var(--sp-xxl);align-items:start;}
-  @media(min-width:860px){ .ba-grid{grid-template-columns:1fr 1fr;} }
-  .ba-item{display:flex;flex-direction:column;gap:var(--sp-sm);}
-  .ba-label{color:var(--ink-mute);font-size:.6875rem;} /* micro-cap(10px)은 기능 라벨 하한 미달 — micro(11px) 실재 토큰으로 상향, 기존 pill-tag와 동일 패턴(§5.3 승인 이탈 2) */
-  /* card-dashboard-mockup 컴포넌트 그대로 적용: canvas 배경·padding 24px·radius-lg·Level 2 shadow(DESIGN.md 토큰표 §5.2) */
-  .ba-frame{background:var(--canvas);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);padding:var(--sp-xl);}
-  .ba-img{width:100%;height:auto;display:block;border-radius:var(--radius-md);border:1px solid var(--hairline);}
-
-  /* ---------- 구성 (릴레이) ---------- */
-  .relay{display:flex;align-items:stretch;gap:var(--sp-lg);}
-  .relay-item{flex:1 1 0;display:flex;flex-direction:column;align-items:flex-start;}
-  .relay-node{
-    width:28px;height:28px;border-radius:50%;background:var(--canvas);border:1px solid var(--primary-subdued);
-    color:var(--primary-deep);display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-mono);font-size:.6875rem;margin-bottom:var(--sp-md);
-  }
-  .relay-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:var(--sp-xl);box-shadow:var(--shadow-1);width:100%;flex:1 0 auto;display:flex;flex-direction:column;} /* M-b: relay-item(stretch)의 남는 세로 공간을 카드가 직접 채워 하단선 정렬 */
-  .relay-card .model-tag{margin-bottom:var(--sp-md);align-self:flex-start;} /* 카드가 column flex라 span 배지가 blockify되어 폭을 꽉 채우던 회귀 수정 — pill-tag-soft는 내용 폭 칩이다 */
-  .relay-card h3{color:var(--ink);margin-bottom:var(--sp-sm);}
-  .relay-card p{color:var(--ink-secondary);}
-  .relay-connector{flex:0 0 auto;width:24px;align-self:flex-start;height:1px;background:var(--hairline);margin-top:14px;} /* M-b: relay-node(28px) 배지의 세로 중심(14px)과 같은 축에 고정 — 카드 중간에 걸리지 않도록 */
-  .composition-note{margin-top:var(--sp-xl);color:var(--ink-secondary);max-width:60ch;}
-
-  @media(max-width:767px){
-    .relay{flex-direction:column;}
-    .relay-connector{width:1px;height:24px;align-self:flex-start;margin:0 0 0 13px;}
-  }
-
-  /* ---------- 이렇게 시키세요 (10회차) ---------- */
-  /* 요청 공식은 슬롯 칩 + 연산자 한 줄, 예시는 relay-card와 같은 카드 언어(hairline·radius-lg·shadow-1). 새 색·새 모션 없음 */
-  .ask-formula{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-xl);}
-  .ask-slot{display:inline-flex;align-items:center;min-height:36px;padding:6px 14px;border:1px solid var(--primary-subdued);border-radius:var(--radius-pill);background:var(--canvas);color:var(--ink);font-size:.9375rem;}
-  .ask-slot--key{border-color:var(--primary);color:var(--primary-press);} /* 효과가 가장 큰 "뻔한 X 말고 Y" 칸만 인디고 테두리로 강조 */
-  .ask-plus{color:var(--ink-mute);font-family:var(--font-mono);}
-  .ask-grid{display:grid;gap:var(--sp-lg);}
-  @media(min-width:768px){ .ask-grid{grid-template-columns:1fr 1fr;} }
-  @media(min-width:1024px){ .ask-grid{grid-template-columns:repeat(3,1fr);} }
-  .ask-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--radius-lg);padding:var(--sp-xl);box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:var(--sp-md);min-width:0;}
-  .ask-card .pill-tag{align-self:flex-start;}
-  .ask-prompt{color:var(--ink);}
-  .ask-cmd{font-family:var(--font-mono);font-size:.875rem;color:var(--primary-press);margin-right:var(--sp-xs);word-break:normal;overflow-wrap:anywhere;}
-  .ask-cmd[hidden]{display:none;}
-  .ask-result{color:var(--ink-secondary);margin-top:auto;padding-top:var(--sp-md);border-top:1px solid var(--hairline);}
-
-  /* ---------- 마감 CTA ---------- */
-  .cta-section .section-head{max-width:none;}
-  .cta-grid{display:grid;gap:var(--sp-xxl);align-items:start;}
-  .cta-sub{color:var(--ink-secondary);margin-top:var(--sp-md);} /* M-c: 좌측 하단 공백 해소 — README "빠른 시작" 다음 행동 안내를 그대로 인용 */
-  @media(min-width:860px){ .cta-grid{grid-template-columns:1fr 1fr;} }
-
-  /* ---------- 푸터 ---------- */
-  .site-footer{background:var(--canvas);border-top:1px solid var(--hairline);padding:var(--sp-huge) 0;}
-  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--sp-xl);align-items:flex-start;}
-  .footer-tagline{margin-top:var(--sp-sm);color:var(--ink-mute);max-width:42ch;}
-
-  /* ---------- 헤어라인 구분(섹션 사이) ---------- */
-  .hr-line{border-top:1px solid var(--hairline);}
-</style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-padding-top: 28px; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 400 16px/1.65 var(--font); font-feature-settings: "ss01"; word-break: keep-all; overflow-wrap: break-word; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, p, figure, blockquote, ul, ol, dl, dd { margin: 0; }
+    ul, ol { padding: 0; list-style: none; }
+    h1, h2, h3 { font-weight: 300; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    img, svg { display: block; max-width: 100%; }
+    img { height: auto; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 2px solid transparent; outline-offset: 3px; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary); border-radius: var(--radius-xs); }
+    .container { width: min(calc(100% - 64px), var(--container)); margin-inline: auto; }
+    .skip-link { position: absolute; z-index: 10; left: 20px; top: -100px; padding: 12px 20px; background: var(--ink); color: white; border-radius: var(--radius-sm); }
+    .skip-link:focus { top: 12px; }
+    .site-header { border-bottom: 1px solid var(--hairline); }
+    .header-inner { min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .wordmark { font-size: 24px; letter-spacing: -.045em; line-height: 1.2; white-space: nowrap; }
+    .wordmark span { color: var(--primary); }
+    .nav { display: flex; align-items: center; gap: 30px; }
+    .nav a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 14px; }
+    .nav .nav-install { color: var(--primary); }
+    .arrow { width: 16px; height: 16px; flex: 0 0 auto; }
+    .button { display: inline-flex; justify-content: center; align-items: center; gap: 12px; min-height: 48px; padding: 12px 22px; border: 1px solid transparent; border-radius: var(--radius-pill); font-weight: 400; font-size: 15px; line-height: 1.4; transition: transform 140ms ease-out; }
+    .button:active { transform: scale(.97); }
+    .button-primary { background: var(--primary); color: white; }
+    .button-secondary { border-color: var(--hairline); background: var(--canvas); }
+    .text-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--primary); font-size: 14px; }
+    .hero { padding: 92px 0 72px; }
+    .hero-grid { display: grid; grid-template-columns: .86fr 1.14fr; align-items: center; gap: 52px; }
+    .hero-copy { padding-bottom: 28px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--ink-secondary); font-size: 13px; line-height: 1.4; letter-spacing: .02em; }
+    .eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+    h1 { margin-top: 26px; font-size: clamp(40px, 3.8vw, 58px); line-height: 1.2; letter-spacing: -.055em; }
+    .hero-description { max-width: 400px; margin-top: 26px; color: var(--ink-secondary); font-size: 17px; line-height: 1.8; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
+    .case-preview { min-width: 0; }
+    .preview-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); font-size: 12px; }
+    .preview-heading span { color: var(--ink-muted); }
+    .preview-images { display: grid; grid-template-columns: .52fr 1fr; align-items: center; gap: 18px; padding: 22px 0 16px; }
+    .ba-card { min-width: 0; }
+    .ba-card--before { margin-top: 124px; }
+    .ba-label { display: block; margin-bottom: 10px; color: var(--ink-secondary); font-size: 11px; letter-spacing: .07em; }
+    .ba-card--after .ba-label { color: var(--primary); }
+    .image-link { display: block; border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--canvas-soft); box-shadow: 0 12px 32px rgba(13, 37, 61, .07); }
+    .ba-img { width: 100%; border-radius: calc(var(--radius-md) - 1px); }
+    .image-note { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; color: var(--ink-muted); font-size: 12px; }
+    .image-note a { color: var(--ink-secondary); padding-block: 4px; text-decoration: underline; text-underline-offset: 3px; }
+    .preview-caption { margin-top: 16px; color: var(--ink-muted); font-size: 12px; }
+    .case-detail { padding: 52px 0 64px; border-top: 1px solid var(--hairline); }
+    .case-detail-grid { display: grid; grid-template-columns: .86fr 1.14fr; gap: 52px; }
+    .section-kicker { color: var(--ink-muted); font-size: 12px; letter-spacing: .03em; }
+    .case-detail h2 { max-width: 440px; margin-top: 16px; font-size: 28px; line-height: 1.4; letter-spacing: -.035em; }
+    .case-observations { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding-top: 4px; }
+    .case-observations dt { font-size: 15px; }
+    .case-observations dd { margin-top: 10px; color: var(--ink-secondary); font-size: 14px; }
+    .case-limit { margin-top: 28px; color: var(--ink-muted); font-size: 12px; }
+    .applications { padding: 88px 0 96px; background: var(--canvas-soft); }
+    .section-heading { display: grid; grid-template-columns: .86fr 1.14fr; gap: 52px; align-items: start; margin-bottom: 48px; }
+    .section-heading h2 { font-size: clamp(29px, 3vw, 40px); line-height: 1.3; letter-spacing: -.045em; }
+    .section-heading p { max-width: 480px; padding-top: 7px; color: var(--ink-secondary); font-size: 16px; line-height: 1.8; }
+    .application-list { border-top: 1px solid var(--hairline); }
+    .application-row { display: grid; grid-template-columns: .45fr .9fr 1fr; gap: 32px; align-items: start; padding: 26px 0; border-bottom: 1px solid var(--hairline); }
+    .application-row h3 { font-size: 23px; letter-spacing: -.03em; line-height: 1.4; }
+    .application-request { padding-top: 3px; font-size: 15px; }
+    .application-output { padding-top: 3px; color: var(--ink-muted); font-size: 14px; }
+    .application-output strong { margin-right: 10px; color: var(--ink-secondary); font-weight: 400; }
+    .application-note { margin-top: 22px; color: var(--ink-muted); font-size: 13px; }
+    .workflow { padding: 96px 0; }
+    .workflow-intro { max-width: 700px; margin-bottom: 48px; }
+    .workflow-intro h2 { font-size: clamp(29px, 3vw, 40px); line-height: 1.3; letter-spacing: -.045em; }
+    .workflow-intro p { margin-top: 18px; color: var(--ink-secondary); }
+    .workflow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+    .workflow-item { min-width: 0; padding-top: 28px; border-top: 1px solid var(--ink); }
+    .workflow-item h3 { font-size: 27px; line-height: 1.35; letter-spacing: -.035em; }
+    .workflow-item > p { margin-top: 16px; color: var(--ink-secondary); font-size: 15px; }
+    .command-pair { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 8px 16px; margin-top: 24px; font-size: 12px; }
+    .command-pair dt { color: var(--ink-muted); }
+    .command-pair code { font: 12px/1.6 var(--mono); overflow-wrap: anywhere; word-break: normal; }
+    .request-example { margin-top: 24px; padding: 24px; background: var(--canvas-soft); border-radius: var(--radius-lg); font-size: 15px; line-height: 1.8; }
+    .request-example > span { display: block; margin-bottom: 10px; color: var(--ink-muted); font-size: 12px; }
+    .workflow-result { margin-top: 18px; color: var(--ink-muted); font-size: 13px; }
+    .workflow-result strong { color: var(--ink-secondary); font-weight: 400; }
+    .workflow-detail { margin-top: 38px; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+    .workflow-detail summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding-block: 16px; cursor: pointer; font-size: 14px; list-style: none; }
+    .workflow-detail summary::-webkit-details-marker { display: none; }
+    .workflow-detail summary::after { content: '+'; font-size: 20px; font-weight: 300; }
+    .workflow-detail[open] summary::after { content: '−'; }
+    .workflow-detail p { max-width: 850px; padding: 0 0 22px; color: var(--ink-secondary); font-size: 14px; line-height: 1.8; }
+    .installation { padding: 88px 0 96px; background: var(--canvas-soft); }
+    .installation-grid { display: grid; grid-template-columns: .86fr 1.14fr; gap: 52px; }
+    .installation-intro h2 { max-width: 440px; font-size: clamp(29px, 3vw, 40px); line-height: 1.3; letter-spacing: -.045em; }
+    .installation-intro p { max-width: 360px; margin-top: 20px; color: var(--ink-secondary); font-size: 15px; line-height: 1.8; }
+    .installation-intro .text-link { margin-top: 20px; }
+    .install { min-width: 0; }
+    .install-hosts { display: flex; gap: 6px; margin-bottom: 20px; }
+    .host-tab { min-height: 44px; padding: 10px 19px; background: white; border: 1px solid var(--hairline); border-radius: var(--radius-pill); color: var(--ink-secondary); font-size: 14px; }
+    .host-tab[aria-selected="true"] { background: var(--brand-dark); border-color: var(--brand-dark); color: white; }
+    .install-panel { margin-top: 20px; }
+    .install-panel + .install-panel { margin-top: 28px; }
+    .install-panel h3 { margin-bottom: 12px; font-size: 19px; }
+    .install-panel[role="tabpanel"] { margin-top: 0; }
+    .install-panel[role="tabpanel"] h3 { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+    .code-block { padding: 24px; border-radius: var(--radius-lg); background: var(--brand-dark); color: white; }
+    .code-label { color: #c8c9ed; font-size: 11px; letter-spacing: .04em; }
+    .code-lines { margin: 16px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-all; }
+    .code-lines code { font: 13px/1.9 var(--mono); }
+    .install-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 18px; }
+    .copy-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; background: white; border: 1px solid var(--hairline); border-radius: var(--radius-pill); color: var(--ink); font-size: 13px; transition: transform 140ms ease-out; }
+    .copy-button:active { transform: scale(.97); }
+    .copy-button[aria-busy="true"] { cursor: wait; }
+    .copy-status { flex: 1 1 160px; min-height: 22px; color: var(--ink-secondary); font-size: 12px; }
+    .host-instruction { margin-top: 16px; color: var(--ink-secondary); font-size: 13px; line-height: 1.8; }
+    .host-instruction code { color: var(--ink); font: 12px/1.8 var(--mono); overflow-wrap: anywhere; }
+    .copy-help { margin-top: 20px; color: var(--ink-muted); font-size: 12px; line-height: 1.8; }
+    .no-script { padding: 12px 0; color: var(--ink-secondary); font-size: 13px; }
+    .site-footer { padding: 40px 0; border-top: 1px solid var(--hairline); }
+    .footer-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+    .footer-inner .wordmark { font-size: 19px; }
+    .footer-caption { margin-top: 10px; color: var(--ink-muted); font-size: 12px; }
+    .footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; font-size: 13px; }
+    .footer-links a { padding-block: 8px; }
+    @media (hover: hover) and (pointer: fine) {
+      .nav a:hover, .footer-links a:hover { color: var(--primary); }
+      .button-primary:hover { background: var(--primary-deep); }
+      .button-secondary:hover, .copy-button:hover { border-color: var(--ink-muted); }
+      .text-link:hover, .image-note a:hover { text-decoration: underline; text-underline-offset: 4px; }
+      .host-tab:not([aria-selected="true"]):hover { border-color: var(--ink-muted); }
+    }
+    @media (max-width: 1100px) {
+      .hero-grid, .case-detail-grid, .section-heading, .installation-grid { gap: 36px; }
+      .hero { padding-top: 72px; }
+      .hero-grid { grid-template-columns: .9fr 1.1fr; }
+      h1 { font-size: 44px; }
+      .hero-description { font-size: 16px; }
+      .preview-images { gap: 12px; }
+      .ba-card--before { margin-top: 76px; }
+      .workflow-grid { gap: 36px; }
+      .code-block { padding: 20px; }
+    }
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+      .hero-copy { padding-bottom: 0; }
+      h1 { font-size: 54px; }
+      h1 br { display: none; }
+      .hero-description { max-width: 560px; }
+      .case-preview { max-width: 700px; }
+      .preview-images { grid-template-columns: .62fr 1fr; gap: 24px; }
+      .ba-card--before { margin-top: 90px; }
+      .case-detail-grid { grid-template-columns: 1fr; gap: 32px; }
+      .case-detail h2 { max-width: 600px; }
+      .case-observations { gap: 32px; }
+      .case-limit { margin-top: 24px; }
+      .section-heading { grid-template-columns: 1fr; gap: 20px; }
+      .section-heading p { max-width: 560px; padding-top: 0; }
+      .application-row { grid-template-columns: .48fr .9fr 1fr; gap: 20px; }
+      .workflow-grid { gap: 28px; }
+      .command-pair { grid-template-columns: 1fr; gap: 4px; }
+      .command-pair dt:not(:first-child) { margin-top: 8px; }
+      .installation-grid { grid-template-columns: 1fr; gap: 40px; }
+      .installation-intro p { max-width: 560px; }
+      .install { max-width: 700px; }
+    }
+    @media (max-width: 600px) {
+      .container { width: calc(100% - 40px); }
+      .header-inner { min-height: 76px; gap: 12px; }
+      .wordmark { font-size: 21px; }
+      .nav { gap: 18px; }
+      .nav a { font-size: 12px; }
+      .nav .nav-github { display: none; }
+      .hero { padding: 52px 0 40px; }
+      .hero-grid { gap: 42px; }
+      .eyebrow { font-size: 12px; }
+      h1 { margin-top: 22px; font-size: 40px; line-height: 1.25; }
+      h1 br { display: initial; }
+      .hero-description { margin-top: 22px; font-size: 15px; }
+      .hero-actions { margin-top: 26px; }
+      .button { min-height: 46px; padding-inline: 20px; font-size: 14px; }
+      .preview-heading { margin-bottom: 16px; font-size: 11px; }
+      .preview-images { grid-template-columns: 1fr; gap: 26px; padding-top: 4px; }
+      .ba-card--before { margin-top: 0; width: 82%; }
+      .ba-card--after { width: 100%; }
+      .ba-label { margin-bottom: 8px; }
+      .image-note { margin-top: 8px; }
+      .preview-caption { margin-top: 8px; }
+      .case-detail { padding: 36px 0 48px; }
+      .case-detail h2 { font-size: 25px; }
+      .case-observations { grid-template-columns: 1fr; gap: 24px; }
+      .case-observations dd { margin-top: 7px; }
+      .applications, .workflow, .installation { padding: 56px 0; }
+      .section-heading { margin-bottom: 32px; gap: 18px; }
+      .section-heading h2, .workflow-intro h2, .installation-intro h2 { font-size: 30px; }
+      .section-heading p, .workflow-intro p { font-size: 15px; }
+      .application-row { grid-template-columns: 1fr; gap: 8px; padding-block: 22px; }
+      .application-row h3 { font-size: 23px; }
+      .application-request, .application-output { padding-top: 0; }
+      .application-output { font-size: 13px; }
+      .workflow-intro { margin-bottom: 32px; }
+      .workflow-grid { grid-template-columns: 1fr; gap: 36px; }
+      .workflow-item { padding-top: 22px; }
+      .workflow-item h3 { font-size: 26px; }
+      .command-pair { grid-template-columns: auto 1fr; gap: 8px 14px; }
+      .command-pair dt:not(:first-child) { margin-top: 0; }
+      .request-example { margin-top: 20px; padding: 20px; font-size: 14px; }
+      .workflow-detail { margin-top: 32px; }
+      .installation-intro .text-link { margin-top: 16px; }
+      .install-hosts { gap: 8px; }
+      .host-tab { flex: 1 1 auto; padding-inline: 16px; }
+      .code-block { padding: 20px 16px; }
+      .code-lines code { font-size: 12px; }
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .site-footer { padding-block: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+      .button:active, .copy-button:active { transform: none; }
+    }
+    @media (forced-colors: active) {
+      .host-tab[aria-selected="true"] { outline: 2px solid Highlight; outline-offset: -4px; }
+      .image-link { border-color: CanvasText; }
+    }
+    @media print {
+      .site-header, .hero-actions, .install-hosts, .copy-button, .site-footer { display: none !important; }
+      .hero, .applications, .workflow, .installation { padding-block: 24px; }
+      .container { width: 100%; }
+      .install-panel[hidden] { display: block !important; }
+      .install-panel[role="tabpanel"] h3 { position: static; width: auto; height: auto; clip-path: none; white-space: normal; }
+      .code-block { border: 1px solid #aaa; color: black; background: white; }
+      .code-label { color: black; }
+      .workflow-detail p { display: block; }
+    }
+  </style>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 건너뛰기</a>
-<div id="copy-announce" class="visually-hidden" role="status" aria-live="polite"></div>
-
-<div class="chrome container">
-  <div class="chrome-inner">
-    <span class="brand-word">gx-design</span>
-    <a class="chrome-link t-body-md" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="#main" aria-label="gx-design 처음으로">gx<span>-</span>design</a>
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="#work">적용 사례</a>
+      <a href="#workflow">사용 방법</a>
+      <a class="nav-github" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener" aria-label="GitHub 저장소 (새 탭)">GitHub<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12 12 4M4 4h8v8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      <a class="nav-install" href="#install">설치하기<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2"/></svg></a>
+    </nav>
   </div>
-</div>
-
+</header>
 <main id="main">
-
-  <!-- ============ 1. 히어로 ============ -->
   <section class="hero" aria-labelledby="hero-heading">
-    <div class="hero-mesh" aria-hidden="true">
-      <svg viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="meshBlur" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="68"/>
-          </filter>
-        </defs>
-        <!-- M1: 블롭을 0~1440 전 구간에 고르게 겹치도록 재배치(좌우 가장자리로 bleed) — 상단 1/3 가로 워시(DESIGN.md) -->
-        <g filter="url(#meshBlur)">
-          <path class="blob-cream" d="M60,50 C180,-10 400,10 500,90 C600,170 580,270 470,310 C350,355 160,330 70,260 C-20,190 -40,110 60,50 Z"/>
-          <path class="blob-lemon" d="M340,130 C460,70 640,90 700,180 C760,270 690,350 570,360 C450,370 320,340 300,250 C282,180 240,175 340,130 Z"/>
-          <path class="blob-lavender" d="M600,70 C750,20 930,50 980,140 C1030,230 960,310 840,330 C720,350 590,300 570,210 C552,140 480,105 600,70 Z"/>
-          <path class="blob-indigo" d="M860,110 C1010,50 1200,80 1260,180 C1320,275 1230,360 1100,370 C970,380 830,330 810,240 C792,170 730,150 860,110 Z"/>
-          <path class="blob-ruby" d="M1120,80 C1260,40 1420,80 1450,170 C1480,255 1400,320 1290,320 C1190,320 1100,270 1090,190 C1082,130 1020,110 1120,80 Z"/>
-          <path class="blob-magenta" d="M1240,140 C1320,110 1400,140 1410,200 C1420,255 1360,290 1300,285 C1250,280 1200,240 1210,190 C1215,158 1180,158 1240,140 Z"/>
-        </g>
-      </svg>
-    </div>
-
-    <div class="container hero-content">
-     <div class="hero-grid">
-      <h1 id="hero-heading" class="t-display-xxl">디자인 팀처럼 묻고,<br>디자인 팀처럼 진행합니다.</h1>
-      <p class="sub t-heading-sm">Claude Code와 Codex에서 한 줄로 요청하세요. 리서치·전략·제작·검수를 역할별 절차로 진행합니다.</p>
-
-      <!-- 6회차 R-1: 모바일(<1024px)은 DOM 순서가 곧 시각 순서라 install(코드+CTA)을 mockup-card보다 앞에 둔다.
-           ≥1024px는 grid-template-areas가 DOM 순서와 무관하게 배치하므로 데스크톱 2열은 그대로 유지된다. -->
-      <div class="install reveal">
-        <div class="code-block">
-          <div class="code-head">
-            <span class="code-label t-micro-cap">INSTALL · 호스트 선택</span>
-            <div class="install-hosts" role="group" aria-label="설치할 호스트 선택">
-              <button class="install-host-btn" type="button" data-install-host="claude" aria-pressed="true">Claude Code</button>
-              <button class="install-host-btn" type="button" data-install-host="codex" aria-pressed="false">Codex</button>
-            </div>
-          </div>
-          <pre class="code-lines"><code data-host="claude">/plugin marketplace add bs-koo/gx-design
-/plugin install gx-design@gx-design</code></pre>
-          <pre class="code-lines" hidden><code data-host="codex">codex plugin marketplace add bs-koo/gx-design
-codex plugin add gx-design@gx-design</code></pre>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-primary t-button" type="button" data-copy>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 10.5V3a1 1 0 0 1 1-1h7.5" stroke="currentColor" stroke-width="1.3"/></svg>
-            <span class="copy-btn-label" data-default="명령어 복사">명령어 복사</span>
-          </button>
-          <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
-        </div>
-        <p class="install-help t-body-md"><a href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">두 호스트의 설치·스킬 유지보수 안내</a></p>
-      </div>
-
-      <div class="mockup-card reveal">
-        <div class="mockup-topline">
-          <span class="mockup-dot" aria-hidden="true"></span>
-          <span class="mockup-label t-micro-cap">gx-design</span>
-          <span class="mockup-caption t-caption">예시</span>
-        </div>
-        <div class="mockup-row mockup-input t-body-lg">
-          <span class="prompt-icon" aria-hidden="true">›</span>
-          <span>공공기관 에너지 감축 캠페인 사이트 UX/UI</span>
-        </div>
-
-        <div class="mockup-turn">
-          <p class="mockup-turn-text t-body-md">만들기 전에 몇 가지 여쭙겠습니다</p>
-        </div>
-
-        <div class="mockup-question">
-          <p class="mockup-q-text t-body-md">Q. 핵심 사용자는 누구인가요?</p>
-          <div class="chip-row">
-            <span class="pill-tag t-micro-cap">기관 담당자</span>
-            <span class="pill-tag t-micro-cap">일반 시민</span>
-          </div>
-        </div>
-
-        <div class="mockup-question">
-          <p class="mockup-q-text t-body-md">Q. 무엇을 먼저 보여줄까요?</p>
-          <div class="chip-row">
-            <span class="pill-tag t-micro-cap">감축 실적</span>
-            <span class="pill-tag t-micro-cap">참여 신청</span>
-            <span class="pill-tag t-micro-cap">가이드</span>
-          </div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Claude Code · Codex 플러그인</p>
+        <h1 id="hero-heading">디자인을 기획하고,<br>만들고, 개선합니다.</h1>
+        <p class="hero-description">브랜드·그래픽·UX/UI·영상의 기획, 제작, 개선과 품질 검토를 지원하는 디자인 워크플로.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#install">gx-design 설치하기<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          <a class="button button-secondary" href="#workflow">사용 방법 보기</a>
         </div>
       </div>
-     </div>
+      <!-- Case provenance: assets/redesign-case.json. BEFORE is dark green; AFTER is the light redesign, as confirmed by the user. -->
+      <figure id="work" class="case-preview" aria-labelledby="case-preview-title" aria-describedby="case-preview-caption">
+        <figcaption class="preview-heading" id="case-preview-title">인증 진행현황 조회 화면<span>UX/UI · 실제 개선 사례</span></figcaption>
+        <div class="preview-images">
+          <div class="ba-card ba-card--before">
+            <span class="ba-label">BEFORE</span>
+            <a class="image-link" href="assets/redesign-before-dark.png" target="_blank" rel="noopener" aria-label="개편 전 초록색 다크 인증조회 화면 원본 보기 (새 탭)">
+              <img class="ba-img" src="assets/redesign-before-dark.png" width="1231" height="1206" alt="개편 전 진행현황 통합조회 화면 — 상태 요약 카드와 점검 안내가 있는 초록색 다크 대시보드">
+            </a>
+            <p class="image-note">기존 화면 · 다크<a href="assets/redesign-before-dark.png" target="_blank" rel="noopener" aria-label="개편 전 초록색 다크 화면 원본 보기 (새 탭)">원본 보기 ↗</a></p>
+          </div>
+          <div class="ba-card ba-card--after">
+            <span class="ba-label">AFTER</span>
+            <a class="image-link" href="assets/redesign-after-light.png" target="_blank" rel="noopener" aria-label="개편 후 흰 바탕 인증조회 개선 시안 원본 보기 (새 탭)">
+              <img class="ba-img" src="assets/redesign-after-light.png" width="1260" height="1038" fetchpriority="high" alt="개편 후 진행현황 통합조회 화면 — 조회 조건과 목록 테이블을 구분한 흰 바탕의 개선 시안">
+            </a>
+            <p class="image-note">개선 시안 · 라이트<a href="assets/redesign-after-light.png" target="_blank" rel="noopener" aria-label="개편 후 흰 바탕 개선 시안 원본 보기 (새 탭)">원본 보기 ↗</a></p>
+          </div>
+        </div>
+        <p class="preview-caption" id="case-preview-caption">인증조회 화면의 변경 전과 개선 시안입니다. 이미지를 선택하면 원본을 볼 수 있습니다.</p>
+      </figure>
     </div>
   </section>
 
-  <!-- ============ 2. 파이프라인 6단계 (문제 제기 리드 이설) ============ -->
-  <section id="pipeline" class="section section--soft" aria-labelledby="pipeline-heading">
+  <section class="case-detail" aria-labelledby="case-heading">
     <div class="container">
-      <div class="section-head reveal">
-        <p class="pipeline-pain t-body-lg">목표를 확인하고, 필요한 결정만 묻습니다.</p>
-        <h2 id="pipeline-heading" class="t-display-lg">한 줄의 요청이, <span id="pipeline-heading-count">여섯</span> 단계를 거칩니다.</h2>
-      </div>
-
-      <!-- 8회차: role="tablist" 중첩 방지 — 토글은 버튼 2개 + aria-pressed(별도 패턴), 스텝바의 tablist와 역할이 겹치지 않는다 -->
-      <div class="pipeline-toggle reveal" role="group" aria-label="파이프라인 종류">
-        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="new" aria-pressed="true">gx-design</button>
-        <button type="button" class="pipeline-toggle-btn t-button" data-pipeline="redesign" aria-pressed="false">gx-redesign</button>
-      </div>
-
-      <div class="pipeline-card reveal">
-        <div class="pipeline-set" data-pipeline-set="new">
-          <div class="stepbar" role="tablist" aria-label="gx-design 파이프라인 6단계">
-            <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-new" id="step-tab-new-0" tabindex="0" data-step="0">
-              <span class="step-node">0</span><span class="step-label t-caption">브리프</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-1" tabindex="-1" data-step="1">
-              <span class="step-node">1</span><span class="step-label t-caption">리서치</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-2" tabindex="-1" data-step="2">
-              <span class="step-node">2</span><span class="step-label t-caption">전략</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-3" tabindex="-1" data-step="3">
-              <span class="step-node">3</span><span class="step-label t-caption">제작</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-4" tabindex="-1" data-step="4">
-              <span class="step-node">4</span><span class="step-label t-caption">검수</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-5" tabindex="-1" data-step="5">
-              <span class="step-node">5</span><span class="step-label t-caption">납품</span>
-            </button>
-          </div>
-
-          <div class="step-panel" id="step-panel-new" role="tabpanel" aria-labelledby="step-tab-new-0">
-            <div class="step-panel-inner">
-              <span class="step-panel-index t-caption">0 · 브리프</span>
-              <p class="step-panel-desc t-display-md">의도·유지 조건 확인</p>
-              <p class="step-panel-detail t-body-md">필수 결정의 답변 전에는 관련 제작을 기다립니다.</p>
-            </div>
-          </div>
+      <div class="case-detail-grid">
+        <div>
+          <p class="section-kicker">이 사례에서 바뀐 점</p>
+          <h2 id="case-heading">조회 조건과 진행 목록을<br>밝은 화면 안에 정리합니다.</h2>
         </div>
-
-        <div class="pipeline-set" data-pipeline-set="redesign" hidden>
-          <div class="stepbar" role="tablist" aria-label="gx-redesign 파이프라인 7단계">
-            <button class="step-trigger is-active" role="tab" aria-selected="true" aria-controls="step-panel-redesign" id="step-tab-redesign-0" tabindex="0" data-step="0">
-              <span class="step-node">0</span><span class="step-label t-caption">자산 인벤토리</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-1" tabindex="-1" data-step="1">
-              <span class="step-node">1</span><span class="step-label t-caption">진단</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-2" tabindex="-1" data-step="2">
-              <span class="step-node">2</span><span class="step-label t-caption">갭 리서치</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-3" tabindex="-1" data-step="3">
-              <span class="step-node">3</span><span class="step-label t-caption">변경 범위</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-4" tabindex="-1" data-step="4">
-              <span class="step-node">4</span><span class="step-label t-caption">제작</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-5" tabindex="-1" data-step="5">
-              <span class="step-node">5</span><span class="step-label t-caption">검수</span>
-            </button>
-            <span class="step-connector" aria-hidden="true"></span>
-            <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-6" tabindex="-1" data-step="6">
-              <span class="step-node">6</span><span class="step-label t-caption">납품</span>
-            </button>
-          </div>
-
-          <div class="step-panel" id="step-panel-redesign" role="tabpanel" aria-labelledby="step-tab-redesign-0">
-            <div class="step-panel-inner">
-              <span class="step-panel-index t-caption">0 · 자산 인벤토리</span>
-              <p class="step-panel-desc t-display-md">기존 문서·코드·배포 화면 전수 파악 후 인터뷰</p>
-            </div>
-          </div>
-        </div>
+        <dl class="case-observations">
+          <div><dt>밝은 바탕과 구분된 영역</dt><dd>흰 바탕에 조회 조건을 연한 배경으로 묶고, 진행 목록을 그 아래에 배치했습니다.</dd></div>
+          <div><dt>정돈된 목록 정보</dt><dd>신청일·접수번호·건축물명 등의 정보를 열로 정렬하고, 각 신청의 진행 단계를 배지로 표시했습니다.</dd></div>
+        </dl>
       </div>
+      <p class="case-limit">인증조회 화면 한 건의 개선 사례이며, 모든 프로젝트의 품질이나 사용성 향상을 보장하는 성과 자료는 아닙니다.</p>
     </div>
   </section>
 
-  <!-- ============ 3. gx-redesign 실사례 (9회차 추가) ============ -->
-  <section id="redesign-case" class="section" aria-labelledby="redesign-case-heading">
+  <section class="applications" aria-labelledby="applications-heading">
     <div class="container">
-      <div class="section-head reveal">
-        <h2 id="redesign-case-heading" class="t-display-lg">기존 화면은 이렇게 바뀝니다.</h2>
-        <p class="t-body-lg">gx-redesign 실제 사례 — 인증 진행현황 통합조회 화면을 개선한 결과입니다.</p>
+      <div class="section-heading">
+        <h2 id="applications-heading">필요한 디자인 업무에서<br>시작하세요.</h2>
+        <p>새로운 방향을 기획할 때도, 기존 결과물을 다듬을 때도.<br>목표와 기존 자료를 바탕으로 필요한 작업과 결과물 형식을 정합니다.</p>
       </div>
-
-      <div class="ba-grid reveal">
-        <figure class="ba-item">
-          <figcaption class="ba-label t-micro-cap">BEFORE</figcaption>
-          <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-before.png" width="1260" height="1038" loading="lazy" alt="개편 전 진행현황 통합조회 화면 — 필터와 목록 테이블로 구성된 밝은 화면">
-          </div>
-        </figure>
-        <figure class="ba-item">
-          <figcaption class="ba-label t-micro-cap">AFTER</figcaption>
-          <div class="ba-frame">
-            <img class="ba-img" src="assets/redesign-after.png" width="1231" height="1206" loading="lazy" alt="개편 후 진행현황 통합조회 화면 — 상태 요약 카드와 점검 알럿이 있는 다크 대시보드">
-          </div>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 4. 구성 (3 역할) ============ -->
-  <section id="composition" class="section section--soft" aria-labelledby="composition-heading">
-    <div class="container">
-      <div class="section-head reveal">
-        <h2 id="composition-heading" class="t-display-lg">세 역할이 이어받습니다.</h2>
-        <p class="t-body-lg">Claude Code의 전용 에이전트나 Codex의 사용 가능한 작업자가 역할을 맡을 수 있습니다. 위임할 수 없으면 주 에이전트가 같은 스킬 절차를 수행합니다.</p>
-      </div>
-
-      <div class="relay reveal" role="list">
-        <div class="relay-item" role="listitem">
-          <span class="relay-node" aria-hidden="true">01</span>
-          <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">RESEARCH</span>
-            <h3 class="t-display-md">리서처</h3>
-            <p class="t-body-md">시장·경쟁사·사용자·트렌드를 조사합니다.</p>
-          </div>
-        </div>
-        <span class="relay-connector" aria-hidden="true"></span>
-        <div class="relay-item" role="listitem">
-          <span class="relay-node" aria-hidden="true">02</span>
-          <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">STRATEGY</span>
-            <h3 class="t-display-md">전략가</h3>
-            <p class="t-body-md">방향이 열려 있으면 대표 후보를 비교하고, 확정된 방향은 재사용합니다.</p>
-          </div>
-        </div>
-        <span class="relay-connector" aria-hidden="true"></span>
-        <div class="relay-item" role="listitem">
-          <span class="relay-node" aria-hidden="true">03</span>
-          <div class="relay-card">
-            <span class="pill-tag model-tag t-micro-cap">PRODUCTION</span>
-            <h3 class="t-display-md">프로듀서</h3>
-            <p class="t-body-md">명세·카피·생성형 프롬프트·프로토타입까지 만듭니다.</p>
-          </div>
-        </div>
-      </div>
-
-      <p class="composition-note t-body-md reveal">이 세 역할에 스킬 6종이 매체가 아니라 업무 단계로 연결됩니다.</p>
-    </div>
-  </section>
-
-  <!-- ============ 5. 이렇게 시키세요 (10회차) ============ -->
-  <!-- 호스트 토글은 설치 블록과 다른 속성(data-ask-host)을 쓴다 — .install 범위 밖이라 설치 블록 파서·복사 버튼과 섞이지 않는다 -->
-  <section id="ask" class="section" aria-labelledby="ask-heading">
-    <div class="container">
-      <div class="section-head reveal">
-        <h2 id="ask-heading" class="t-display-lg">이렇게 시키세요.</h2>
-        <p class="t-body-lg">한 줄이어도 시작됩니다. 다섯 칸을 채울수록 질문이 줄고, 첫 결과가 덜 뻔해집니다. 빈 칸은 첫 라운드 전에 요청 해석 카드로 보여 드리고 필요한 것만 묻습니다.</p>
-      </div>
-
-      <p class="ask-formula reveal">
-        <span class="ask-slot">무엇을</span><span class="ask-plus" aria-hidden="true">+</span>
-        <span class="ask-slot">누구·목적</span><span class="ask-plus" aria-hidden="true">+</span>
-        <span class="ask-slot ask-slot--key">뻔한 X 말고 Y처럼</span><span class="ask-plus" aria-hidden="true">+</span>
-        <span class="ask-slot">기준 자료 · DESIGN.md</span><span class="ask-plus" aria-hidden="true">+</span>
-        <span class="ask-slot">범위·기기</span>
-      </p>
-
-      <div class="ask-toggle reveal" role="group" aria-label="예시 명령 표기 호스트">
-        <button type="button" class="ask-toggle-btn t-button" data-ask-choice="claude" aria-pressed="true">Claude Code</button>
-        <button type="button" class="ask-toggle-btn t-button" data-ask-choice="codex" aria-pressed="false">Codex</button>
-      </div>
-
-      <ul class="ask-grid reveal">
-        <li class="ask-card">
-          <span class="pill-tag t-micro-cap">신규 UI</span>
-          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 사내 협업툴 소개 랜딩 페이지. 도입을 검토하는 IT 팀장 대상, 목표는 도입 문의. 뻔한 보라 그라데이션 히어로 말고 실제 제품 화면이 주인공인 절제된 구성으로. 첨부한 DESIGN.md 톤 유지, 데스크톱·모바일.</p>
-          <p class="ask-result t-caption">방향이 열려 있으면 정보량·움직임·변경 범위의 차이를 비교합니다.</p>
-        </li>
-        <li class="ask-card">
-          <span class="pill-tag t-micro-cap">점검 전용 · 모션</span>
-          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-redesign</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-redesign</code> 점검만. 온보딩 화면의 모션이 굼뜨고 어색해. 고치지 말고 문제를 전/후/이유 표로 정리해줘. 모바일 기준.</p>
-          <p class="ask-result t-caption">요소·위치 | Before | After | Why 표로 보고한 뒤, 종료·리디자인·바로 수정 중에서 고릅니다.</p>
-        </li>
-        <li class="ask-card">
-          <span class="pill-tag t-micro-cap">점검 전용 · 여정</span>
-          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-redesign</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-redesign</code> 점검만. 메인 → 상품 상세 → 장바구니 여정을 모바일(375×812)에서 직접 눌러 보고 막히는 곳을 찾아줘.</p>
-          <p class="ask-result t-caption">Playwright MCP가 있으면 실제로 클릭하고 콘솔 오류까지 기록합니다. 없으면 설치 방법을 한 번 안내합니다.</p>
-        </li>
-        <li class="ask-card">
-          <span class="pill-tag t-micro-cap">BX</span>
-          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 동네 베이커리 브랜드 BX. 출근길 30대 직장인 단골 확보가 목적. 뻔한 크림+세리프 감성 말고 갓 구운 빵처럼 따뜻하고 경쾌한 톤으로. 로고·패키지·간판까지.</p>
-          <p class="ask-result t-caption">이미 "X 말고"를 적었으니 피할 룩은 다시 묻지 않습니다.</p>
-        </li>
-        <li class="ask-card">
-          <span class="pill-tag t-micro-cap">숏폼 영상</span>
-          <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 신규 앱 런칭 15초 Instagram Reels. 20대 대상, 목표는 앱 설치. 뻔한 다크+형광 테크 연출 말고 손글씨 키네틱 타이포처럼. 세로 9:16, 30fps.</p>
-          <p class="ask-result t-caption">씬 길이를 초(프레임)로 검산하고, 텍스트 홀드와 플랫폼 안전영역을 명세에 적습니다.</p>
-        </li>
+      <ul class="application-list">
+        <li class="application-row"><h3>브랜드</h3><p class="application-request">브랜드의 방향과 시각 언어를 정할 때</p><p class="application-output"><strong>결과물 예시</strong>브랜드 콘셉트, 컬러·타이포그래피, 적용 가이드</p></li>
+        <li class="application-row"><h3>그래픽</h3><p class="application-request">캠페인의 메시지를 시각물로 만들 때</p><p class="application-output"><strong>결과물 예시</strong>키비주얼, 배너·포스터, 제작 명세</p></li>
+        <li class="application-row"><h3>UX/UI</h3><p class="application-request">화면을 설계하거나 사용 흐름을 개선할 때</p><p class="application-output"><strong>결과물 예시</strong>화면 구조, 프로토타입, 개선·검수 보고</p></li>
+        <li class="application-row"><h3>영상</h3><p class="application-request">영상의 구성과 장면별 연출을 기획할 때</p><p class="application-output"><strong>결과물 예시</strong>스토리보드, 장면·모션 명세, 제작 프롬프트</p></li>
       </ul>
+      <p class="application-note">요청한 형식과 현재 작업 환경에 맞춰 제작합니다. 문서·프롬프트와 실제 이미지·영상·실행 화면의 제작 여부를 구분해 안내합니다.</p>
     </div>
   </section>
 
-  <!-- ============ 6. 설치 CTA (반복) ============ -->
-  <!-- 10회차: 앞 섹션(이렇게 시키세요)이 흰 배경이라 soft로 바꿔 흰/soft 교차 유지 -->
-  <section id="cta" class="section section--soft cta-section" aria-labelledby="cta-heading">
+  <section id="workflow" class="workflow" aria-labelledby="workflow-heading">
     <div class="container">
-      <div class="cta-grid">
-        <div class="section-head reveal" style="margin-bottom:0;">
-          <h2 id="cta-heading" class="t-display-lg">지금, 설치 명령 두 줄이면 됩니다.</h2>
-          <p class="cta-sub t-body-lg">Claude Code 또는 Codex를 선택해 설치하고, 새 대화에서 만들고 싶은 것을 한 줄로 말하세요.</p>
+      <div class="workflow-intro">
+        <h2 id="workflow-heading">새로 만들기와 기존 개선.<br>상황에 맞게 요청하세요.</h2>
+        <p>대상, 목표, 유지할 조건을 알려주세요. 기존 자료에서 확인되는 내용과 이미 정한 방향은 이어서 사용합니다.</p>
+      </div>
+      <div class="workflow-grid">
+        <article class="workflow-item" aria-labelledby="new-heading">
+          <h3 id="new-heading">새로운 디자인을 만들 때</h3>
+          <p>아이디어를 구체화하고, 필요한 근거와 방향을 정해 결과물로 만듭니다.</p>
+          <dl class="command-pair"><dt>Claude Code</dt><dd><code>/gx-design:gx-design</code></dd><dt>Codex</dt><dd><code>$gx-design</code></dd></dl>
+          <blockquote class="request-example"><span>이렇게 요청하세요</span>협업툴 소개 페이지를 만들어줘. 대상은 도입을 검토하는 IT 팀장이고, 목표는 도입 문의야. 기존 브랜드 가이드를 유지하고 모바일도 함께 설계해줘.</blockquote>
+          <p class="workflow-result"><strong>이어지는 작업</strong> 필요한 의도 확인 → 방향 설정 → 제작 → 최종 검수</p>
+        </article>
+        <article class="workflow-item" aria-labelledby="redesign-heading">
+          <h3 id="redesign-heading">기존 디자인을 개선할 때</h3>
+          <p>현재 결과물에서 문제를 확인하고, 유지할 자산과 합의한 수정 범위 안에서 개선합니다.</p>
+          <dl class="command-pair"><dt>Claude Code</dt><dd><code>/gx-design:gx-redesign</code></dd><dt>Codex</dt><dd><code>$gx-redesign</code></dd></dl>
+          <blockquote class="request-example"><span>이렇게 요청하세요</span>이 인증조회 화면을 개선해줘. 밝은 바탕에서 조회 조건과 진행 목록이 구분되도록 정리하고 싶어. 기존 조회 기능과 신청 정보는 유지해줘.</blockquote>
+          <p class="workflow-result"><strong>이어지는 작업</strong> 기존 화면 진단 → 수정 범위 확인 → 개선 → 변경 전후 검수</p>
+        </article>
+      </div>
+      <details class="workflow-detail">
+        <summary>수정하지 않고 점검 결과만 받을 수도 있나요?</summary>
+        <p>네. 개선 명령에 “점검만. 고치지 말고 문제를 정리해줘”라고 적어주세요. 화면 URL이나 파일, 확인할 기기와 사용 흐름을 함께 알려주면 해당 범위의 진단 보고로 마칩니다. 실제 조작 검증은 사용 가능한 브라우저 실행 환경에서 진행하며, 확인하지 못한 부분은 별도로 표시합니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="install" class="installation" aria-labelledby="install-heading">
+    <div class="container installation-grid">
+      <div class="installation-intro">
+        <h2 id="install-heading">사용하는 도구에 설치하고,<br>첫 작업을 시작하세요.</h2>
+        <p>Claude Code와 Codex를 지원합니다.<br>사용하는 도구를 선택한 뒤, 설치 명령 두 줄을 차례로 실행하세요.</p>
+        <a class="text-link" href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">설치·유지보수 안내<svg class="arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12 12 4M4 4h8v8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      </div>
+      <div class="install">
+        <!-- Both panels are visible by default. JavaScript enhances them into tabs. -->
+        <div class="install-hosts" data-install-tabs hidden>
+          <button id="host-tab-claude" class="host-tab" type="button" data-install-host="claude">Claude Code</button>
+          <button id="host-tab-codex" class="host-tab" type="button" data-install-host="codex">Codex</button>
         </div>
-        <div class="install reveal" style="margin-top:0;">
-          <div class="code-block">
-            <div class="code-head">
-              <span class="code-label t-micro-cap">INSTALL · 호스트 선택</span>
-              <div class="install-hosts" role="group" aria-label="설치할 호스트 선택">
-                <button class="install-host-btn" type="button" data-install-host="claude" aria-pressed="true">Claude Code</button>
-                <button class="install-host-btn" type="button" data-install-host="codex" aria-pressed="false">Codex</button>
-              </div>
-            </div>
-            <pre class="code-lines"><code data-host="claude">/plugin marketplace add bs-koo/gx-design
-/plugin install gx-design@gx-design</code></pre>
-            <pre class="code-lines" hidden><code data-host="codex">codex plugin marketplace add bs-koo/gx-design
-codex plugin add gx-design@gx-design</code></pre>
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-primary t-button" type="button" data-copy>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 10.5V3a1 1 0 0 1 1-1h7.5" stroke="currentColor" stroke-width="1.3"/></svg>
-              <span class="copy-btn-label" data-default="명령어 복사">명령어 복사</span>
-            </button>
-            <a class="btn btn-secondary t-button" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub에서 보기</a>
-          </div>
-          <p class="install-help t-body-md"><a href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">두 호스트의 설치·스킬 유지보수 안내</a></p>
-        </div>
+        <section id="install-claude" class="install-panel" aria-labelledby="install-claude-heading" data-install-panel="claude">
+          <h3 id="install-claude-heading">Claude Code에 설치</h3>
+          <div class="code-block"><p class="code-label">Claude Code에서 차례로 실행</p><pre class="code-lines"><code data-host="claude">/plugin marketplace add bs-koo/gx-design
+/plugin install gx-design@gx-design</code></pre></div>
+          <div class="install-actions"><button class="copy-button" type="button" data-copy="claude" hidden><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 11H2V2h9v1" stroke="currentColor" stroke-width="1.2"/></svg><span>설치 명령 복사</span></button><p id="copy-status-claude" class="copy-status" role="status" aria-live="polite" aria-atomic="true"></p></div>
+          <p class="host-instruction">설치 후 Claude Code를 재시작하고,<br><code>/gx-design:gx-design</code> 또는 <code>/gx-design:gx-redesign</code> 뒤에 요청을 적으세요.</p>
+        </section>
+        <section id="install-codex" class="install-panel" aria-labelledby="install-codex-heading" data-install-panel="codex">
+          <h3 id="install-codex-heading">Codex에 설치</h3>
+          <div class="code-block"><p class="code-label">터미널에서 차례로 실행</p><pre class="code-lines"><code data-host="codex">codex plugin marketplace add bs-koo/gx-design
+codex plugin add gx-design@gx-design</code></pre></div>
+          <div class="install-actions"><button class="copy-button" type="button" data-copy="codex" hidden><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 11H2V2h9v1" stroke="currentColor" stroke-width="1.2"/></svg><span>설치 명령 복사</span></button><p id="copy-status-codex" class="copy-status" role="status" aria-live="polite" aria-atomic="true"></p></div>
+          <p class="host-instruction">설치 후 새 Codex 대화에서<br><code>$gx-design</code> 또는 <code>$gx-redesign</code> 뒤에 요청을 적으세요.</p>
+        </section>
+        <p class="copy-help" id="copy-help">복사가 되지 않으면 위 명령을 직접 선택해 복사하세요. 자동 복사는 HTTPS와 클립보드 권한이 필요할 수 있습니다.</p>
+        <noscript><p class="no-script">사용하는 도구의 설치 명령을 직접 선택해 복사하세요.</p></noscript>
       </div>
     </div>
   </section>
-
 </main>
-
-<!-- ============ 7. 푸터 ============ -->
 <footer class="site-footer">
   <div class="container footer-inner">
-    <div>
-      <span class="brand-word">gx-design</span>
-      <p class="footer-tagline t-body-md">BX · 그래픽 · UX/UI · 영상 — 한 줄로 요청하세요. 디자인 팀이 움직입니다.</p>
-    </div>
-    <a class="chrome-link t-body-md" href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub 레포지토리</a>
+    <div><a class="wordmark" href="#main">gx<span>-</span>design</a><p class="footer-caption">브랜드 · 그래픽 · UX/UI · 영상의 디자인 워크플로</p></div>
+    <nav class="footer-links" aria-label="관련 문서"><a href="https://github.com/bs-koo/gx-design" target="_blank" rel="noopener">GitHub ↗</a><a href="https://github.com/bs-koo/gx-design#readme" target="_blank" rel="noopener">전체 사용 안내 ↗</a><a href="https://github.com/bs-koo/gx-design/blob/main/docs/codex-skill-maintenance.md" target="_blank" rel="noopener">설치·유지보수 ↗</a></nav>
   </div>
 </footer>
-
 <script>
-(function(){
-  "use strict";
+(function () {
+  'use strict';
+  var install = document.querySelector('.install');
+  var tabList = install.querySelector('[data-install-tabs]');
+  var tabs = Array.prototype.slice.call(tabList.querySelectorAll('[data-install-host]'));
+  var panels = Array.prototype.slice.call(install.querySelectorAll('[data-install-panel]'));
 
-  /* ---------- 1) 설치 명령 복사 ---------- */
-  function fallbackCopy(text, cb){
-    try{
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly','');
-      ta.style.position = 'fixed';
-      ta.style.top = '-1000px';
-      ta.style.left = '-1000px';
-      document.body.appendChild(ta);
-      ta.select();
-      ta.setSelectionRange(0, text.length);
-      var ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      cb(ok);
-    }catch(e){ cb(false); }
+  function selectHost(index, moveFocus) {
+    tabs.forEach(function (tab, i) {
+      var selected = i === index;
+      tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+      tab.tabIndex = selected ? 0 : -1;
+      panels[i].hidden = !selected;
+    });
+    if (moveFocus) { tabs[index].focus(); }
   }
 
-  var announce = document.getElementById('copy-announce');
-  document.querySelectorAll('.install').forEach(function(block){
-    block.querySelectorAll('[data-install-host]').forEach(function(choice){
-      choice.addEventListener('click', function(){
-        var host = choice.getAttribute('data-install-host');
-        block.querySelectorAll('[data-install-host]').forEach(function(button){
-          button.setAttribute('aria-pressed', button === choice ? 'true' : 'false');
-        });
-        block.querySelectorAll('[data-host]').forEach(function(code){
-          code.closest('.code-lines').hidden = code.getAttribute('data-host') !== host;
-        });
-      });
+  tabList.setAttribute('role', 'tablist');
+  tabList.setAttribute('aria-label', '설치할 도구 선택');
+  tabs.forEach(function (tab, index) {
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', panels[index].id);
+    panels[index].setAttribute('role', 'tabpanel');
+    panels[index].setAttribute('aria-labelledby', tab.id);
+    panels[index].tabIndex = 0;
+    tab.addEventListener('click', function () { selectHost(index, false); });
+    tab.addEventListener('keydown', function (event) {
+      var next = null;
+      if (event.key === 'ArrowRight') { next = (index + 1) % tabs.length; }
+      if (event.key === 'ArrowLeft') { next = (index - 1 + tabs.length) % tabs.length; }
+      if (event.key === 'Home') { next = 0; }
+      if (event.key === 'End') { next = tabs.length - 1; }
+      if (next !== null) { event.preventDefault(); selectHost(next, true); }
     });
   });
-  var copyButtons = document.querySelectorAll('[data-copy]');
-  copyButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var block = btn.closest('.install'); /* 5회차: 복사 버튼이 .code-block 밖(형제 .btn-row)으로 이동해 조회 범위를 상위 컨테이너로 확장 */
-      var codeEl = block ? block.querySelector('.code-lines:not([hidden]) code[data-host]') : null;
-      var text = codeEl ? codeEl.innerText.trim() : '';
-      var label = btn.querySelector('.copy-btn-label');
-      var original = label.getAttribute('data-default');
+  selectHost(0, false);
+  tabList.hidden = false;
 
-      function done(ok){
-        btn.classList.toggle('is-copied', ok);
-        label.textContent = ok ? '복사됨' : original;
-        if(announce){ announce.textContent = ok ? '설치 명령이 복사되었습니다.' : '복사에 실패했습니다. 직접 선택해 복사해 주세요.'; }
-        window.clearTimeout(btn._copyTimer);
-        btn._copyTimer = window.setTimeout(function(){
-          btn.classList.remove('is-copied');
-          label.textContent = original;
-        }, 1800);
+  function fallbackCopy(value) {
+    var originalFocus = document.activeElement;
+    var selection = document.getSelection();
+    var ranges = [];
+    if (selection) {
+      for (var i = 0; i < selection.rangeCount; i++) { ranges.push(selection.getRangeAt(i).cloneRange()); }
+    }
+    var field = document.createElement('textarea');
+    field.value = value;
+    field.setAttribute('readonly', '');
+    field.setAttribute('aria-hidden', 'true');
+    field.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0;font-size:16px;';
+    document.body.appendChild(field);
+    var copied = false;
+    try {
+      field.focus({ preventScroll: true });
+      field.select();
+      field.setSelectionRange(0, value.length);
+      copied = document.execCommand('copy');
+    } catch (error) {
+      copied = false;
+    } finally {
+      field.remove();
+      if (selection) {
+        selection.removeAllRanges();
+        ranges.forEach(function (range) { selection.addRange(range); });
       }
+      if (originalFocus && originalFocus.isConnected) { originalFocus.focus({ preventScroll: true }); }
+    }
+    return copied;
+  }
 
-      if(navigator.clipboard && window.isSecureContext){
-        navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(function(){ fallbackCopy(text, done); });
-      } else {
-        fallbackCopy(text, done);
+  install.querySelectorAll('[data-copy]').forEach(function (button) {
+    button.hidden = false;
+    button.setAttribute('aria-describedby', 'copy-help');
+    var host = button.getAttribute('data-copy');
+    var hostName = host === 'claude' ? 'Claude Code' : 'Codex';
+    button.setAttribute('aria-label', hostName + ' 설치 명령 복사');
+    var copyPending = false;
+    button.addEventListener('click', function () {
+      if (copyPending) { return; }
+      var status = document.getElementById('copy-status-' + host);
+      var code = install.querySelector('[data-host="' + host + '"]');
+      var value = code.textContent.trim();
+      var label = button.querySelector('span');
+      var finished = false;
+      copyPending = true;
+      button.setAttribute('aria-busy', 'true');
+      status.textContent = '설치 명령을 복사하는 중입니다.';
+      function finish(ok) {
+        if (finished) { return; }
+        finished = true;
+        copyPending = false;
+        button.removeAttribute('aria-busy');
+        label.textContent = ok ? '복사 완료' : '다시 복사';
+        status.textContent = ok ? hostName + ' 설치 명령 두 줄을 복사했습니다.' : '복사하지 못했습니다. 위 명령을 직접 선택해 복사하세요.';
+        window.clearTimeout(button.copyReset);
+        button.copyReset = window.setTimeout(function () { label.textContent = '설치 명령 복사'; }, 3000);
       }
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          navigator.clipboard.writeText(value).then(function () { finish(true); }, function () { finish(fallbackCopy(value)); });
+        } catch (error) { finish(fallbackCopy(value)); }
+      } else { finish(fallbackCopy(value)); }
     });
   });
-
-  /* ---------- 2) 파이프라인 자동 전환 탭리스트(신규 제작 / 기존 개선 토글) ---------- */
-  /* 7회차: 클릭 전용 → 2초 자동 전환(사용자 요청). 8회차: gx-redesign 7단계를 토글로 추가.
-     전략 §5.4 원문과 다른 사양 — 오케스트레이터가 전략 문서를 별도 갱신한다. */
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var AUTOPLAY_MS = 2000;
-  var FADE_OUT_MS = 120; /* CSS .step-panel.is-swapping의 dur-out(120ms)과 동기화 */
-  var pipelineCardEl = document.querySelector('.pipeline-card');
-  var sharedSectionInView = false; /* 정지 조건 3 — 두 파이프라인이 같은 카드 안에 있어 IO 하나를 공유 */
-
-  /* detail: README 사실 기반 2번째 줄(신규 제작만 — §9 3회차 M-a). 개선은 README 원문이 이미 한 줄이라 detail 없음(§9 8회차) */
-  var newSteps = [
-    {label:'브리프', desc:'의도·유지 조건 확인', detail:'필수 결정의 답변 전에는 관련 제작을 기다립니다.'},
-    {label:'리서치', desc:'필요한 근거 조사', detail:'자료로 답이 난 질문은 다시 조사하지 않습니다.'},
-    {label:'전략', desc:'열린 방향만 비교', detail:'방향이 정해졌으면 재사용하고, 후보 선택이 필요하면 기다립니다.'},
-    {label:'제작', desc:'명세·카피·프롬프트', detail:'프로토타입까지 실제로 만듭니다.'},
-    {label:'검수', desc:'최종 결과물 검수', detail:'전략·완성도를 나누고 실제 버전과 관측 조건을 확인합니다.'},
-    {label:'납품', desc:'요청한 형식으로 전달', detail:'미검증·예외·남은 사용자 판단을 구분합니다.'}
-  ];
-  var redesignSteps = [
-    {label:'자산 인벤토리', desc:'기존 문서·코드·배포 화면 전수 파악 후 인터뷰'},
-    {label:'진단', desc:"낡았다는 인상을 Critical/Major/Minor로 번역"},
-    {label:'갭 리서치', desc:'경쟁·트렌드 대비 격차 분석'},
-    {label:'변경 범위 확인', desc:'정해진 방향은 재사용, 열린 방향만 비교'},
-    {label:'제작', desc:'변경 ID→before→after→근거로 추적'},
-    {label:'검수', desc:'2축 + 개선 목표 달성 축 = 3축 독립 검수'},
-    {label:'납품', desc:'최종 after 버전의 검수 상태와 함께 전달'}
-  ];
-
-  function makeStepRefs(setEl, panelId){
-    var panel = document.getElementById(panelId);
-    return {
-      tabs: Array.prototype.slice.call(setEl.querySelectorAll('.step-trigger')),
-      stepbarEl: setEl.querySelector('.stepbar'),
-      panel: panel,
-      panelIndex: panel ? panel.querySelector('.step-panel-index') : null,
-      panelDesc: panel ? panel.querySelector('.step-panel-desc') : null,
-      panelDetail: panel ? panel.querySelector('.step-panel-detail') : null
-    };
-  }
-
-  function makePipelineController(refs, steps){
-    var tabs = refs.tabs, stepbarEl = refs.stepbarEl, panel = refs.panel;
-    var panelIndex = refs.panelIndex, panelDesc = refs.panelDesc, panelDetail = refs.panelDetail;
-    var currentStep = 0;
-    var autoplayStopped = reduceMotion; /* 정지 조건 2 */
-    var stepbarFocused = false;         /* 정지 조건 5 */
-    var autoplayTimer = null;
-    var isActiveSet = false; /* 토글로 현재 화면에 보이는 파이프라인인지 — canAutoplay의 일부 */
-
-    function activateStep(i, moveFocus){
-      currentStep = i;
-      tabs.forEach(function(tab, idx){
-        var on = idx === i;
-        tab.setAttribute('aria-selected', on ? 'true' : 'false');
-        tab.tabIndex = on ? 0 : -1;
-        tab.classList.toggle('is-active', on);
-      });
-      if(panel){ panel.setAttribute('aria-labelledby', tabs[i].id); }
-
-      function swap(){
-        if(panelIndex){ panelIndex.textContent = i + ' · ' + steps[i].label; }
-        if(panelDesc){ panelDesc.textContent = steps[i].desc; }
-        if(panelDetail){ panelDetail.textContent = steps[i].detail || ''; }
-      }
-      if(reduceMotion || !panel){
-        swap();
-      } else {
-        panel.classList.add('is-swapping');
-        window.setTimeout(function(){
-          swap();
-          panel.classList.remove('is-swapping');
-        }, FADE_OUT_MS);
-      }
-      if(moveFocus){ tabs[i].focus(); } /* 자동 전환 tick은 항상 moveFocus=false — 포커스 강탈 금지 */
-    }
-
-    function canAutoplay(){
-      return !reduceMotion && !autoplayStopped && isActiveSet && sharedSectionInView && !document.hidden && !stepbarFocused;
-    }
-    function stopAutoplayTimer(){
-      if(autoplayTimer){ window.clearInterval(autoplayTimer); autoplayTimer = null; }
-    }
-    function refreshAutoplayTimer(){
-      if(canAutoplay()){
-        if(!autoplayTimer){
-          autoplayTimer = window.setInterval(function(){
-            activateStep((currentStep + 1) % tabs.length, false);
-          }, AUTOPLAY_MS);
-        }
-      } else {
-        stopAutoplayTimer();
-      }
-    }
-    function disableAutoplayPermanently(){ /* 정지 조건 1 — 토글 전환에는 적용하지 않음(setActive가 별도로 리셋) */
-      autoplayStopped = true;
-      stopAutoplayTimer();
-    }
-
-    tabs.forEach(function(tab, i){
-      tab.addEventListener('click', function(){ disableAutoplayPermanently(); activateStep(i, false); });
-      tab.addEventListener('keydown', function(e){
-        var target = null;
-        if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ target = (i + 1) % tabs.length; }
-        else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ target = (i - 1 + tabs.length) % tabs.length; }
-        else if(e.key === 'Home'){ target = 0; }
-        else if(e.key === 'End'){ target = tabs.length - 1; }
-        if(target !== null){ e.preventDefault(); disableAutoplayPermanently(); activateStep(target, true); }
-      });
-    });
-
-    if(stepbarEl){
-      stepbarEl.addEventListener('focusin', function(){ stepbarFocused = true; refreshAutoplayTimer(); });
-      stepbarEl.addEventListener('focusout', function(e){
-        if(!stepbarEl.contains(e.relatedTarget)){ stepbarFocused = false; refreshAutoplayTimer(); }
-      });
-    }
-
-    function setActive(active){ /* 8회차: 토글 전환 — 자동 재생은 멈추지 않고 새 파이프라인 0단계부터 다시 시작(스텝 클릭과는 다른 경로) */
-      isActiveSet = active;
-      if(active){
-        currentStep = 0;
-        autoplayStopped = reduceMotion;
-        activateStep(0, false);
-        refreshAutoplayTimer();
-      } else {
-        stopAutoplayTimer();
-      }
-    }
-
-    return { activateStep: activateStep, refreshAutoplayTimer: refreshAutoplayTimer, setActive: setActive };
-  }
-
-  var newSetEl = document.querySelector('[data-pipeline-set="new"]');
-  var redesignSetEl = document.querySelector('[data-pipeline-set="redesign"]');
-  var newController = makePipelineController(makeStepRefs(newSetEl, 'step-panel-new'), newSteps);
-  var redesignController = makePipelineController(makeStepRefs(redesignSetEl, 'step-panel-redesign'), redesignSteps);
-
-  var pipelineHeadingCount = document.getElementById('pipeline-heading-count');
-  var toggleButtons = Array.prototype.slice.call(document.querySelectorAll('.pipeline-toggle-btn'));
-  toggleButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var showNew = btn.getAttribute('data-pipeline') === 'new';
-      toggleButtons.forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
-      newSetEl.hidden = !showNew;
-      redesignSetEl.hidden = showNew;
-      if(pipelineHeadingCount){ pipelineHeadingCount.textContent = showNew ? '여섯' : '일곱'; }
-      newController.setActive(showNew);
-      redesignController.setActive(!showNew);
-    });
-  });
-
-  newController.setActive(true);   /* 초기: 신규 제작 표시 — 실제 자동 재생 시작은 아래 IO가 뷰포트 진입을 감지한 뒤 */
-  redesignController.setActive(false);
-
-  /* 정지 조건 4: 탭이 백그라운드면 정지, 복귀 시 재개(활성 파이프라인만) */
-  document.addEventListener('visibilitychange', function(){
-    newController.refreshAutoplayTimer();
-    redesignController.refreshAutoplayTimer();
-  });
-
-  /* B-M1: 공유 패널 구조상 각 파이프라인의 나머지 단계는 DOM에 없어 인쇄 시 0단계로 고정 — 8회차: 두 컨트롤러 모두 리셋 */
-  window.addEventListener('beforeprint', function(){
-    newController.activateStep(0, false);
-    redesignController.activateStep(0, false);
-  });
-
-  /* 정지 조건 3: 카드가 뷰포트 밖이면 일시정지, 재진입 시 재개(조건 1로 정지된 경우 제외) — 두 컨트롤러가 공유 */
-  if(pipelineCardEl && !reduceMotion && 'IntersectionObserver' in window){
-    var pipelineIO = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        sharedSectionInView = entry.isIntersecting;
-        newController.refreshAutoplayTimer();
-        redesignController.refreshAutoplayTimer();
-      });
-    }, { threshold: 0.3 });
-    pipelineIO.observe(pipelineCardEl);
-  }
-
-  /* ---------- 3) 이렇게 시키세요 — 예시 명령 호스트 토글(10회차) ---------- */
-  /* 설치 블록 토글과 같은 aria-pressed 패턴. 범위는 #ask 하나 — 설치 블록의 선택 상태와는 독립 */
-  var askSection = document.getElementById('ask');
-  if(askSection){
-    var askChoices = Array.prototype.slice.call(askSection.querySelectorAll('[data-ask-choice]'));
-    askChoices.forEach(function(choice){
-      choice.addEventListener('click', function(){
-        var host = choice.getAttribute('data-ask-choice');
-        askChoices.forEach(function(button){ button.setAttribute('aria-pressed', button === choice ? 'true' : 'false'); });
-        askSection.querySelectorAll('[data-ask-host]').forEach(function(cmd){
-          cmd.hidden = cmd.getAttribute('data-ask-host') !== host;
-        });
-      });
-    });
-  }
-
-  /* ---------- 4) 스크롤 진입 애니메이션 ---------- */
-  var reveals = document.querySelectorAll('.reveal');
-  if(reduceMotion || !('IntersectionObserver' in window)){
-    reveals.forEach(function(el){ el.classList.add('is-visible'); });
-  } else {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-    reveals.forEach(function(el){ io.observe(el); });
-  }
-})();
+}());
 </script>
 </body>
 </html>
