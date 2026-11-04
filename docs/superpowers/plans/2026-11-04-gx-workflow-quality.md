@@ -96,7 +96,7 @@ The user approved all findings and usability recommendations from the additional
 - [x] Workflow owner: reconcile brand preservation, partial-polish records, requested devices and actual candidate counts; clarify first versus repeated rejection, concise questions, independent task switching and available deliverables. Extend only missing dialogue acceptance cases.
 - [x] Root: add an optional reviewed timing report for first useful turn and rework; distinguish CLI active time from human waiting and total elapsed time. No mandatory product-user instrumentation.
 - [x] Root: run independent, isolated model forward checks for unanswered/partial/cancelled decisions, task switching and targeted fixes; record actual outcomes and limits without claiming a production benchmark.
-- [ ] Root: review changes, run the full deterministic and explicit Chrome suites, validate packaging and dry-runs, update validation evidence, commit and push to PR #18. Do not merge or deploy.
+- [x] Root: review changes, run the full deterministic and explicit Chrome suites, validate packaging and dry-runs, update validation evidence, commit and push to PR #18. Do not merge or deploy.
 
 Ownership: evaluation worker owns evals/run_eval.py, evals/score.py, eval tests and the existing eval README; observation worker owns the example/observer/browser tests and observation reference; workflow worker owns skill Markdown except that reference and dialogue fixtures; root owns the optional benchmark module/tests, plans, evidence and PR integration. Shared files are coordinated before edits.
 
