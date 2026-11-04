@@ -1,0 +1,19 @@
+{
+  "case_id": "certification-progress",
+  "description": "인증 진행현황 조회 화면의 디자인 개선 사례",
+  "mapping_source": "사용자 확인 (2026-11-04): 초록색·어두운 화면이 개선 전, 흰 바탕 화면이 개선 후. 과거 before/after 파일명이 반대였음.",
+  "before": {
+    "file": "redesign-before-dark.png",
+    "appearance": "초록색·어두운 배경의 기존 대시보드",
+    "width": 1231,
+    "height": 1206,
+    "sha256": "aa1ca8279c892d04ecea661a163c9c1cadb0cf00635b81048a278f2b60eb6c76"
+  },
+  "after": {
+    "file": "redesign-after-light.png",
+    "appearance": "흰 바탕의 조회 조건·진행 목록 개선안",
+    "width": 1260,
+    "height": 1038,
+    "sha256": "45a93724f0ce08f26412bcfb38e1c23c7d1ba2858f3f6e1ce9fa2bf1e260faed"
+  }
+}
