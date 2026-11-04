@@ -1,0 +1,20 @@
+{
+  "id": "T21",
+  "title": "T21 gemini-prompt-only",
+  "skill": "gx-design",
+  "request": "수선점 실의 세로 6초 소개 영상을 만들 Gemini 프롬프트 패키지만 납품해줘. 청록, 수선 전후 비교, 무음 자막. 이미지·영상 생성은 하지 마.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "프롬프트 패키지를 완성하고 추가 이미지·영상 생성을 실행하지 않는다.",
+    "생성 실물 품질을 검증 통과했다고 주장하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

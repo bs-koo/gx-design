@@ -1,0 +1,33 @@
+{
+  "id": "T15",
+  "title": "T15 stale-answer",
+  "skill": "gx-design",
+  "request": "브랜드 v2는 파랑이고 전문 사용자용이야. 예전 초록·초보자 방향은 적용하지 마. 새 방향을 비교해줘.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "늦은 v1 답변·작업자 결과를 v2에 자동 적용하지 않는다.",
+    "드라이버도 현재 v2 질문에 v1 승인을 전달하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "direction",
+          "type": "selection",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "answered",
+          "value": "예전 v1의 A로 승인해."
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "late user answer v1",
+    "late worker artifact v1"
+  ]
+}

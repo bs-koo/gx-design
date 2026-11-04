@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>폼·오류 복구 대조 예제</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#edf2ee;color:#193326;font:16px/1.6 system-ui,sans-serif}main{max-width:650px;margin:32px auto;padding:28px;background:#fff}h1{font-size:26px;margin-top:0}label{display:block;font-weight:650;margin-top:20px}input,textarea,button{font:inherit;min-height:44px}input,textarea{display:block;width:100%;padding:10px;border:1px solid #65776c;border-radius:3px}button{margin-top:18px;padding:10px 15px;background:#195b38;color:white;border:0;cursor:pointer}button.secondary{background:#edf2ee;color:#193326;margin-right:8px}:focus-visible{outline:3px solid #1762a5;outline-offset:3px}.error{color:#a52219;margin:5px 0}.note{color:#435c4b}.summary{padding:14px;background:#fff1ef;border:1px solid #bc3428}[aria-invalid=true]{border:2px solid #bc3428}body[data-view=before] .error{display:none}[hidden]{display:none!important}@media(max-width:520px){main{margin:0;padding:18px}}
+</style>
+<main id="application"><h1>상담 신청</h1><p>주 과업: 입력을 유지하면서 잘못된 이메일을 바로잡고 신청을 완료합니다. 외부 제출은 없는 로컬 예제입니다.</p>
+<button class="secondary" id="view" type="button" aria-pressed="false">수정 전 보기</button><button class="secondary" id="stress" type="button">긴 데이터 채우기</button>
+<div id="errors" class="summary" role="alert" tabindex="-1" hidden></div>
+<form id="request" novalidate><label for="name">이름</label><input id="name" name="name" autocomplete="name" required aria-describedby="name-error"><p id="name-error" class="error" hidden>이름을 입력해 주세요.</p>
+<label for="email">이메일</label><input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-help email-error"><p id="email-help" class="note">접수 결과를 받을 주소를 입력하세요.</p><p id="email-error" class="error" hidden>이메일 주소를 확인해 주세요. 예: name@example.com</p>
+<label for="message">상담 내용</label><textarea id="message" name="message" rows="4"></textarea><button type="submit">신청하기</button></form><p id="result" role="status"></p>
+<p>수정 전은 필드별 오류 연결과 포커스 이동이 부족한 대조 상태입니다. 입력 보존·오류 위치·복구를 직접 확인하세요.</p></main>
+<script>
+document.querySelector('#view').addEventListener('click',e=>{const before=document.body.dataset.view!=='before';document.body.dataset.view=before?'before':'after';e.currentTarget.setAttribute('aria-pressed',String(before));e.currentTarget.textContent=before?'수정 후 보기':'수정 전 보기'});
+document.querySelector('#stress').addEventListener('click',()=>{document.querySelector('#name').value='장기프로젝트 공동담당자';document.querySelector('#message').value='입력한 내용을 지우지 않고 오류를 수정할 수 있어야 합니다. '.repeat(12)});
+document.querySelector('#request').addEventListener('submit',e=>{e.preventDefault();const bad=[];for(const id of ['name','email']){const field=document.getElementById(id);const invalid=!field.validity.valid;field.setAttribute('aria-invalid',String(invalid));document.getElementById(id+'-error').hidden=!invalid;if(invalid)bad.push(field)}const summary=document.querySelector('#errors');summary.hidden=bad.length===0;summary.textContent=bad.length?`${bad.length}개 항목을 확인해 주세요. 입력한 내용은 유지됩니다.`:'';document.querySelector('#result').textContent=bad.length?'':'신청 내용을 로컬에서 확인했습니다. 외부로 전송하지 않았습니다.';if(bad.length&&document.body.dataset.view!=='before')bad[0].focus()});
+</script></html>

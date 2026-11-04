@@ -28,7 +28,11 @@ RUBRIC_KEYS = (
 )
 MAX_PER_CRITERION = 2
 USAGE_COLUMNS = ("input_tokens", "cached_input_tokens", "uncached_input_tokens", "output_tokens", "reasoning_output_tokens")
-AVERAGE_STOP_REASONS = {"answers_exhausted", "max_turns", ""}
+AVERAGE_STOP_REASONS = {"completed"}
+DIALOGUE_KEYS = ("required_intent", "dependent_work_wait", "approval_reuse", "question_clarity",
+                 "recommendation_reason", "scope_preservation")
+ARTIFACT_KEYS = ("task_success", "information_hierarchy", "product_specificity", "density_readability",
+                 "state_motion", "scoped_defects", "verification_coverage")
 
 
 def _is_result_file(path: Path) -> bool:
@@ -52,10 +56,10 @@ def score_path_for(result_path: Path) -> Path:
     return result_path.with_name(result_path.name[: -len(".json")] + ".scores.json")
 
 
-def rubric_total(scores: dict) -> tuple[int, int]:
+def rubric_total(scores: dict, keys: tuple = RUBRIC_KEYS) -> tuple[int, int]:
     """(획득 점수, 만점) — None 항목은 제외, 0~2 범위 밖은 ValueError."""
     got, maximum = 0, 0
-    for key in RUBRIC_KEYS:
+    for key in keys:
         value = scores.get(key)
         if value is None:
             continue
@@ -82,6 +86,9 @@ def load_row(result_path: Path) -> dict | None:
         "stop_reason": data.get("stop_reason", ""),
         "usage": {key: usage.get(key, 0) for key in USAGE_COLUMNS},
         "rubric": None,
+        "dialogue": None,
+        "artifact": None,
+        "eligible_for_success_average": data.get("eligible_for_success_average", True),
         "source": str(result_path),
     }
     score_file = score_path_for(Path(result_path))
@@ -90,21 +97,34 @@ def load_row(result_path: Path) -> dict | None:
             score_data = json.loads(score_file.read_text(encoding="utf-8"))
             if not isinstance(score_data, dict):
                 raise ValueError("최상위는 객체여야 함")
-            scores = score_data.get("scores", score_data)
+            scores = score_data.get("scores", {} if any(key in score_data for key in ("dialogue", "artifact")) else score_data)
             if not isinstance(scores, dict):
                 raise ValueError("scores는 객체여야 함")
             unknown = set(scores) - set(RUBRIC_KEYS)
             if unknown:
                 raise ValueError(f"알 수 없는 기준: {sorted(unknown)}")
             got, maximum = rubric_total(scores)
+            for dimension, keys in (("dialogue", DIALOGUE_KEYS), ("artifact", ARTIFACT_KEYS)):
+                values = score_data.get(dimension)
+                if values is None:
+                    continue
+                if not isinstance(values, dict) or set(values) - set(keys):
+                    raise ValueError(f"invalid {dimension} criteria")
+                dim_got, dim_max = rubric_total(values, keys)
+                row[dimension] = {"got": dim_got, "max": dim_max, "scores": values}
         except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
             raise ValueError(f"{score_file}: .scores.json 형식 오류: {exc}") from exc
         row["rubric"] = {"got": got, "max": maximum, "scores": scores, "scorer": score_data.get("scorer")}
-    if row["stop_reason"] not in AVERAGE_STOP_REASONS:
+    if not is_eligible(row):
         row["status"] = f"제외: {row['stop_reason']}"
     else:
         row["status"] = row["stop_reason"]
     return row
+
+
+def is_eligible(row: dict) -> bool:
+    return (row["stop_reason"] in AVERAGE_STOP_REASONS and
+            row.get("eligible_for_success_average", True) is True)
 
 
 def aggregate(rows: Iterable[dict]) -> list[dict]:
@@ -114,8 +134,8 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
         groups.setdefault((row["scenario"], row["mode"]), []).append(row)
     table = []
     for (scenario, mode), group in sorted(groups.items()):
-        eligible = [r for r in group if r["stop_reason"] in AVERAGE_STOP_REASONS]
-        excluded = [r for r in group if r["stop_reason"] not in AVERAGE_STOP_REASONS]
+        eligible = [r for r in group if is_eligible(r)]
+        excluded = [r for r in group if not is_eligible(r)]
         n = len(eligible)
         rubric_rows = [r["rubric"] for r in eligible if r["rubric"]]
         entry = {
@@ -134,6 +154,11 @@ def aggregate(rows: Iterable[dict]) -> list[dict]:
                 "max": sum(r["max"] for r in rubric_rows) / len(rubric_rows),
                 "n": len(rubric_rows),
             }
+        for dimension in ("dialogue", "artifact"):
+            values = [r[dimension] for r in eligible if r.get(dimension)]
+            entry[dimension] = ({"got": sum(v["got"] for v in values) / len(values),
+                                 "max": sum(v["max"] for v in values) / len(values), "n": len(values)}
+                                if values else None)
         table.append(entry)
     return table
 
@@ -143,23 +168,25 @@ def _fmt(value: float) -> str:
 
 
 def format_table(table: list[dict]) -> str:
-    header = ("| 시나리오 | 모드 | 상태 | 채점 표본 수 | 턴 | 입력 토큰 | 캐시 입력 | 미캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 품질(rubric) |\n"
-              "|---|---|---|---|---|---|---|---|---|---|---|---|")
+    header = ("| 시나리오 | 모드 | 상태 | 채점 표본 수 | 턴 | 입력 토큰 | 캐시 입력 | 미캐시 입력 | 출력 토큰 | 추론 출력 | 도구 호출 | 절차(rubric) | 대화 | 실물 |\n"
+              "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     lines = [header]
     for entry in table:
         usage = entry["usage"]
         rubric = entry["rubric"]
         quality = f"{_fmt(rubric['got'])}/{_fmt(rubric['max'])}" if rubric else "미채점"
+        dimensions = [f"{_fmt(entry[d]['got'])}/{_fmt(entry[d]['max'])} (n={entry[d]['n']})"
+                      if entry.get(d) else "미채점" for d in ("dialogue", "artifact")]
         status = "평균" if entry["n"] else "평균 제외"
         lines.append(
             f"| {entry['scenario']} | {entry['mode']} | {status} | {entry['n']} | {_fmt(entry['turns'])} | "
             f"{_fmt(usage['input_tokens'])} | {_fmt(usage['cached_input_tokens'])} | "
             f"{_fmt(usage['uncached_input_tokens'])} | {_fmt(usage['output_tokens'])} | {_fmt(usage['reasoning_output_tokens'])} | "
-            f"{_fmt(entry['tool_calls'])} | {quality} |"
+            f"{_fmt(entry['tool_calls'])} | {quality} | {' | '.join(dimensions)} |"
         )
         for excluded in entry["excluded"]:
             status = excluded.get("status", f"제외: {excluded.get('stop_reason', 'unknown')}")
-            lines.append(f"| {entry['scenario']} | {entry['mode']} | {status} | — | — | — | — | — | — | — | — | 미채점 |")
+            lines.append(f"| {entry['scenario']} | {entry['mode']} | {status} | — | — | — | — | — | — | — | — | 미채점 | 미채점 | 미채점 |")
     lines.append("")
     lines.append("표본이 작다(n 열). 토큰 0은 호스트가 사용량을 내보내지 않았다는 뜻일 수 있다 — 원본 .events.jsonl을 확인한다.")
     return "\n".join(lines)

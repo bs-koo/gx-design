@@ -6,9 +6,8 @@
 흐름(시나리오 1개 × 모드 1개):
   1. 새 작업 폴더를 만들고 시나리오 fixtures를 복사한다.
   2. `codex exec --json ... -` 로 첫 요청을 보낸다(프롬프트는 stdin).
-  3. JSONL 이벤트에서 세션 ID를 찾고, answers를 순서대로
-     `codex exec resume --json ... <SESSION_ID> -` 로 넣는다.
-  4. answers 소진 또는 max_turns 도달 시 멈춘다.
+  3. 평가 전용 sidecar의 현재 결정과 일치하는 checkpoint만 resume으로 보낸다.
+  4. 명시적 완료, 대기, 예상 밖 질문 또는 max_turns에서 멈춘다.
   5. 토큰 사용량·도구 호출 수·턴별 마지막 메시지·생성 파일을
      results/<timestamp>/<scenario>-<mode>.json 에 저장한다.
 
@@ -20,11 +19,14 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import hashlib
 import json
 import os
 import shutil
 import subprocess
 import sys
+import time
+import uuid
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -37,6 +39,18 @@ MODES = ("core", "full")
 MODE_LABELS = {"core": "핵심 모드", "full": "전체 모드"}
 SKILLS = ("gx-design", "gx-redesign")
 REQUIRED_KEYS = ("id", "skill", "request", "mode", "answers", "max_turns", "expected")
+STATE_FILE = ".gx-eval-state.json"
+PROTOCOL = "gx-eval-dialogue/v1"
+DECISION_KEYS = ("id", "type", "scope_version")
+RESPONSE_STATUSES = {"answered", "delegated", "partial", "empty", "cancelled",
+                     "rejected", "status_query", "stopped", "scope_change"}
+OBSERVATION_LIMITS = (
+    "Content SHA-256 snapshots cover turn boundaries in the workdir. Available file_change "
+    "and command events are retained, including in-turn/reverted changes. Arbitrary shell "
+    "writes/restores, external paths, missing events and remote tools can be invisible. "
+    "A clean diff plus assistant assertions does not prove absence of unauthorized mutation. "
+    "The evaluator sidecar is a dialogue signal, not independent artifact verification."
+)
 
 # 세션/스레드 시작 이벤트로 보는 type 값(소문자 비교, 부분 일치 허용).
 _SESSION_EVENT_HINTS = ("thread.started",)
@@ -55,7 +69,7 @@ class ScenarioError(ValueError):
 def validate_scenario(data: Any, source: str = "<scenario>") -> dict:
     if not isinstance(data, dict):
         raise ScenarioError(f"{source}: 최상위는 객체여야 한다")
-    missing = [key for key in REQUIRED_KEYS if key not in data]
+    missing = [key for key in REQUIRED_KEYS if key not in data and not (key == "answers" and "dialogue" in data)]
     if missing:
         raise ScenarioError(f"{source}: 필수 키 누락 {missing}")
     if not isinstance(data["id"], str) or not data["id"].strip():
@@ -66,7 +80,7 @@ def validate_scenario(data: Any, source: str = "<scenario>") -> dict:
         raise ScenarioError(f"{source}: request는 비어 있지 않은 문자열")
     if data["mode"] not in MODES:
         raise ScenarioError(f"{source}: mode는 {MODES} 중 하나")
-    answers = data["answers"]
+    answers = data.get("answers", [])
     if not isinstance(answers, list) or not all(isinstance(a, str) and a.strip() for a in answers):
         raise ScenarioError(f"{source}: answers는 비어 있지 않은 문자열 목록")
     max_turns = data["max_turns"]
@@ -81,7 +95,41 @@ def validate_scenario(data: Any, source: str = "<scenario>") -> dict:
     for fixture in fixtures:
         if not (isinstance(fixture, dict) and isinstance(fixture.get("src"), str)):
             raise ScenarioError(f"{source}: fixture는 {{src, dest?}} 객체")
+    if "dialogue" in data:
+        dialogue = data["dialogue"]
+        if not isinstance(dialogue, dict) or type(dialogue.get("version")) is not int or dialogue["version"] != 1:
+            raise ScenarioError(f"{source}: dialogue.version must be 1")
+        if not isinstance(dialogue.get("checkpoints"), list):
+            raise ScenarioError(f"{source}: dialogue.checkpoints must be a list")
+        for checkpoint in dialogue["checkpoints"]:
+            if not isinstance(checkpoint, dict):
+                raise ScenarioError(f"{source}: checkpoint must be an object")
+            decision_key(checkpoint.get("decision"))
+            response = checkpoint.get("response")
+            if (not isinstance(response, dict) or not isinstance(response.get("status"), str)
+                    or response["status"] not in RESPONSE_STATUSES):
+                raise ScenarioError(f"{source}: invalid checkpoint response status")
+            value = response.get("value")
+            if value is not None and not isinstance(value, str):
+                raise ScenarioError(f"{source}: response.value must be string or null")
+            if response["status"] in {"answered", "delegated", "scope_change"} and (not value or not value.strip()):
+                raise ScenarioError(f"{source}: affirmative responses require explicit value")
+            invalidates = response.get("invalidates", [])
+            if not isinstance(invalidates, list):
+                raise ScenarioError(f"{source}: response.invalidates must be a list")
+            if invalidates and response["status"] != "scope_change":
+                raise ScenarioError(f"{source}: only explicit scope_change may invalidate decisions")
+            if response["status"] == "scope_change" and not invalidates:
+                raise ScenarioError(f"{source}: scope_change requires explicit invalidates")
+            identities = []
+            for invalidated in invalidates:
+                identities.append(decision_key(invalidated))
+                if not isinstance(invalidated.get("reason"), str) or not invalidated["reason"].strip():
+                    raise ScenarioError(f"{source}: invalidation requires explicit reason")
+            if len(identities) != len(set(identities)):
+                raise ScenarioError(f"{source}: duplicate invalidation identity")
     normalized = dict(data)
+    normalized.setdefault("answers", [])
     normalized.setdefault("fixtures", [])
     normalized.setdefault("title", data["id"])
     return normalized
@@ -109,6 +157,81 @@ def load_scenarios(directory: Path = SCENARIO_DIR, only: Iterable[str] | None = 
 
 def build_initial_prompt(scenario: dict, mode: str) -> str:
     return f"${scenario['skill']} {scenario['request']}\n\n진행 모드: {MODE_LABELS[mode]}"
+
+
+def decision_key(decision: Any) -> tuple[str, str, str]:
+    if not isinstance(decision, dict) or any(
+            not isinstance(decision.get(key), str) or not decision[key].strip() for key in DECISION_KEYS):
+        raise ScenarioError("decision requires nonempty id/type/scope_version")
+    return tuple(decision[key] for key in DECISION_KEYS)
+
+
+def protocol_prompt(prompt: str, nonce: str, scenario: dict) -> str:
+    # Test instrumentation only: never add this protocol to product-user flows.
+    identities = [cp["decision"] for cp in scenario.get("dialogue", {}).get("checkpoints", [])]
+    return (prompt + f"\n\n[Evaluator instrumentation, not user approval]\nGX_EVAL_NONCE={nonce}\n"
+            f"Before ending this turn write {STATE_FILE} as JSON: "
+            f'{{"protocol":"{PROTOCOL}","nonce":"{nonce}","state":"waiting|completed|stopped|unverified",'
+            '"pending":[{"id":"...","type":"...","scope_version":"...",'
+            '"required":true,"status":"unresolved|partial"}]}. '
+            "Report actual state; do not invent a question to obtain a prepared answer. "
+            "completed requires no unresolved required decisions; unverified means required evidence unavailable. "
+            "A required decision remains outstanding until its explicit answered/delegated reply. "
+            "Only a scripted scope_change reply's invalidates entries authorize withdrawal. "
+            "Confirm withdrawal in invalidated:[{id,type,scope_version,reason}], copying that exact identity and reason. "
+            "Model-authored reasons alone never authorize withdrawal. "
+            "Use these identity labels only if their decisions actually apply: " + json.dumps(identities, ensure_ascii=False) +
+            ". Replies carry decision and response status; empty/cancelled/partial/status_query are not approval. "
+            "Never infer approval from absence of a reply. This sidecar does not verify artifacts.")
+
+
+def read_dialogue_signal(workdir: Path, nonce: str) -> tuple[dict | None, str | None]:
+    path = workdir / STATE_FILE
+    if not path.exists():
+        return None, "missing_signal"
+    try:
+        state = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(state, dict) or state.get("protocol") != PROTOCOL or state.get("nonce") != nonce:
+            return None, "stale_or_invalid_signal"
+        if not isinstance(state.get("state"), str) or state["state"] not in {"waiting", "completed", "stopped", "unverified"}:
+            return None, "invalid_signal"
+        pending = state.get("pending")
+        if not isinstance(pending, list):
+            return None, "invalid_signal"
+        keys = []
+        for item in pending:
+            keys.append(decision_key(item))
+            if (not isinstance(item.get("required"), bool) or not isinstance(item.get("status"), str)
+                    or item["status"] not in {"unresolved", "partial"}):
+                return None, "invalid_signal"
+        if len(keys) != len(set(keys)) or (state["state"] == "completed" and any(p["required"] for p in pending)):
+            return None, "invalid_signal"
+        if state["state"] == "waiting" and not pending:
+            return None, "invalid_signal"
+        invalidated = state.get("invalidated", [])
+        if not isinstance(invalidated, list):
+            return None, "invalid_signal"
+        for item in invalidated:
+            decision_key(item)
+            if not isinstance(item.get("reason"), str) or not item["reason"].strip():
+                return None, "invalid_signal"
+        return state, None
+    except (ValueError, OSError):
+        return None, "invalid_signal"
+
+
+def next_checkpoint(scenario: dict, state: dict, cursor: int) -> tuple[dict | None, str]:
+    if state["state"] != "waiting":
+        return None, state["state"]
+    if "dialogue" not in scenario:
+        return None, "legacy_unbound_answers"
+    checkpoints = scenario["dialogue"]["checkpoints"]
+    if cursor >= len(checkpoints):
+        return None, "waiting"
+    checkpoint = checkpoints[cursor]
+    if decision_key(checkpoint["decision"]) not in {decision_key(p) for p in state["pending"]}:
+        return None, "unexpected_question"
+    return checkpoint, "resume"
 
 
 # ---------------------------------------------------------------- 명령
@@ -338,12 +461,18 @@ def merge_counts(target: dict, extra: dict) -> dict:
 
 # ---------------------------------------------------------------- 작업 폴더
 
-def snapshot(directory: Path) -> dict[str, tuple[int, int]]:
+def snapshot(directory: Path) -> dict[str, tuple[int, str]]:
+    """Keep the old mapping/two-tuple API; second field is now content SHA-256, not mtime."""
     state = {}
     for path in Path(directory).rglob("*"):
-        if path.is_file():
-            stat = path.stat()
-            state[path.relative_to(directory).as_posix()] = (stat.st_size, stat.st_mtime_ns)
+        if path.is_file() and path.relative_to(directory).as_posix() != STATE_FILE:
+            digest = hashlib.sha256()
+            size = 0
+            with path.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    size += len(chunk)
+                    digest.update(chunk)
+            state[path.relative_to(directory).as_posix()] = (size, digest.hexdigest())
     return state
 
 
@@ -379,6 +508,9 @@ def prepare_workdir(scenario: dict, workdir: Path) -> list[str]:
 def validate_workdir(workdir: Path, results_dir: Path, repo_root: Path = REPO_ROOT) -> None:
     """작업 폴더의 Git 경계와 저장소 덮어쓰기 위험을 검사한다."""
     workdir, results_dir, repo_root = (Path(p).resolve() for p in (workdir, results_dir, repo_root))
+    # The default disposable run copies live here; allow this dedicated subtree only.
+    if results_dir == repo_root / "evals" / "results" and results_dir in workdir.parents:
+        return
     if workdir == repo_root or repo_root in workdir.parents or workdir in repo_root.parents:
         raise ScenarioError(f"작업 폴더가 저장소 루트와 겹치거나 저장소 안에 있음: {workdir}")
     if workdir == results_dir or results_dir in workdir.parents or workdir in results_dir.parents:
@@ -403,48 +535,60 @@ def _run_turn(cmd: list[str], prompt: str, env: dict, cwd: Path, timeout: int) -
 
 
 def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: Path) -> dict:
+    scenario = validate_scenario(scenario)
     name = f"{scenario['id']}-{mode}"
     base = Path(args.workdir).resolve() if args.workdir else run_dir / "work"
     workdir = base / name
     max_turns = min(scenario["max_turns"], args.max_turns) if args.max_turns else scenario["max_turns"]
-    prompts = [build_initial_prompt(scenario, mode)] + list(scenario["answers"])
-    prompts = prompts[:max_turns]
+    prompt = build_initial_prompt(scenario, mode)
+    checkpoints = scenario.get("dialogue", {}).get("checkpoints", [])
 
     env = os.environ.copy()
     if args.codex_home:
         env["CODEX_HOME"] = str(Path(args.codex_home).resolve())
 
     if args.dry_run:
-        print(f"# {name}  (workdir: {workdir}, turns ≤ {len(prompts)})")
+        print(f"# {name}  (workdir: {workdir}, turns ≤ {max_turns})")
         if args.codex_home:
             print(f"#   CODEX_HOME={env['CODEX_HOME']}")
-        for index, prompt in enumerate(prompts, 1):
-            cmd = (build_start_command(args.codex_bin, workdir, args.sandbox, run_dir / f"{name}.turn{index}.last.md")
-                   if index == 1 else
-                   build_resume_command(args.codex_bin, "<SESSION_ID>", args.sandbox,
-                                        run_dir / f"{name}.turn{index}.last.md"))
-            print("  $ " + " ".join(cmd))
-            print("    stdin: " + prompt.replace("\n", " / "))
+        cmd = build_start_command(args.codex_bin, workdir, args.sandbox, run_dir / f"{name}.turn1.last.md")
+        print("  $ " + " ".join(cmd))
+        print("    stdin: " + prompt.replace("\n", " / "))
+        print(f"    evaluator protocol: {PROTOCOL}; fresh nonce required each turn")
+        if "dialogue" not in scenario:
+            print(f"    LEGACY: {len(scenario.get('answers', []))} unbound answers retained but never auto-sent; add dialogue checkpoints")
+        for checkpoint in checkpoints:
+            print("    conditional checkpoint: " + json.dumps(checkpoint, ensure_ascii=False))
         return {}
 
+    run_started = time.perf_counter()
     run_dir.mkdir(parents=True, exist_ok=True)
     validate_workdir(workdir, Path(args.results_dir))
     fixtures = prepare_workdir(scenario, workdir)
     before = snapshot(workdir)
     raw_log = run_dir / f"{name}.events.jsonl"
     turns, per_turn_usages, tools = [], [], {}
-    session_id, stop_reason = None, "answers_exhausted"
+    session_id, stop_reason = None, "max_turns"
+    cursor = 0
+    outstanding_required = set()
+    authorized_invalidations = {}
 
     with raw_log.open("w", encoding="utf-8") as log:
-        for index, prompt in enumerate(prompts, 1):
+        for index in range(1, max_turns + 1):
+            nonce = uuid.uuid4().hex
+            turn_prompt = protocol_prompt(prompt, nonce, scenario)
             last_file = run_dir / f"{name}.turn{index}.last.md"
             if index == 1:
                 cmd = build_start_command(args.codex_bin, workdir, args.sandbox, last_file)
             else:
                 cmd = build_resume_command(args.codex_bin, session_id, args.sandbox, last_file)
             turn_before = snapshot(workdir)
-            code, out, err = _run_turn(cmd, prompt, env, workdir, args.timeout)
-            turn_files = changed_files(turn_before, snapshot(workdir))
+            turn_started = time.perf_counter()
+            code, out, err = _run_turn(cmd, turn_prompt, env, workdir, args.timeout)
+            turn_elapsed = time.perf_counter() - turn_started
+            turn_after = snapshot(workdir)
+            turn_files = changed_files(turn_before, turn_after)
+            dialogue_state, signal_error = read_dialogue_signal(workdir, nonce)
             log.write(json.dumps({"_runner": "turn", "turn": index, "returncode": code}, ensure_ascii=False) + "\n")
             log.write(out if out.endswith("\n") or not out else out + "\n")
             events, junk = parse_jsonl(out)
@@ -460,13 +604,21 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
                             if last_file.exists() else summary["last_message"])
             turns.append({
                 "turn": index,
-                "prompt": prompt,
+                "prompt": turn_prompt,
                 "returncode": code,
-            "usage": summary["usage"],
+                "elapsed_seconds": turn_elapsed,
+                "usage": summary["usage"],
                 "usage_cumulative": summary["usage"],
                 "tool_counts": summary["tool_counts"],
                 "event_types": summary["event_types"],
                 "files": turn_files,  # 이 턴에서 생성·수정·삭제된 파일(게이트 준수 판정용)
+                "file_hashes_before": turn_before,
+                "file_hashes_after": turn_after,
+                "mutation_events": [event for event in events if any(
+                    hint in str((_item_of(event) or {}).get("type", event_type(event))).lower()
+                    for hint in ("file_change", "command", "exec", "patch"))],
+                "dialogue_signal": dialogue_state,
+                "signal_error": signal_error,
                 "non_json_lines": len(junk),
                 "stderr_tail": err[-2000:],
                 "last_message": last_message,
@@ -479,14 +631,42 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
             if session_id is None:
                 stop_reason = "no_session_id"
                 break
-        else:
-            if len(prompts) < 1 + len(scenario["answers"]):
+            if signal_error:
+                stop_reason = signal_error
+                break
+            invalidated_decisions = dialogue_state.get("invalidated", [])
+            if any(authorized_invalidations.get(decision_key(item)) != item["reason"]
+                   for item in invalidated_decisions):
+                stop_reason = "unauthorized_invalidation"
+                break
+            for invalidated in invalidated_decisions:
+                outstanding_required.discard(decision_key(invalidated))
+                authorized_invalidations.pop(decision_key(invalidated), None)
+            outstanding_required.update(decision_key(p) for p in dialogue_state["pending"] if p["required"])
+            if dialogue_state["state"] == "completed" and outstanding_required:
+                stop_reason = "unresolved_required"
+                break
+            checkpoint, stop_reason = next_checkpoint(scenario, dialogue_state, cursor)
+            if checkpoint is None:
+                break
+            if index == max_turns:
                 stop_reason = "max_turns"
+                break
+            # Only an exact, current pending decision authorizes this test response.
+            prompt = "[Evaluator reply]\n" + json.dumps(checkpoint, ensure_ascii=False)
+            turns[-1]["dispatched_checkpoint"] = checkpoint
+            if checkpoint["response"]["status"] in {"answered", "delegated"}:
+                outstanding_required.discard(decision_key(checkpoint["decision"]))
+            if checkpoint["response"]["status"] == "scope_change":
+                for invalidated in checkpoint["response"]["invalidates"]:
+                    authorized_invalidations[decision_key(invalidated)] = invalidated["reason"]
+            cursor += 1
 
     usage_deltas, usage, usage_mode = aggregate_turn_usage(per_turn_usages)
     for turn, delta in zip(turns, usage_deltas):
         turn["usage_delta"] = delta
-    files = changed_files(before, snapshot(workdir))
+    after = snapshot(workdir)
+    files = changed_files(before, after)
     result = {
         "scenario": scenario["id"],
         "title": scenario.get("title"),
@@ -494,6 +674,17 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         "mode": mode,
         "session_id": session_id,
         "stop_reason": stop_reason,
+        "elapsed_seconds": time.perf_counter() - run_started,
+        "turn_elapsed_seconds": sum(turn["elapsed_seconds"] for turn in turns),
+        "timing_scope": "Monotonic active scripted runner through result assembly; turn durations cover CLI calls. Excludes human reply waiting and final result write/print; not evidence of speedup.",
+        "eligible_for_success_average": stop_reason == "completed",
+        "dialogue_format": "state-aware-v1" if "dialogue" in scenario else "legacy-unbound",
+        "checkpoints_dispatched": cursor,
+        "outstanding_required": [dict(zip(DECISION_KEYS, key)) for key in sorted(outstanding_required)],
+        "unused_checkpoints": checkpoints[cursor:],
+        "legacy_answers_not_dispatched": scenario.get("answers", []),
+        "observation_limits": OBSERVATION_LIMITS,
+        "snapshot_format": "path -> [size_bytes, sha256] (v2; formerly size/mtime)",
         "turn_count": len(turns),
         "usage": usage,
         "uncached_input_tokens": usage.get("uncached_input_tokens", 0),
@@ -504,6 +695,8 @@ def run_scenario(scenario: dict, mode: str, args: argparse.Namespace, run_dir: P
         "workdir": str(workdir),
         "fixtures": fixtures,
         "files": files,
+        "file_hashes_before": before,
+        "file_hashes_after": after,
         "expected": scenario["expected"],
         "sandbox": args.sandbox,
         "codex_home": env.get("CODEX_HOME") if args.codex_home else None,
@@ -520,6 +713,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="gx-design 평가 러너 (codex exec)")
     parser.add_argument("--scenario", action="append", default=[],
                         help="시나리오 id 또는 파일 이름(확장자 제외). 반복 가능. 생략 시 전체")
+    parser.add_argument("--scenario-dir", type=Path, default=SCENARIO_DIR,
+                        help="시나리오 폴더; 새 계약은 evals/dialogue-scenarios")
     parser.add_argument("--mode", choices=MODES + ("scenario", "both"), default="scenario",
                         help="core|full|both, 기본은 시나리오 파일의 mode")
     parser.add_argument("--codex-home", help="격리 CODEX_HOME 경로(하위 프로세스 환경에만 설정)")
@@ -541,7 +736,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    scenarios = load_scenarios(SCENARIO_DIR, args.scenario)
+    scenarios = load_scenarios(args.scenario_dir, args.scenario)
     if not scenarios:
         print("선택된 시나리오가 없다", file=sys.stderr)
         return 2

@@ -1,0 +1,20 @@
+{
+  "id": "T02",
+  "title": "T02 resolved-intent",
+  "skill": "gx-design",
+  "request": "30대 운동 초보 대상 4주 홈트 구독 신청 페이지를 HTML로 만들어줘. 목표는 체험 신청, 브랜드는 초록·흰색, CTA는 무료 체험, 기본 오류 상태 포함. 나머지 세부 표현은 맡길게.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "요청에서 확정된 의도·실물·위임 범위를 재질문하지 않는다.",
+    "HTML과 오류 상태를 확인하고 요청 범위 안에서 완료한다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

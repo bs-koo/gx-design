@@ -1,0 +1,33 @@
+{
+  "id": "T09",
+  "title": "T09 stop-and-proceed",
+  "skill": "gx-design",
+  "request": "새 화면 방향을 먼저 비교해줘. 고르기 전에는 제작하지 마.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "'그만'은 중단이다.",
+    "'그만, 진행해'는 현재 설명된 범위의 진행 위임으로 구별한다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "direction",
+          "type": "selection",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "stopped",
+          "value": "그만"
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "그만 → stopped",
+    "그만, 진행해 → bounded delegation"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "T10",
+  "title": "T10 status-while-waiting",
+  "skill": "gx-design",
+  "request": "새 화면의 목표가 아직 정해지지 않았으니 중요한 결정을 먼저 물어봐.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "상태 질문에는 현재 상태를 짧게 답한다.",
+    "상태 확인을 제작 승인으로 바꾸지 않고 기존 필수 결정을 기다린다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "intent",
+          "type": "required_intent",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "status_query",
+          "value": "어디까지 됐어?"
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

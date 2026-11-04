@@ -1,0 +1,32 @@
+{
+  "id": "T06",
+  "title": "T06 freeform-rejection",
+  "skill": "gx-design",
+  "request": "고객 지원 화면 방향을 두 가지로 제안하고 고르게 해줘.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "옵션을 거절한 자유 응답을 손실 없이 반영한다.",
+    "필요한 후속 질문은 거절한 결정에 좁혀 묻는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "direction",
+          "type": "selection",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "rejected",
+          "value": "둘 다 싫어. 검색보다 문의 작성이 중심이어야 해."
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}
