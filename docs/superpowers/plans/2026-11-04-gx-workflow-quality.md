@@ -78,9 +78,11 @@
 
 - [x] Review worker changes against the approved proposal, then request a fresh whole-branch review.
 - [x] Fix actionable review findings, rerun affected checks, and record honest validation limits in docs/research/2026-11-04-workflow-implementation-validation.md.
-- [ ] Inspect the final diff, commit Korean feature messages, push codex/gx-workflow-quality and open a PR against main.
-- [ ] Return the verified PR URL and concise implementation/testing summary. Do not merge or deploy.
+- [x] Inspect the final diff, commit Korean feature messages, push codex/gx-workflow-quality and open a PR against main.
+- [x] Return the verified PR URL and concise implementation/testing summary. Do not merge or deploy.
 
 ## Additional approved steering — elapsed time / entry weight
 
 The user additionally requested reducing long, heavy default execution while this implementation was active. Add core-by-default routing, progressive target-only discovery, unchanged-reference reuse, core recommendation1 plus comparison1 only if useful (explicit counts/full preserved), one orchestrator for small work, risk-based batched evidence, compact logs and runtime measurement. Required intent/wait/final criteria stay unchanged; no claimed wall-time speedup without matched real runs. Browser integration is opt-in so normal unit checks remain fast.
+
+PR: https://github.com/bs-koo/gx-design/pull/18
