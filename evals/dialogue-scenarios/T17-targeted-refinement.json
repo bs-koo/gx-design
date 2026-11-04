@@ -1,0 +1,26 @@
+{
+  "id": "T17",
+  "title": "T17 targeted-refinement",
+  "skill": "gx-redesign",
+  "request": "index.html의 신청 폼 오류 문구를 이해하기 쉽게 바꿔줘. 그 외 디자인·기능·문구는 유지해.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "명시한 폼 오류 문구만 수정한다.",
+    "전체 전략·새 기능·무관한 문구 변경과 전체 재승인을 추가하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ],
+  "fixtures": [
+    {
+      "src": "tests/fixtures/eval-ui.html",
+      "dest": "index.html"
+    }
+  ]
+}

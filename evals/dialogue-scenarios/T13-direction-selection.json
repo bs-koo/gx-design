@@ -1,0 +1,32 @@
+{
+  "id": "T13",
+  "title": "T13 direction-selection",
+  "skill": "gx-design",
+  "request": "예약 화면의 방향을 비교 가능한 두 후보로 제안해줘. 내가 고르기 전 통합하지 마.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "비교 가능한 후보를 제시한다.",
+    "선택 전 통합·제작을 기다린다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "direction",
+          "type": "selection",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "empty",
+          "value": null
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

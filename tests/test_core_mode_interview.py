@@ -1,3 +1,5 @@
+"""Instruction contract checks; these do not measure real-model behavior."""
+
 import unittest
 from pathlib import Path
 
@@ -43,6 +45,50 @@ class CoreModeInterviewTests(unittest.TestCase):
         readme = read_doc("README.md")
         self.assertNotIn("인터뷰 1라운드", readme)
         self.assertNotIn("(전체 모드 기준)", readme)
+
+    def test_core_does_not_force_a_new_direction_on_an_already_chosen_task(self) -> None:
+        for relative_path, heading in (
+            ("skills/gx-design/SKILL.md", "## 단계 2 — Strategy"),
+            ("skills/gx-redesign/SKILL.md", "## 단계 3 — 개선 전략"),
+        ):
+            strategy = read_doc(relative_path).split(heading, 1)[1].split("\n## ", 1)[0]
+            core = strategy.split("**핵심 모드**:", 1)[1]
+            with self.subTest(path=relative_path):
+                self.assertIn("방향 비교가 필요", core)
+                self.assertIn("재사용", core)
+                self.assertIn("RUN-BUDGET", core)
+
+    def test_default_route_loads_only_references_needed_for_the_request(self) -> None:
+        for relative_path in ("skills/gx-design/SKILL.md", "skills/gx-redesign/SKILL.md"):
+            doc = read_doc(relative_path)
+            with self.subTest(path=relative_path):
+                mode = doc.split("## 모드 결정", 1)[1].split("\n## ", 1)[0]
+                self.assertIn("기본은 핵심 모드", mode)
+                self.assertIn("해당 단계만", mode)
+                self.assertIn("## 시작 분기와 읽기 지도", doc)
+                routing = doc.split("## 시작 분기와 읽기 지도", 1)[1].split("\n## ", 1)[0]
+                self.assertIn("미확정 핵심 의도가 있을 때만", routing)
+                self.assertIn("방향이 열려 있을 때만", routing)
+                self.assertIn("대상과 필요한 의존 자료만", routing)
+        host = read_doc("skills/gx-design/HOST-COMPAT.md")
+        self.assertIn("변경되지 않은 세션에서는 한 번", host)
+
+    def test_small_work_uses_progressive_discovery_instead_of_whole_project_inventory(self) -> None:
+        for relative_path in ("skills/gx-design/BRIEF-INTERVIEW.md", "skills/gx-redesign/REDESIGN-INTERVIEW.md"):
+            doc = read_doc(relative_path)
+            with self.subTest(path=relative_path):
+                self.assertIn("점진적으로", doc)
+                self.assertIn("필요한 의존", doc)
+                self.assertNotIn("outputs/ 전체", doc)
+                self.assertNotIn("전수 수행", doc)
+
+    def test_core_direction_count_is_one_plus_a_real_comparison_when_needed(self) -> None:
+        doc = read_doc("skills/gx-design/DESIGN-IT-TWICE.md")
+        self.assertIn("추천 스케치 1안", doc)
+        self.assertIn("비교 1안", doc)
+        self.assertIn("전체 모드·명시적 3안", doc)
+        self.assertIn("실질적으로 다른", doc)
+        self.assertNotIn("스케치 3안**에서", doc)
 
 
 if __name__ == "__main__":

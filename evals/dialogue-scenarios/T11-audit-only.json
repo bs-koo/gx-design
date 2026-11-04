@@ -1,0 +1,26 @@
+{
+  "id": "T11",
+  "title": "T11 audit-only",
+  "skill": "gx-redesign",
+  "request": "index.html의 접근성과 폼 오류 흐름만 점검해줘. 파일은 수정하지 마.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "원본 내용 해시가 유지된다. 가능한 파일·명령 이벤트도 검사한다.",
+    "진단·미검증 범위를 보고하고 수정 선택을 강요하지 않고 완료한다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ],
+  "fixtures": [
+    {
+      "src": "tests/fixtures/eval-ui.html",
+      "dest": "index.html"
+    }
+  ]
+}

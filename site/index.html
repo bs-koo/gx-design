@@ -455,7 +455,7 @@ codex plugin add gx-design@gx-design</code></pre>
   <section id="pipeline" class="section section--soft" aria-labelledby="pipeline-heading">
     <div class="container">
       <div class="section-head reveal">
-        <p class="pipeline-pain t-body-lg">질문 없이 나온 디자인엔, 근거가 없습니다.</p>
+        <p class="pipeline-pain t-body-lg">목표를 확인하고, 필요한 결정만 묻습니다.</p>
         <h2 id="pipeline-heading" class="t-display-lg">한 줄의 요청이, <span id="pipeline-heading-count">여섯</span> 단계를 거칩니다.</h2>
       </div>
 
@@ -489,15 +489,15 @@ codex plugin add gx-design@gx-design</code></pre>
             </button>
             <span class="step-connector" aria-hidden="true"></span>
             <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-new" id="step-tab-new-5" tabindex="-1" data-step="5">
-              <span class="step-node">5</span><span class="step-label t-caption">실물 제작</span>
+              <span class="step-node">5</span><span class="step-label t-caption">납품</span>
             </button>
           </div>
 
           <div class="step-panel" id="step-panel-new" role="tabpanel" aria-labelledby="step-tab-new-0">
             <div class="step-panel-inner">
               <span class="step-panel-index t-caption">0 · 브리프</span>
-              <p class="step-panel-desc t-display-md">결정 트리로 질문</p>
-              <p class="step-panel-detail t-body-md">승인 전에는 어떤 산출물도 만들지 않습니다.</p>
+              <p class="step-panel-desc t-display-md">의도·유지 조건 확인</p>
+              <p class="step-panel-detail t-body-md">필수 결정의 답변 전에는 관련 제작을 기다립니다.</p>
             </div>
           </div>
         </div>
@@ -517,7 +517,7 @@ codex plugin add gx-design@gx-design</code></pre>
             </button>
             <span class="step-connector" aria-hidden="true"></span>
             <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-3" tabindex="-1" data-step="3">
-              <span class="step-node">3</span><span class="step-label t-caption">개선 강도 3안</span>
+              <span class="step-node">3</span><span class="step-label t-caption">변경 범위</span>
             </button>
             <span class="step-connector" aria-hidden="true"></span>
             <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-4" tabindex="-1" data-step="4">
@@ -529,7 +529,7 @@ codex plugin add gx-design@gx-design</code></pre>
             </button>
             <span class="step-connector" aria-hidden="true"></span>
             <button class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel-redesign" id="step-tab-redesign-6" tabindex="-1" data-step="6">
-              <span class="step-node">6</span><span class="step-label t-caption">실물 제작</span>
+              <span class="step-node">6</span><span class="step-label t-caption">납품</span>
             </button>
           </div>
 
@@ -592,7 +592,7 @@ codex plugin add gx-design@gx-design</code></pre>
           <div class="relay-card">
             <span class="pill-tag model-tag t-micro-cap">STRATEGY</span>
             <h3 class="t-display-md">전략가</h3>
-            <p class="t-body-md">철학이 다른 전략 3안을 세우고, 하나를 함께 고릅니다.</p>
+            <p class="t-body-md">방향이 열려 있으면 대표 후보를 비교하고, 확정된 방향은 재사용합니다.</p>
           </div>
         </div>
         <span class="relay-connector" aria-hidden="true"></span>
@@ -636,7 +636,7 @@ codex plugin add gx-design@gx-design</code></pre>
         <li class="ask-card">
           <span class="pill-tag t-micro-cap">신규 UI</span>
           <p class="ask-prompt t-body-md"><code class="ask-cmd" data-ask-host="claude">/gx-design:gx-design</code><code class="ask-cmd" data-ask-host="codex" hidden>$gx-design</code> 사내 협업툴 소개 랜딩 페이지. 도입을 검토하는 IT 팀장 대상, 목표는 도입 문의. 뻔한 보라 그라데이션 히어로 말고 실제 제품 화면이 주인공인 절제된 구성으로. 첨부한 DESIGN.md 톤 유지, 데스크톱·모바일.</p>
-          <p class="ask-result t-caption">전략 3안마다 다이얼 값이 붙고, 안을 고르면 다이얼도 확정됩니다.</p>
+          <p class="ask-result t-caption">방향이 열려 있으면 정보량·움직임·변경 범위의 차이를 비교합니다.</p>
         </li>
         <li class="ask-card">
           <span class="pill-tag t-micro-cap">점검 전용 · 모션</span>
@@ -786,21 +786,21 @@ codex plugin add gx-design@gx-design</code></pre>
 
   /* detail: README 사실 기반 2번째 줄(신규 제작만 — §9 3회차 M-a). 개선은 README 원문이 이미 한 줄이라 detail 없음(§9 8회차) */
   var newSteps = [
-    {label:'브리프', desc:'결정 트리로 질문', detail:'승인 전에는 어떤 산출물도 만들지 않습니다.'},
-    {label:'리서치', desc:'시장·사용자 조사', detail:'경쟁사·트렌드까지 네 갈래로 조사합니다.'},
-    {label:'전략', desc:'철학 다른 3안', detail:'본질 우선·차별화 우선·시스템 우선 중 하나를 고릅니다.'},
+    {label:'브리프', desc:'의도·유지 조건 확인', detail:'필수 결정의 답변 전에는 관련 제작을 기다립니다.'},
+    {label:'리서치', desc:'필요한 근거 조사', detail:'자료로 답이 난 질문은 다시 조사하지 않습니다.'},
+    {label:'전략', desc:'열린 방향만 비교', detail:'방향이 정해졌으면 재사용하고, 후보 선택이 필요하면 기다립니다.'},
     {label:'제작', desc:'명세·카피·프롬프트', detail:'프로토타입까지 실제로 만듭니다.'},
-    {label:'검수', desc:'전략·완성도 2축', detail:'두 보고서는 서로 합치지 않습니다.'},
-    {label:'실물 제작', desc:'코드·Gemini·편집 핸드오프 중 선택', detail:'검수를 통과해야 열리는 단계입니다.'}
+    {label:'검수', desc:'최종 결과물 검수', detail:'전략·완성도를 나누고 실제 버전과 관측 조건을 확인합니다.'},
+    {label:'납품', desc:'요청한 형식으로 전달', detail:'미검증·예외·남은 사용자 판단을 구분합니다.'}
   ];
   var redesignSteps = [
     {label:'자산 인벤토리', desc:'기존 문서·코드·배포 화면 전수 파악 후 인터뷰'},
     {label:'진단', desc:"낡았다는 인상을 Critical/Major/Minor로 번역"},
     {label:'갭 리서치', desc:'경쟁·트렌드 대비 격차 분석'},
-    {label:'개선 강도 3안', desc:'최소 개입·리프레시·리뉴얼 중 선택'},
-    {label:'제작', desc:'모든 변경을 before→after→근거 3열로 기록'},
+    {label:'변경 범위 확인', desc:'정해진 방향은 재사용, 열린 방향만 비교'},
+    {label:'제작', desc:'변경 ID→before→after→근거로 추적'},
     {label:'검수', desc:'2축 + 개선 목표 달성 축 = 3축 독립 검수'},
-    {label:'실물 제작', desc:'신규 제작과 동일한 게이트, after 실물까지'}
+    {label:'납품', desc:'최종 after 버전의 검수 상태와 함께 전달'}
   ];
 
   function makeStepRefs(setEl, panelId){

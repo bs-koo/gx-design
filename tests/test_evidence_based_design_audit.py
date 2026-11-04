@@ -56,7 +56,7 @@ class RedesignAuditContractTests(unittest.TestCase):
             self,
             text,
             (
-                "UI·웹 화면일 때만",
+                "시각 구조·AI 티가 점검 범위인 UI·웹 화면",
                 "실제로 발견된 항목만",
                 "해당 없음",
                 "검증 한계",
@@ -116,7 +116,7 @@ class LoadingAndScopeContractTests(unittest.TestCase):
         design = read_doc("skills/gx-design/SKILL.md")
         redesign = read_doc("skills/gx-redesign/SKILL.md")
         self.assertIn("UI·그래픽·UX/UI·Gemini 웹 생성 산출물", design)
-        self.assertIn("UI·웹 화면일 때만", redesign)
+        self.assertIn("시각 구조·AI 티가 점검 범위인 UI·웹 화면", redesign)
         self.assertIn("ANTI-TELL-CHECKLIST.md", design)
         self.assertIn("ANTI-TELL-CHECKLIST.md", redesign)
 

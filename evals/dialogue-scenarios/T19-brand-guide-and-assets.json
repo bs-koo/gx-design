@@ -1,0 +1,20 @@
+{
+  "id": "T19",
+  "title": "T19 brand-guide-and-assets",
+  "skill": "gx-design",
+  "request": "수선점 실 브랜드의 간단한 BX 가이드와 실제 512px PNG 심볼을 함께 만들어줘. 청록·손바느질 인상, 상호는 실. 필요한 세부 표현은 맡길게.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "가이드와 실제 PNG 자산의 완료·미검증 상태를 각각 확인한다.",
+    "자산 요청을 가이드 문서만으로 완료 처리하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

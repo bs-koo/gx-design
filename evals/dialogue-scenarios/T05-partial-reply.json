@@ -1,0 +1,32 @@
+{
+  "id": "T05",
+  "title": "T05 partial-reply",
+  "skill": "gx-design",
+  "request": "새 서비스의 목표·타깃·납품 방식을 아직 정하지 않았어. 같이 정하자.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "세 문항 중 답한 한 항목만 확정한다.",
+    "미응답 필수 결정에 의존하는 작업은 계속 기다린다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "target",
+          "type": "required_intent",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "answered",
+          "value": "대상은 운동 초보인 30대야."
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

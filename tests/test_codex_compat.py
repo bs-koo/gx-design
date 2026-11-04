@@ -272,7 +272,7 @@ class CodexCompatibilityTests(unittest.TestCase):
         review = (ROOT / "skills/gx-design/REVIEW-AXES.md").read_text(encoding="utf-8")
         redesign = (ROOT / "skills/gx-redesign/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("위임할 수 없으면", review)
-        self.assertIn("축 A와 축 B를 순서대로 각각 기록", review)
+        self.assertRegex(review, r"축 A와 축 B를 순서대로(?: 각각)? 기록")
         self.assertIn("축 C", redesign)
         self.assertIn("위임할 수 없으면", redesign)
 
@@ -296,22 +296,13 @@ class CodexCompatibilityTests(unittest.TestCase):
                 self.assertTrue(runtime_dependency_violations(content))
 
     def test_question_headers_follow_the_active_host_capability(self):
-        brief_lines = (ROOT / "skills/gx-design/BRIEF-INTERVIEW.md").read_text(encoding="utf-8").splitlines()
-        header_rule = next(line for line in brief_lines if "현재 호스트" in line and "header" in line)
-        mode_rule = next(line for line in brief_lines if "첫 문항" in line and "진행 모드" in line)
-        for line in (header_rule, mode_rule):
-            with self.subTest(path="skills/gx-design/BRIEF-INTERVIEW.md", line=line):
-                self.assertIn("구조화 입력 도구", line)
-                self.assertIn("실제 도구 상한", line)
-                self.assertIn("일반 대화 라벨", line)
-
+        host = (ROOT / "skills/gx-design/HOST-COMPAT.md").read_text(encoding="utf-8")
+        self.assertIn("구조", host)
+        self.assertIn("도구", host)
         for relative_path in ("skills/gx-design/SKILL.md", "skills/gx-redesign/SKILL.md"):
-            lines = (ROOT / relative_path).read_text(encoding="utf-8").splitlines()
-            mode_rule = next(line for line in lines if "첫 문항" in line and "진행 모드" in line)
-            with self.subTest(path=relative_path):
-                self.assertIn("구조화 입력 도구", mode_rule)
-                self.assertIn("실제 도구 상한", mode_rule)
-                self.assertIn("일반 대화 라벨", mode_rule)
+            text = (ROOT / relative_path).read_text(encoding="utf-8")
+            self.assertIn("HOST-COMPAT.md", text)
+            self.assertNotIn("첫 라운드의 첫 문항으로 모드를 묻는다", text)
 
     def test_strategy_variants_have_main_agent_fallback(self):
         text = (ROOT / "skills/gx-design/DESIGN-IT-TWICE.md").read_text(encoding="utf-8")

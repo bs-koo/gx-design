@@ -1,0 +1,40 @@
+{
+  "id": "T22",
+  "title": "T22 switch-independent-task",
+  "skill": "gx-design",
+  "request": "수선점 새 랜딩 HTML을 만들려고 해. 타깃은 동네 주민, 모바일·데스크톱, 기존 브랜드 초록 유지야. 핵심 목적을 예약 유도와 가격 안내 중 아직 정하지 못했으니 그 결정부터 물어봐.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "명시적 작업 전환을 상태 질문이나 이전 필수 결정의 응답으로 해석하지 않는다.",
+    "보류된 새 랜딩의 미응답과 맥락을 보존하면서, 독립적인 기존 화면 점검을 진행한다.",
+    "이전 결정을 현재 활성 작업의 의존성에서만 제외하며 새 랜딩을 승인·완료·영구 폐기했다고 보고하지 않는다.",
+    "index.html은 수정하지 않고 요청한 버튼 대비의 관찰 근거와 검증 한계를 보고한다.",
+    "나중에 새 랜딩으로 복귀하면 최신 목적·범위를 확인하고 영향 없는 확정 결정은 재사용한다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {"id": "intent", "type": "required_intent", "scope_version": "v1"},
+        "response": {
+          "status": "scope_change",
+          "value": "새 랜딩은 나중에 하자. 대신 index.html의 첫 화면 '진행 중만 보기' 버튼 글자 대비만 데스크톱 1440px에서 점검해줘. 원본은 고치지 마.",
+          "invalidates": [
+            {
+              "id": "intent",
+              "type": "required_intent",
+              "scope_version": "v1",
+              "reason": "User deferred the new landing; exclude this unanswered decision only from the active audit task, preserving the deferred task."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "fixtures": [{"src": "tests/fixtures/eval-ui.html", "dest": "index.html"}],
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "The runner can check active-decision invalidation; retaining and resuming the deferred task requires dialogue review and a later explicit resume."
+  ]
+}

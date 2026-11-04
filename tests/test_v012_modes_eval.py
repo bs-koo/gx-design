@@ -137,11 +137,6 @@ class SessionIdTests(unittest.TestCase):
         self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started", "thread_id": "fb"}]))
         self.assertIsNone(run_eval.extract_session_id([{"type": "turn.started"}]))
 
-    def test_resume_stream_id_mismatch_is_detected(self) -> None:
-        original, resumed = "thread-1", "thread-2"
-        self.assertNotEqual(original, resumed)
-
-
 class UsageAggregationTests(unittest.TestCase):
     def test_cumulative_turn_usage_uses_last_total_and_deltas(self) -> None:
         samples = [
@@ -263,6 +258,7 @@ class ScoreTests(unittest.TestCase):
         path = directory / f"{scenario}-{mode}.json"
         path.write_text(json.dumps({
             "scenario": scenario, "mode": mode, "turn_count": turns, "usage": usage,
+            "stop_reason": "completed",
             "tool_counts": {"command_execution": tools}, "tool_calls": tools,
         }), encoding="utf-8")
         return path
@@ -310,13 +306,13 @@ class ScoreTests(unittest.TestCase):
 
     def test_stopped_runs_excluded_and_reported_separately(self) -> None:
         rows = [
-            {"scenario": "s", "mode": "core", "stop_reason": "answers_exhausted", "turns": 2, "tool_calls": 3, "usage": {key: 1 for key in score.USAGE_COLUMNS}, "rubric": None},
+            {"scenario": "s", "mode": "core", "stop_reason": "completed", "turns": 2, "tool_calls": 3, "usage": {key: 1 for key in score.USAGE_COLUMNS}, "rubric": None},
             {"scenario": "s", "mode": "core", "stop_reason": "session_mismatch", "turns": 1, "tool_calls": 1, "usage": {key: 99 for key in score.USAGE_COLUMNS}, "rubric": None},
         ]
         table = score.aggregate(rows)
         self.assertEqual(table[0]["n"], 1)
         self.assertEqual(table[0]["excluded"][0]["stop_reason"], "session_mismatch")
-        self.assertIn("채점 표본 수", score.format_table(table))
+        self.assertIn("완료 비용 표본 수", score.format_table(table))
 
     def test_invalid_scores_file_has_clear_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -348,7 +344,8 @@ class V012AnchorTests(unittest.TestCase):
         budget = read_doc("skills/gx-design/RUN-BUDGET.md")
         motion = read_doc("skills/gx-design/MOTION.md")
         self.assertIn("[요청에서 확정]", redesign)
-        self.assertIn("점검 결과를 보고하고 이어가기 게이트 없이 끝냈다", redesign)
+        self.assertIn("점검 전용은 이 보고로 완료한다", redesign)
+        self.assertIn("명시된 수정 ID 집합", redesign)
         self.assertIn("관찰법", motion)
         self.assertIn("ID 계약", review)
         self.assertIn("독립 검수(별도 맥락)", review)

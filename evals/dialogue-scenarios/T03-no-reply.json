@@ -1,0 +1,20 @@
+{
+  "id": "T03",
+  "title": "T03 no-reply",
+  "skill": "gx-design",
+  "request": "목표가 정해지지 않은 신규 서비스 랜딩을 만들어줘.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "필수 질문 뒤 무응답은 대기다.",
+    "무응답 동안 관련 제작·원본 수정·제작 위임이 없다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

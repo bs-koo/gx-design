@@ -1,0 +1,32 @@
+{
+  "id": "T01",
+  "title": "T01 unresolved-intent",
+  "skill": "gx-design",
+  "request": "새 서비스를 소개하는 랜딩을 만들어줘.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "목표·타깃 중 결과를 바꾸는 미확정 필수 의도를 질문한다.",
+    "해당 답변 전 관련 제작·원본 수정·제작 위임을 시작하지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": [
+      {
+        "decision": {
+          "id": "intent",
+          "type": "required_intent",
+          "scope_version": "v1"
+        },
+        "response": {
+          "status": "empty",
+          "value": null
+        }
+      }
+    ]
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ]
+}

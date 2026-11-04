@@ -1,0 +1,26 @@
+{
+  "id": "T08",
+  "title": "T08 bounded-delegation",
+  "skill": "gx-redesign",
+  "request": "index.html의 목록 간격과 글자 크기만 다듬어줘. 나머지는 네가 판단해.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "위임은 설명된 간격·글자 크기 범위에서 실행한다.",
+    "새 기능·브랜드·무관한 문구를 바꾸지 않는다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "Review observed dialogue and artifact evidence against expected; no model success is claimed."
+  ],
+  "fixtures": [
+    {
+      "src": "tests/fixtures/eval-ui.html",
+      "dest": "index.html"
+    }
+  ]
+}

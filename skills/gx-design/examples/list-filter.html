@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>목록·필터 대조 예제</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#17212b;font:16px/1.55 system-ui,sans-serif}main{max-width:980px;margin:32px auto;padding:24px;background:white}h1{font-size:26px;margin:0 0 8px}p{max-width:70ch}button,select{font:inherit;padding:9px 12px;min-height:44px}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #1260a5;outline-offset:3px}.tools{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0}.table-wrap{overflow:auto}table{width:100%;min-width:640px;border-collapse:collapse}th,td{white-space:nowrap;text-align:left;padding:13px 12px;border-bottom:1px solid #d2dae2}th{background:#edf1f5}td:first-child{min-width:200px}td:last-child{min-width:110px}.late{font-weight:700;color:#9c281c}body[data-view=before] .late{font-weight:400;color:inherit}body[data-view=before] #summary{visibility:hidden}[hidden]{display:none!important}@media(max-width:520px){main{margin:0;padding:16px}h1{font-size:23px}}
+</style>
+<main id="worklist"><h1>처리 대기 요청</h1><p>주 과업: 기한을 넘긴 요청을 찾아 담당자와 상태를 확인합니다. 비교 중 데이터·필터·폭은 유지하세요.</p>
+<div class="tools"><button id="view" type="button" aria-pressed="false">수정 전 보기</button><button id="stress" type="button" aria-pressed="false">긴 데이터 보기</button><label>상태 <select id="status"><option value="all">전체</option><option value="late">기한 초과</option><option value="normal">처리 중</option></select></label></div>
+<p id="summary" role="status" aria-live="polite"></p><div class="table-wrap" tabindex="0" role="region" aria-label="요청 목록"><table><thead><tr><th scope="col">요청</th><th scope="col">담당자</th><th scope="col">기한</th><th scope="col">상태</th></tr></thead><tbody id="rows"></tbody></table></div><p id="empty" hidden>조건에 맞는 요청이 없습니다. 상태를 전체로 바꾸면 다시 볼 수 있습니다.</p>
+<p>이 예제의 색과 표 모양은 정답이 아닙니다. 상태 강조·요약의 효과와 긴 데이터·작은 폭을 비교하는 자체 fixture입니다.</p></main>
+<script>
+const requests=[{name:'외부 계정 갱신',owner:'김하린',due:'11월 2일',late:true},{name:'교육 자료 검토',owner:'박민재',due:'11월 6일',late:false},{name:'시설 접근 승인',owner:'윤서진',due:'11월 3일',late:true}];
+let stressed=false;
+function render(){const filter=document.querySelector('#status').value;const chosen=requests.filter(r=>filter==='all'||(filter==='late')===r.late);const rows=document.querySelector('#rows');rows.replaceChildren();for(const r of chosen){const tr=document.createElement('tr');for(const [i,value] of [r.name+(stressed?' — 여러 부서가 공동으로 확인해야 하는 장기 운영 요청':''),r.owner+(stressed?' / 서비스운영지원팀':''),r.due,r.late?'기한 초과':'처리 중'].entries()){const td=document.createElement('td');td.textContent=value;if(i===3&&r.late)td.className='late';tr.append(td)}rows.append(tr)}document.querySelector('#summary').textContent=`표시 ${chosen.length}건 · 기한 초과 ${chosen.filter(r=>r.late).length}건`;document.querySelector('#empty').hidden=chosen.length!==0}
+document.querySelector('#status').addEventListener('change',render);
+document.querySelector('#stress').addEventListener('click',e=>{stressed=!stressed;e.currentTarget.setAttribute('aria-pressed',String(stressed));render()});
+document.querySelector('#view').addEventListener('click',e=>{const before=document.body.dataset.view!=='before';document.body.dataset.view=before?'before':'after';e.currentTarget.setAttribute('aria-pressed',String(before));e.currentTarget.textContent=before?'수정 후 보기':'수정 전 보기'});render();
+</script></html>

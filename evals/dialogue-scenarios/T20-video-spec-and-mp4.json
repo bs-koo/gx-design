@@ -1,0 +1,22 @@
+{
+  "id": "T20",
+  "title": "T20 video-spec-and-mp4",
+  "skill": "gx-design",
+  "request": "수선점 실의 6초 소개 영상 명세와 실제 MP4를 함께 납품해줘. 화면은 수선 전후 비교, 음성 없이 자막, 세로형이야.",
+  "mode": "core",
+  "max_turns": 6,
+  "expected": [
+    "명세와 실제 MP4 납품 기준·상태를 별도로 판정한다.",
+    "MP4는 실제 출력·구간·자막·요청 오디오 조건의 증거가 필요하다."
+  ],
+  "dialogue": {
+    "version": 1,
+    "checkpoints": []
+  },
+  "validation_status": "unexecuted-model-acceptance",
+  "review_cases": [
+    "specification only",
+    "MP4 only",
+    "both requested"
+  ]
+}

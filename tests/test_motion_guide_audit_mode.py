@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_VERSION = "0.13.0"
+TARGET_VERSION = "0.14.0"
 NAMED_CLAUDE_AGENTS = ("design-researcher", "design-strategist", "creative-producer")
 
 
@@ -41,7 +41,7 @@ ANCHORS = {
     "skills/gx-design/VISUAL-QUALITY.md": ("polish", "핵심 여정", "컨택트 시트", "@playwright/mcp@latest"),
     "skills/gx-design/BRIEF-INTERVIEW.md": ("요청 해석 카드", "피할 것", "핵심 여정"),
     "skills/gx-design/DESIGN-IT-TWICE.md": ("다이얼", "모션 범위"),
-    "skills/gx-redesign/SKILL.md": ("점검 전용", "이어가기 게이트", "MOTION.md"),
+    "skills/gx-redesign/SKILL.md": ("점검 전용", "보고로 완료", "MOTION.md"),
     "skills/gx-design/DESIGN-TONE-ANCHOR.md": ("awesome-design-md",),
     "skills/creative-production/SKILL.md": ("MOTION.md", "fps"),
     "skills/creative-review/SKILL.md": ("MOTION.md",),
@@ -82,14 +82,14 @@ class MotionDeliveryTests(unittest.TestCase):
 
     def test_flow_contracts_for_join_points_questions_and_codex_entry(self) -> None:
         redesign = read_doc("skills/gx-redesign/SKILL.md")
-        self.assertIn("선택지 | 합류 단계 | 재사용 산출물 | 새로 필요한 산출물·게이트", redesign)
-        self.assertIn("여기서 종료", redesign)
+        self.assertIn("보고로 완료", redesign)
+        self.assertNotIn("진단 보고와 이어가기 게이트는 같은 메시지", redesign)
         self.assertIn("고치지 말고", redesign)
 
         brief = read_doc("skills/gx-design/BRIEF-INTERVIEW.md")
         self.assertRegex(brief, r"핵심 여정.{0,200}\[가정\]")
         self.assertIn("피할 것", brief)
-        self.assertIn("톤 기준 첨부", brief)
+        self.assertIn("톤 자료", brief)
 
         self.assertIn("마케팅 페이지의 스크롤 연출", read_doc("skills/gx-design/MOTION.md"))
         self.assertIn("마케팅 페이지의 스크롤 연출", read_doc("skills/gx-design/VISUAL-CRAFT.md"))
@@ -101,7 +101,7 @@ class MotionDeliveryTests(unittest.TestCase):
 
 
 class ReadFailureAndSlotContractTests(unittest.TestCase):
-    SLOT_TABLE_HEADER = "| 흐름 | 라운드 | 첫 라운드 슬롯 우선순위 |"
+    SLOT_TABLE_HEADER = "| 흐름 | 질문할 때 | 우선순위 |"
 
     def test_host_compat_defines_read_failure_and_slot_table(self) -> None:
         host = read_doc("skills/gx-design/HOST-COMPAT.md")
@@ -122,7 +122,7 @@ class ReadFailureAndSlotContractTests(unittest.TestCase):
     def test_redesign_polish_contract(self) -> None:
         redesign = read_doc("skills/gx-redesign/SKILL.md")
         self.assertNotIn("2·3을 고른 뒤", redesign)
-        for term in ("polish 경로 계약", "지적 항목 외 전부", "생략 보고", "진단 ID"):
+        for term in ("polish 경로 계약", "지적 항목 외 전부", "재질문하지 않는다", "진단 ID"):
             with self.subTest(term=term):
                 self.assertIn(term, redesign)
 
@@ -140,7 +140,8 @@ class ReadFailureAndSlotContractTests(unittest.TestCase):
     def test_readme_scope_rule_matches_redesign(self) -> None:
         readme = read_doc("README.md")
         self.assertNotIn("점검·테스트만 원하면", readme)
-        self.assertIn("진행 모드와 함께 범위", readme)
+        self.assertIn("점검 전용", readme)
+        self.assertIn("이미 받은 브리프", readme)
 
 
 class ActiveSkillHostCompatTests(unittest.TestCase):
