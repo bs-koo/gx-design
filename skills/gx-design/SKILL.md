@@ -19,6 +19,8 @@ argument-hint: "[프로젝트 한 줄 설명]"
 - 브리프 인터뷰는 미확정 핵심 의도가 있을 때만 BRIEF-INTERVIEW.md를 읽는다. 목표·범위·결과물·보존 조건이 이미 정해졌으면 요청 근거를 기존 기록에 남기고 필요한 제작으로 간다.
 - 전략은 방향이 열려 있을 때만 DESIGN-IT-TWICE.md와 design-strategy를 읽는다. 확정 방향의 제작에는 기존 결정을 재사용한다.
 - 제작 시 creative-production과 해당 매체·영역에 실제 적용되는 참조 절, 검수 시 REVIEW-AXES와 해당 축의 필수 기준을 읽는다. MOTION·PROMPT-PLAYBOOK·REFERENCE-DRIVEN 등 다른 매체 규칙을 미리 일괄 로드하지 않는다.
+- 기존 제품에 새 UI를 제작할 때는 [UI-QUALITY.md](UI-QUALITY.md#기존-제품의-컴포넌트와-토큰)에 따라 편집 전에 해당 과업의 공용 컴포넌트와 토큰을 확인한다. 확정된 방향으로 바로 제작하는 경우에도 적용한다.
+- UX/UI의 흐름·상태·구조를 정할 때 기존 화면·컴포넌트·내부 예제를 먼저 확인한다. 맞는 선례가 없어 판단이 어렵거나 사용자가 외부 참고 사례를 요청하면 안을 내기 전에 [공개 템플릿과 패턴](DESIGN-INTELLIGENCE.md#0-공개-템플릿과-패턴)을 살핀다. 바로 제작하는 경우에는 이 조건에 해당하는 구현 판단에만 적용한다.
 - 문서만 요청했으면 문서 수용 기준으로 완료하고, 별도 실물 경로가 필요할 때만 PRODUCTION-HANDOFF를 읽는다. 실제 UI·이미지·영상 결과물은 최종 버전 관찰·관련 상태 검증을 유지한다.
 
 ## 모드 결정
@@ -77,7 +79,7 @@ UI·웹 화면과 정보 전달 중심 그래픽은 [DESIGN-JUDGMENT.md](DESIGN-
 모션이 있는 산출물(UI 인터랙션·영상·모션 그래픽·Veo 프롬프트의 모션 서술)은 [MOTION.md](MOTION.md) 경로와 선택 기록의 다이얼·모션 범위를 함께 배달한다 — UI는 §A, 영상·모션 그래픽은 §B를 적용하고 §A 규칙을 영상에 쓰지 않는다. 위임할 수 없으면 주 에이전트가 해당 절을 읽는다.
 UX/UI 제작에는 [UI-QUALITY.md](UI-QUALITY.md) 경로를 전달해 문구·예외 상태·수용 체크를 적용한다. UX·차트·기술 스택 지침 검색이 필요하면 [DESIGN-INTELLIGENCE.md](DESIGN-INTELLIGENCE.md)도 전달한다. 위임할 수 없으면 주 에이전트가 해당 참조를 읽는다.
 레퍼런스 이미지·영상을 아트디렉션 입력으로 쓰는 제작(스타일 트랜스퍼·1레퍼런스→N브랜드)이면 위임 프롬프트에 REFERENCE-DRIVEN.md 경로도 포함한다(근접도 다이얼·visual DNA·저작권 가드레일 — 타인 자산 재현 금지).
-디자인 톤 기준이 있으면 원본 경로·명시된 강도·승인된 이탈을 전달한다. hard의 hex·폰트·spacing·radius는 그대로 적용하고 soft 이탈은 근거를 기록한다([DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4 — 즉흥 팔레트 금지). Gemini 경로가 병행되면 적용 팔레트를 PROMPT-PLAYBOOK 공통 스타일 블록에 주입한다.
+디자인 톤 기준이 있으면 원본 경로·명시된 강도·승인된 이탈을 전달하고 [DESIGN-TONE-ANCHOR.md](DESIGN-TONE-ANCHOR.md) §4에 따라 적용한다. Gemini 경로가 병행되면 적용 팔레트를 PROMPT-PLAYBOOK 공통 스타일 블록에 주입한다.
 제품 소개 화면·커서 데모·촬영 장면이 요청된 영역은 [PRODUCT-SCENES.md](PRODUCT-SCENES.md)를 읽고 실제 동작 UI와 연출을 구분한다. 화면 구조·반복 후보의 관찰 증거가 필요할 때만 [references/OBSERVATION.md](references/OBSERVATION.md)의 선택 도구를 사용한다. BX·그래픽·영상·Gemini·.pen·문서 경로를 UI 하나로 대체하지 않는다.
 
 규칙 문서를 전달할 때는 경로와 함께 각 문서의 읽기 지도에서 고른 **읽을 절**을 적는다(예: MOTION — UI는 §0·§A·§C, 영상은 §0·§B·§C). 위임할 수 없으면 주 에이전트가 같은 절을 읽는다.
